@@ -7,6 +7,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Flask
+instance
+
+
 # swap files
 *.swp
 
