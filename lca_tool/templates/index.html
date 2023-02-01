@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<article id="home" class="panel">
+    <div class="main" style="width: 70%">
+	{% if g.user %}
+	<h1>Welcome {{ g.user['username'] }}</h1>
+	{% endif %}
+        <h1>This will be the home page eventually.</h1>
+        <p>Will add information about the concept, work, and contributors later.<\p>
+
+    </div>
+</article>
+{% endblock %}

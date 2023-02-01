@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<article id="login" class="panel">
+    <div class="main" style="width: 70%">
+        <h1>Account Login</h1>
+        <form method="post">
+            <label for="username">Username:</label><br>
+	    <input type="text" id="username" name="username" required><br><br>
+            <label for="password">Password:</label><br>
+	    <input type="password" id="password" name="password" required><br><br>
+            <input type="submit" value="Login">
+
+            <button type="button" onclick="window.location.href='{{ url_for('auth.register') }}';">Create New Account</button>
+
+        </form>
+    </div>
+</article>
+{% endblock %}
