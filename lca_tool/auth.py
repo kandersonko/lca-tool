@@ -31,6 +31,11 @@ def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        email = request.form["email"]
+        confirm_password = request.form["confirm_password"]
+        first_name = request.form["first_name"]
+        last_name = request.form["last_name"]
+        affiliation = request.form["affiliation"]
         db = get_db()
         error = None
 
@@ -38,18 +43,30 @@ def register():
             error = "Username is required."
         elif not password:
             error = "Password is required."
+        elif not confirm_password:
+            error = "Password confirmation is required."
+        elif confirm_password != password:
+            error = "The two passwords do not match."
+        elif not email:
+            error = "The email is required."
+        elif not first_name:
+            error = "The fist name is required."
+        elif not last_name:
+            error = "The Last name is required."
+        elif not affiliation:
+            error = "The Affiliation is required."
 
         if error is None:
             try:
                 db.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
-                    (username, generate_password_hash(password)),
+                    "INSERT INTO user (username, password, email, first_name, last_name, affiliation) VALUES (?, ?, ?, ?, ?, ?)",
+                    (username, generate_password_hash(password), email, first_name, last_name, affiliation),
                 )
                 db.commit()
             except db.IntegrityError:
                 # The username was already taken, which caused the
                 # commit to fail. Show a validation error.
-                error = f"User {username} is already registered."
+                error = f"User {username} and/or email {email} is already registered."
             else:
                 # Success, go to the login page.
                 return redirect(url_for("auth.login"))

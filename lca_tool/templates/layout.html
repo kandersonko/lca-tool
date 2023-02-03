@@ -1,50 +1,49 @@
 <!DOCTYPE html>
 <html lang="en-US">
-<head>
+  <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='lca.css') }}">
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IDEAL Research Group @ Uni. of Idaho</title>
-    <!-- TODO: Fix the CSS -->
-</head>
+  </head>
 
 
-<body>
+  <body>
     <div class="main">
-        <div class="header">
-            <div>
-                <div style="height: 35px; background-color: #FFC300  ; border-bottom: #000000; margin-bottom: 10px;">
-                </div>
-                <h2 class="text">
-                    <a href="https://www.uidaho.edu/idaho-falls">
-			    <img src="{{ url_for('static', filename='UI.jpg') }}" class="panel" style="width: 271px; height: 90px; float: left;" />
-                    </a>
-                </h2>
-                <h2 class="panel" align="center">
-                    Innovative Design and Manufacturing Laboratory
-                    <a href="https://www.uidaho.edu/idaho-falls">
-			    <img src="{{ url_for('static', filename='ideal.jpg') }} " class="panel" style="width: 271px; height: 90px; float:right;" />
-                    </a>
-                </h2>
-                <h2 class="panel" align="center">PI: Dr. Amin Mirkouei</h2>
-            </div>
-            <div style="height: 17px; background-color: #808080; border-bottom: #b39700; margin-bottom: 30px;">
-            </div>
-            <!-- end .header -->
+      <div class="header">
+        <div>
+          <div style="height: 35px; background-color: #FFC300  ; border-bottom: #000000; margin-bottom: 10px;">
+          </div>
+          <h2 class="text">
+            <a href="https://www.uidaho.edu/idaho-falls">
+              <img src="{{ url_for('static', filename='UI.jpg') }}" class="panel" style="width: 271px; height: 90px; float: left;" />
+            </a>
+          </h2>
+          <h2 class="panel" align="center">
+            Innovative Design and Manufacturing Laboratory
+            <a href="https://www.uidaho.edu/idaho-falls">
+              <img src="{{ url_for('static', filename='ideal.jpg') }} " class="panel" style="width: 271px; height: 90px; float:right;" />
+            </a>
+          </h2>
+          <h2 class="panel" align="center">PI: Dr. Amin Mirkouei</h2>
         </div>
+        <div style="height: 17px; background-color: #808080; border-bottom: #b39700; margin-bottom: 30px;">
+        </div>
+        <!-- end .header -->
+      </div>
 
-        <div class="sidenav">
-            <p><a href="{{ url_for('index') }}">Home</a></p>
-	    {% if g.user %}
-	    <a href="{{ url_for('auth.logout') }}">Log Out</a>
-  9         {% else %}
-	    <a href="{{ url_for('auth.register') }}">Register</a>
-	    <a href="{{ url_for('auth.login') }}">Log In</a>
-	    {% endif %}
-        </div>
-        {% block content %}
-        {% endblock %}
-        <p>&nbsp;</p>
-</body>
+      <div class="sidenav">
+        <p><a href="{{ url_for('index') }}">Home</a></p>
+        {% if g.user %}
+        <a href="{{ url_for('auth.logout') }}">Log Out</a>
+        {% else %}
+        <a href="{{ url_for('auth.register') }}">Register</a>
+        <a href="{{ url_for('auth.login') }}">Log In</a>
+        {% endif %}
+      </div>
+      {% block content %}
+      {% endblock %}
+      <p>&nbsp;</p>
+  </body>
 </html>
