@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS users (
     affiliation VARCHAR(255) NOT NULL,
     status ENUM ('inactive', 'active', 'disabled') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_loggin_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    last_login_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )

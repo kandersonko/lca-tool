@@ -112,6 +112,8 @@ class DBManager:
                 user = self._unpack_user(result)
                 logging.debug(f"get_user_by_id result: {result}")
                 logging.debug(f"=== FOUND user: {user} ===")
+                if user:
+                    user = self.update_user_last_login(user["id"])
 
         return user
 
@@ -125,6 +127,23 @@ class DBManager:
                 result = cursor.fetchone()
                 logging.debug(f"=== get_user_by_id result: {result}")
                 user = self._unpack_user(result)
+        return user
+
+    def update_user_last_login(self, user_id):
+        user = None
+        logging.debug(f"=== Updating last_login_on for user with id : {user_id} ===")
+        connection = db_connection()
+        if connection:
+            with connection.cursor(buffered=True) as cursor:
+                cursor.execute(
+                    """
+                    UPDATE users SET last_login_on=NOW()
+                    WHERE id=%s
+                    """,
+                    (user_id,),
+                )
+                connection.commit()
+                user = self.get_user_by_id(user_id)
         return user
 
 
