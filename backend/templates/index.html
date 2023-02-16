@@ -6,13 +6,20 @@
 
       <h1>Welcome {{ g.user['last_name'] }}</h1>
 
-      <h5>Email: {{g.user['email']}}</h5>
+      <p>Email: {{g.user['email']}}</p>
 
-      <h5>First name: {{g.user['first_name']}}</h5>
+      <p>First name: {{g.user['first_name']}}</p>
 
-      <h5>Last name: {{g.user['last_name']}}</h5>
+      <p>Last name: {{g.user['last_name']}}</p>
 
-      <h5>Affiliation: {{g.user['affiliation']}}</h5>
+      <p>Affiliation: {{g.user['affiliation']}}</p>
+
+      <p>Status (Activation via email): {{g.user['status']}}</p>
+
+      <p>Account Creation Timestamp: {{g.user['created_at']}}</p>
+
+      <p>Last Login: {{g.user['last_login_on']}}</p>
+
       {% endif %}
 
       <h1>This will be the home page eventually.</h1>

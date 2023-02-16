@@ -52,7 +52,17 @@ class DBManager:
     def _unpack_user(self, query_result):
         if query_result is None:
             return None
-        (user_id, first_name, last_name, email, password, affiliation) = query_result
+        (
+            user_id,
+            first_name,
+            last_name,
+            email,
+            password,
+            affiliation,
+            status,
+            created_at,
+            last_login_on,
+        ) = query_result
         user = {
             "id": user_id,
             "first_name": first_name,
@@ -60,6 +70,9 @@ class DBManager:
             "email": email,
             "password": password,
             "affiliation": affiliation,
+            "status": status,
+            "created_at": created_at,
+            "last_login_on": last_login_on,
         }
         return user
 
