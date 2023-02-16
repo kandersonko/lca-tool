@@ -61,7 +61,8 @@ class DBManager:
             affiliation,
             status,
             created_at,
-            last_login_on,
+            last_updated,
+            last_login,
         ) = query_result
         user = {
             "id": user_id,
@@ -72,7 +73,8 @@ class DBManager:
             "affiliation": affiliation,
             "status": status,
             "created_at": created_at,
-            "last_login_on": last_login_on,
+            "last_updated": last_updated,
+            "last_login": last_login,
         }
         return user
 
@@ -137,7 +139,7 @@ class DBManager:
             with connection.cursor(buffered=True) as cursor:
                 cursor.execute(
                     """
-                    UPDATE users SET last_login_on=NOW()
+                    UPDATE users SET last_login=NOW()
                     WHERE id=%s
                     """,
                     (user_id,),
