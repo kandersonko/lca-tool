@@ -1,21 +1,34 @@
 from flask import Flask
-# from flask.logging import default_handler
-# import logging
+from logging.config import dictConfig
+import logging
 
 from backend import auth, home
 
-
-app = Flask(__name__) 
-app.config.from_mapping(
-    SECRET_KEY="dev-secret-3aerq23raea3083qa"
+dictConfig(
+    {
+        "version": 1,
+        "formatters": {
+            "default": {
+                "format": "[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
+            }
+        },
+        "handlers": {
+            "wsgi": {"class": "logging.StreamHandler", "formatter": "default"}
+        },
+        "root": {"level": "DEBUG", "handlers": ["wsgi"]},
+    }
 )
+
+
+app = Flask(__name__, static_folder="static")
+app.config.from_mapping(SECRET_KEY="dev-secret-3aerq23raea3083qa")
 app.register_blueprint(auth.bp)
 app.register_blueprint(home.bp)
 
 app.add_url_rule("/", endpoint="index")
 
-# app.logger.addHandler(default_handler)
-# app.logger.addHandler(logging.getLogger())
+# app.logger.addHandler(logging.StreamHandler())
+# app.logger.setLevel(logging.DEBUG)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()

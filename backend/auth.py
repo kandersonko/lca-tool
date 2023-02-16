@@ -4,7 +4,7 @@ from flask import request, render_template, g, redirect, url_for, flash
 from flask import session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-# import logging
+import logging
 
 from backend.db import manager
 from mysql.connector import Error
@@ -23,9 +23,9 @@ def load_logged_in_user():
     else:
         try:
             g.user = manager.get_user_by_id(user_id)
-            print(f"=== User: {g.user} ")
+            logging.debug(f"=== User: {g.user} ")
         except Error as e:
-            print(f"=== load_logged_in_user error: {e} ===")
+            logging.debug(f"=== load_logged_in_user error: {e} ===")
 
 
 @bp.route("/register", methods=("GET", "POST"))
@@ -34,7 +34,7 @@ def register():
     Validates that the email is not already taken. Hashes the
     password for security.
     """
-    print(f"request: {request}")
+    logging.debug(f"=== Register request: {request}")
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
@@ -42,31 +42,23 @@ def register():
         first_name = request.form["first_name"]
         last_name = request.form["last_name"]
         affiliation = request.form["affiliation"]
-        print(f"Register: {email} | {password}")
+        logging.debug(f"Register: {email} | {password}")
         error = None
         if confirm_password != password:
             error = "The password should matched."
 
         if error is None:
             password_hash = generate_password_hash(password)
-            try:
-                manager.create_user(
-                    first_name=first_name,
-                    last_name=last_name,
-                    email=email,
-                    password_hash=password_hash,
-                    affiliation=affiliation,
-                )
-                g.user = manager.get_user_by_email(email)
-                if g.user:
-                    session["user_id"] = g.user["id"]
+            g.user = manager.create_user(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                password_hash=password_hash,
+                affiliation=affiliation,
+            )
+            if g.user is not None and g.user.get("id"):
+                session["user_id"] = g.user["id"]
                 return redirect(url_for("index"))
-
-            except Error as e:
-                # The email was already taken, which caused the
-                # commit to fail. Show a validation error.
-                print(f"Failed to register user: {e} ===")
-                error = f"User with email {email} is already registered."
         else:
             flash(error)
 
@@ -76,28 +68,30 @@ def register():
 @bp.route("/login", methods=("GET", "POST"))
 def login():
     """Log in a registered user by adding the user id to the session."""
-    print("Login request: ", request)
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
         error = None
         user = None
-        print(f"=== Login: {email} | {password} | {user}")
         try:
             user = manager.get_user_by_email(email)
-            if user is None:
-                error = "The user does not have an account."
-            print(f"Login user found: {user}")
+            logging.debug(f"=== Login: ", email, password, user)
 
         except Error as e:
-            print(f"=== Error login: {e} ===")
+            logging.debug(f"=== Error login: {e} ===")
 
-        if check_password_hash(user["password"], password) == False:
+        if user is None:
+            error = "The user does not have an account."
+            logging.debug(f"Login user found: {user}")
+        elif check_password_hash(user["password"], password) == False:
             error = "Incorrect email or password."
         else:
             session.clear()
             session["user_id"] = user["id"]
             return redirect(url_for("index"))
+
+        if error is not None:
+            flash(error)
 
     return render_template("auth/login.html")
 
