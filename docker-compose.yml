@@ -14,6 +14,8 @@ services:
     volumes:
       - db-data:/var/lib/mysql
       - "./db/schema.sql:/docker-entrypoint-initdb.d/1.sql"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     networks:
       - backnet
     environment:
@@ -32,6 +34,8 @@ services:
       target: builder
     volumes:
       - ./backend:/backend
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     restart: always
     secrets:
       - db-password
