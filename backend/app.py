@@ -2,7 +2,7 @@ from flask import Flask
 from logging.config import dictConfig
 import logging
 
-from backend import auth, home
+from backend import auth, home, config
 
 dictConfig(
     {
@@ -21,7 +21,7 @@ dictConfig(
 
 
 app = Flask(__name__, static_folder="static")
-app.config.from_mapping(SECRET_KEY="dev-secret-3aerq23raea3083qa")
+app.config.from_mapping(**config.config)
 app.register_blueprint(auth.bp)
 app.register_blueprint(home.bp)
 

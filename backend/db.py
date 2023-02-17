@@ -198,6 +198,23 @@ class DBManager:
                     logging.debug(f"=== Error creating plan: {e}")
                     connection.rollback()
 
+    def activate_user(self, email):
+        logging.debug(f"=== Activating user with email : {email} ===")
+        user = None
+        connection = db_connection()
+        if connection:
+            with connection.cursor(buffered=True) as cursor:
+                cursor.execute(
+                    """
+                    UPDATE users SET status='active'
+                    WHERE email=%s
+                    """,
+                    (email,),
+                )
+                connection.commit()
+                user = self.get_user_by_email(email)
+        return user
+
 
 manager = DBManager()
 # manager.create_users_table()

@@ -4,12 +4,30 @@ from flask import request, render_template, g, redirect, url_for, flash
 from flask import session
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from itsdangerous import URLSafeTimedSerializer
 import logging
 
 from backend.db import manager
+from backend.config import config
 from mysql.connector import Error
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+
+def generate_token(email):
+    serializer = URLSafeTimedSerializer(config["SECRET_KEY"])
+    return serializer.dumps(email, salt=config["SECURITY_PASSWORD_SALT"])
+
+
+def confirm_token(token, expiration=3600):
+    serializer = URLSafeTimedSerializer(config["SECRET_KEY"])
+    try:
+        email = serializer.loads(
+            token, salt=config["SECURITY_PASSWORD_SALT"], max_age=expiration
+        )
+        return email
+    except Exception:
+        return False
 
 
 @bp.before_app_request
@@ -60,7 +78,9 @@ def register():
                 session["user_id"] = g.user["id"]
                 logging.debug("=== Create plan after registration")
                 manager.create_user_plan(g.user["id"], tier="free")
-                return redirect(url_for("index"))
+                token = generate_token(g.user["email"])
+                confirm_url = url_for("auth.activate", token=token, _external=True)
+                return render_template("auth/activate.html", confirm_url=confirm_url)
         else:
             flash(error)
 
@@ -90,12 +110,43 @@ def login():
         else:
             session.clear()
             session["user_id"] = user["id"]
-            return redirect(url_for("index"))
+            g.user = user
+            if user.get("status") != "active":
+                token = generate_token(user["email"])
+                confirm_url = url_for("auth.activate", token=token, _external=True)
+                return render_template("auth/activate.html", confirm_url=confirm_url)
+            else:
+                return redirect(url_for("index"))
 
         if error is not None:
             flash(error)
 
     return render_template("auth/login.html")
+
+
+@bp.route("/activate/<token>")
+def activate(token):
+    if g.user is None:
+        return redirect(url_for("auth.login"))
+    else:
+        user_email = g.user.get("email")
+        status = g.user.get("status")
+        email_from_token = confirm_token(token)
+        if status == "active":
+            flash("Account already active")
+            return redirect(url_for("index"))
+        elif user_email == email_from_token:
+            try:
+                manager.activate_user(user_email)
+                return redirect(url_for("index"))
+            except Error as e:
+                logging.debug(f"=== Error account activation: {e}")
+                flash("Error during account activation try again")
+
+        else:
+            flash("Invalid or expired activation token")
+
+    return render_template("auth/activate.html")
 
 
 @bp.route("/logout")
