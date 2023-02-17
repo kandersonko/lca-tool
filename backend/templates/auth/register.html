@@ -1,22 +1,34 @@
 {% extends "layout.html" %} {% block content %}
-<article id="register" class="panel">
+<div id="register" class="panel">
   <div class="main" style="width: 70%">
+    <script src="{{url_for('static', filename='js/register_events.js')}}"></script>
+
     <h1>Create Your Account</h1>
-    <form method="post">
-      <label for="first_name">First name:</label> <br>
-      <input type="text" id="first_name" name="first_name" required><br><br>
-      <label for="last_name">Last name:</label><br>
-      <input type="text" id="last_name" name="last_name" required><br><br>
-      <label for="affiliation">Affiliation: </label><br>
-      <input type="text" id="affiliation" name="affiliation" required><br><br>
-      <label for="email">Email Address:</label><br>
-      <input type="text" id="email" name="email" required><br><br> 
-      <label for="password">Password:</label><br>
-      <input type="password" id="password" name="password" required><br><br>
-      <label for="confirm_password">Confirm Password:</label><br>
-      <input type="password" id="confirm_password" name="confirm_password" required><br><br>
-      <input type="submit" value="Create Account">
+    {% if isError %}
+    <h2 style="color: red">{{ error[0] }}</h2>
+    {% endif %}
+
+    <form method="post" onsubmit="return validateForm();">
+      <label for="first_name">First name:</label> <br />
+      <input type="text" id="first_name" name="first_name" />
+      <span style="color: red" id="firstnameErrorMSG"></span><br /><br />
+      <label for="last_name">Last name:</label><br />
+      <input type="text" id="last_name" name="last_name" />
+      <span style="color: red" id="lastnameErrorMSG"></span><br /><br />
+      <label for="affiliation">Affiliation: </label><br />
+      <input type="text" id="affiliation" name="affiliation" />
+      <span style="color: red" id="affiliationErrorMSG"></span><br /><br />
+      <label for="email">Email Address:</label><br />
+      <input type="text" id="email" name="email" />
+      <span style="color: red" id="emailErrorMSG"></span><br /><br />
+      <label for="password">Password:</label><br />
+      <input type="password" id="password" name="password" />
+      <span style="color: red" id="passwordErrorMSG"></span><br /><br />
+      <label for="confirm_password">Confirm Password:</label><br />
+      <input type="password" id="confirm_password" name="confirm_password" />
+      <span style="color: red" id="confirmpasswordErrorMSG"></span><br /><br />
+      <input type="submit" value="Create Account" />
     </form>
   </div>
-</article>
+</div>
 {% endblock %}

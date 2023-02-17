@@ -1,19 +1,29 @@
-{% extends "layout.html" %}
-
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 <article id="login" class="panel">
-    <div class="main" style="width: 70%">
-        <h1>Account Login</h1>
-        <form method="post">
-            <label for="email">Email:</label><br>
-	    <input type="text" id="email" name="email" required><br><br>
-            <label for="password">Password:</label><br>
-	    <input type="password" id="password" name="password" required><br><br>
-            <input type="submit" value="Login">
+  <div class="main" style="width: 70%">
+    <script src="{{ url_for('static', filename='js/login_events.js')}}"></script>
 
-            <button type="button" onclick="window.location.href='{{ url_for('auth.register') }}';">Create New Account</button>
+    <h1>Account Login</h1>
+    {% if isError %}
+    <h2 style="color: red">{{ error[0] }}</h2>
+    {% endif %}
 
-        </form>
-    </div>
+    <form method="post" onsubmit="return validateForm();">
+      <label for="email">Email:</label><br />
+      <input type="text" id="email" name="email" />
+      <span style="color: red" id="emailErrorMSG"></span><br /><br />
+      <label for="password">Password:</label><br />
+      <input type="password" id="password" name="password" />
+      <span style="color: red" id="passwordErrorMSG"></span><br /><br />
+      <input type="submit" value="Login" />
+
+      <button
+        type="button"
+        onclick="window.location.href='{{ url_for('auth.register') }}';"
+      >
+        Create New Account
+      </button>
+    </form>
+  </div>
 </article>
 {% endblock %}

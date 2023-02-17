@@ -1,6 +1,6 @@
 import os
-from flask import Blueprint
-from flask import request, render_template, g, redirect, url_for, flash
+from flask import Blueprint, flash
+from flask import request, render_template, g, redirect, url_for
 from flask import session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -52,6 +52,7 @@ def register():
     Validates that the email is not already taken. Hashes the
     password for security.
     """
+    error = None
     logging.debug(f"=== Register request: {request}")
     if request.method == "POST":
         email = request.form["email"]
@@ -61,9 +62,9 @@ def register():
         last_name = request.form["last_name"]
         affiliation = request.form["affiliation"]
         logging.debug(f"Register: {email} | {password}")
-        error = None
         if confirm_password != password:
             error = "The password should matched."
+            return render_template("auth/register.html", error=[error], isError=True)
 
         if error is None:
             password_hash = generate_password_hash(password)
@@ -82,18 +83,18 @@ def register():
                 confirm_url = url_for("auth.activate", token=token, _external=True)
                 return render_template("auth/activate.html", confirm_url=confirm_url)
         else:
-            flash(error)
+            return render_template("auth/register.html", error=[error], isError=True)
 
-    return render_template("auth/register.html")
+    return render_template("auth/register.html", error=[error], isError=False)
 
 
 @bp.route("/login", methods=("GET", "POST"))
 def login():
     """Log in a registered user by adding the user id to the session."""
+    error = None
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
-        error = None
         user = None
         try:
             user = manager.get_user_by_email(email)
@@ -101,12 +102,15 @@ def login():
 
         except Error as e:
             logging.debug(f"=== Error login: {e} ===")
+            return render_template("auth/login.html", error=[error], isError=True)
 
         if user is None:
             error = "The user does not have an account."
             logging.debug(f"Login user found: {user}")
+            return render_template("auth/login.html", error=[error], isError=True)
         elif check_password_hash(user["password"], password) == False:
             error = "Incorrect email or password."
+            return render_template("auth/login.html", error=[error], isError=True)
         else:
             session.clear()
             session["user_id"] = user["id"]
@@ -118,10 +122,7 @@ def login():
             else:
                 return redirect(url_for("index"))
 
-        if error is not None:
-            flash(error)
-
-    return render_template("auth/login.html")
+    return render_template("auth/login.html", error=[error], isError=False)
 
 
 @bp.route("/activate/<token>")
