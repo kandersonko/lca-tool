@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div id="activation" class="panel">
+    <div class="main" style="width: 70%">
+        <h1>Account Activation</h1>
+        {% if g.user.get('status') == 'active' %}
+        <p>Account already activated</p>
+        {% else %}
+        <p>Click on the link below to activate your account</p>
+        <p><a href="{{ confirm_url }}">{{ confirm_url }}</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
