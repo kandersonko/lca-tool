@@ -1,4 +1,17 @@
 --
+-- Plans table
+-- maybe change the tiers to `free`, `premium`, 'enterprise'
+--
+CREATE TABLE IF NOT EXISTS plans (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tier ENUM ('free', 'premium', 'enterprise') NOT NULL,
+    price DECIMAL (6,2) NOT NULL,
+    storage_url VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+--
 -- Users table
 --
 CREATE TABLE IF NOT EXISTS users (
@@ -9,19 +22,10 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     affiliation VARCHAR(255) NOT NULL,
     status ENUM ('inactive', 'active', 'disabled') NOT NULL,
+    plan_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (plan_id) REFERENCES plans(id)
 );
 
---
--- Plans table
--- maybe change the tiers to `free`, `premium`, 'enterprise'
---
--- CREATE TABLE IF NOT EXISTS plans (
---     id INT AUTO_INCREMENT PRIMARY KEY,
---     user_id
---     tier ENUM ('free', 'premium', 'enterprise') NOT NULL,
---     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
--- );

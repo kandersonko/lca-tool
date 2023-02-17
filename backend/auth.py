@@ -58,6 +58,8 @@ def register():
             )
             if g.user is not None and g.user.get("id"):
                 session["user_id"] = g.user["id"]
+                logging.debug("=== Create plan after registration")
+                manager.create_user_plan(g.user["id"], tier="free")
                 return redirect(url_for("index"))
         else:
             flash(error)
