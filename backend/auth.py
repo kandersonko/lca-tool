@@ -117,7 +117,7 @@ def login():
             g.user = user
             if user.get("status") != "active":
                 token = generate_token(user["email"])
-                confirm_url = url_for("auth.activate", token=token, _external=True)
+                confirm_url = url_for("auth.activate", token=token)
                 return render_template("auth/activate.html", confirm_url=confirm_url)
             else:
                 return redirect(url_for("index"))

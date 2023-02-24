@@ -43,9 +43,20 @@ services:
       - 8000:8000
     networks:
       - backnet
+      - frontnet
     depends_on:
       db:
         condition: service_healthy
+
+  proxy:
+    build: proxy
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+    networks:
+      - frontnet
 
 volumes:
   db-data:
@@ -56,3 +67,4 @@ secrets:
 
 networks:
   backnet:
+  frontnet:
