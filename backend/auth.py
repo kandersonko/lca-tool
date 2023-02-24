@@ -80,7 +80,7 @@ def register():
                 logging.debug("=== Create plan after registration")
                 manager.create_user_plan(g.user["id"], tier="free")
                 token = generate_token(g.user["email"])
-                confirm_url = url_for("auth.activate", token=token, _external=True)
+                confirm_url = url_for("auth.activate", token=token)
                 return render_template("auth/activate.html", confirm_url=confirm_url)
         else:
             return render_template("auth/register.html", error=[error], isError=True)
