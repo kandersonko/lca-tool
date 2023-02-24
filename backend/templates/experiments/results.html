@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+<div id="home" class="panel">
+    <div class="main" style="width: 70%">
+
+        <h1>Welcome, results of experiments are displayed here.</h1>
+
+        {% if g.results %}
+
+
+        {% else %}
+        <p>No results or current running experiments on file. </p>
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

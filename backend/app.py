@@ -2,7 +2,7 @@ from flask import Flask
 from logging.config import dictConfig
 import logging
 
-from backend import auth, home, config
+from backend import auth, home, config, experiments
 
 dictConfig(
     {
@@ -24,6 +24,7 @@ app = Flask(__name__, static_folder="static")
 app.config.from_mapping(**config.config)
 app.register_blueprint(auth.bp)
 app.register_blueprint(home.bp)
+app.register_blueprint(experiments.bp)
 
 app.add_url_rule("/", endpoint="index")
 

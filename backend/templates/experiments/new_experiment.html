@@ -1,0 +1,205 @@
+{% extends "layout.html" %}
+{% block content %}
+<div id="home" class="panel">
+    <div class="main" style="width: 70%">
+
+        <script src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}"></script>
+
+        <script>
+            $(document).ready(function () {
+                $("div.desc").hide();
+                text = "Help"
+                document.getElementById("demo").innerHTML = text;
+                $("input[name$='methodology' ]").click(function () {
+                    var test = $(this).val();
+                    var num = 0
+                    var count = 1
+                    const Methodologies = ["LCA:", "MLA:"]
+
+                    for (const methodology of Methodologies) {
+                        if (test == methodology) {
+                            num = count
+                        }
+                        count = count + 1
+                    }
+                    $("div.desc").hide();
+                    $("#LoadData" + num).show();
+                    $("#Preoptimization" + num).show();
+                    $("#Method" + num).show();
+                    $("#Validation" + num).show();
+                    $("#Metric" + num).show();
+                });
+            });
+        </script>
+
+
+        <h1>Welcome, please fill out the following information to start an experiment.</h1>
+
+        <p id="demo"></p>
+
+        <form method="post" onsubmit="return validateForm();">
+
+            <!-- Methodology section 1 -->
+            {% if g.Methodologies %}
+
+            <h2>Phase 1. Please determine which methodology to use.</h2><br>
+
+            {% for choices, infos in g.Methodologies%}
+            <input type="radio" id={{ choices }} name="methodology" value={{ choices }}> <label for={{ choices }}>{{ choices }}</label><br>
+            {% for sentence in infos%}
+            {% if sentence != null and sentence != ""%}
+            <p>{{ sentence }}</p><br>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            {% endif %}
+
+            <!-- Experiment Informationsection -->
+            <h2>Phase 2. Experiment information.</h2>
+            <h3>Name of the project, Name and Email:</h3>
+
+            <table>
+                <tr>
+                    <td><input id="projectName" type="text" name="projectName" placeholder="Name of the project" /></td>
+                </tr>
+                <tr>
+                    <td><input id="name" type="text" name="name" placeholder="Name" /></td>
+                    <td><input id="email" type="email" name="email" placeholder="Email" /></td>
+                </tr>
+            </table>
+
+            <h3>Goal and scope definition:</h3>
+            <li style="font-size:12pt">
+                <b>
+                    Define your goal, scope, system boundary, functional unit, and case study
+                    assumptions down here:
+                </b>
+            </li>
+
+            <textarea id="phase1Text" name="phase1Text" rows="2" cols="50">
+
+                </textarea>
+            <p>&nbsp;</p>
+
+            <h3> Objective</h3>
+            <!-- The same name allows the one of the two radio buttons to be selected -->
+            <input type="radio" id="socialMethod" name="method" value="socialMethod">
+            <label for="socialMethod"><i>Social</i></label>
+            <input type="radio" id="economicMethod" name="method" value="economicMethod">
+            <label for="economicMethod"><i>Economic</i></label>
+            <input type="radio" id="environmentalMethod" name="method" value="environmentalMethod">
+            <label for="environmentalMethod"><i>Environmental </i> </label>
+
+
+            <!-- Dataset section -->
+            {% if g.LoadDataset %}
+            {% for choices, infos in g.LoadDataset%}
+            <div id="LoadData{{ loop.index }}" class="desc">
+                <h2>Phase 3. Please Load Dataset.</h2><br>
+                <input type="file" id="csv" name="csv" accept=".csv">
+
+                {% for sentence in infos%}
+                {% if sentence != null and sentence != ""%}
+                <p>{{ sentence }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+
+            <!-- Preprocess section-->
+            {% if g.Preoptimization %}
+            {% for choices, infos in g.Preoptimization %}
+            <div id="Preoptimization{{ loop.index }}" class="desc">
+                {% if choices != null or choices != "" %}
+                <h2>Phase 4. Please select a Preoptimization option.</h2><br>
+                {% endif %}
+                {% for choice in choices %}
+                {% if choice != null or choice != "" %}
+                <input type="radio" id={{ choice }} name="preoptimization" value={{ choice }}> <label for={{ choice }}>{{ choice }}</label><br>
+                {% endif %}
+                {% endfor %}
+                {% for sentence in infos %}
+                {% if sentence != null and sentence != "" %}
+                <p>{{ sentence }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <!-- Methods section-->
+            {% if g.Methods %}
+            {% for choices, infos in g.Methods %}
+            <div id="Method{{ loop.index }}" class="desc">
+                {% if choices != null or choices != "" %}
+                <h2>Phase 5. Please select a method option.</h2><br>
+                {% endif %}
+                {% for choice in choices %}
+                {% if choice != null or choice != "" %}
+                <input type="radio" id={{ choice }} name="methods" value={{ choice }}> <label for={{ choice }}>{{ choice }}</label><br>
+                {% endif %}
+                {% endfor %}
+                {% for sentence in infos %}
+                {% if sentence != null and sentence != "" %}
+                <p>{{ sentence }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <!-- Validation section-->
+            {% if g.Validation %}
+            {% for choices, infos in g.Validation %}
+            <div id="Validation{{ loop.index }}" class="desc">
+                {% if choices != null and choices != "" and choices != None %}
+                <h2>Phase 6. Please select a Validation option.</h2><br>
+                {% endif %}
+                {% for choice in choices %}
+                {% if choice != null and choice != "" and choice != None %}
+                <input type="radio" id={{ choice }} name="validation" value={{ choice }}> <label for={{ choice }}>{{ choice }}</label>
+                <input type="text" id="{{ choice }}_text" name="{{ choice }}_textInput"><br>
+                {% else %}
+                <p>No validation methods are currently available for the choosen methodology.</p>
+                {% endif %}
+                {% endfor %}
+                {% for sentence in infos %}
+                {% if sentence != null and sentence != "" and sentence != None %}
+                <p>{{ sentence }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <!-- Metrics section-->
+            {% if g.Metric %}
+            {% for choices, infos in g.Metric %}
+            <div id="Metric{{ loop.index }}" class="desc">
+                {% if choices != null and choices != "" and choices != None %}
+                <h2>Phase 7. Please select metrics to show results.</h2><br>
+                {% endif %}
+                {% for choice in choices %}
+                {% if choice != null and choice != "" and choice != None %}
+                <input type="checkbox" id={{ choice }} name="metric" value={{ choice }}> <label for={{ choice }}>{{ choice }}</label><br>
+                {% else %}
+                <p>No metrics are currently available for the choosen methodology.</p>
+                {% endif %}
+                {% endfor %}
+                {% for sentence in infos %}
+                {% if sentence != null and sentence != "" and sentence != None %}
+                <p>{{ sentence }}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+
+            <button type="button" onclick="window.location.href='{{ url_for('experiments.results') }}';">Run Experiment</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
