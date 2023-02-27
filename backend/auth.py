@@ -11,6 +11,8 @@ from backend.db import manager
 from backend.config import config
 from mysql.connector import Error
 
+from backend.mail import send_email
+
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
@@ -81,7 +83,11 @@ def register():
                 manager.create_user_plan(g.user["id"], tier="free")
                 token = generate_token(g.user["email"])
                 confirm_url = url_for("auth.activate", token=token)
-                return render_template("auth/activate.html", confirm_url=confirm_url)
+                body = f"Here is your account activation link: {request.base_url.split('auth/register')[0][:-1]}{confirm_url}"
+                send_email(
+                    subject="Account Activation Link", body=body, recipients=[email]
+                )
+                return redirect(url_for("index"))
         else:
             return render_template("auth/register.html", error=[error], isError=True)
 
@@ -118,7 +124,11 @@ def login():
             if user.get("status") != "active":
                 token = generate_token(user["email"])
                 confirm_url = url_for("auth.activate", token=token)
-                return render_template("auth/activate.html", confirm_url=confirm_url)
+                body = f"Here is your account activation link: {request.base_url.split('auth/register')[0][:-1]}{confirm_url}"
+                send_email(
+                    subject="Account Activation Link", body=body, recipients=[email]
+                )
+                return redirect(url_for("index"))
             else:
                 return redirect(url_for("index"))
 
