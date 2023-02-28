@@ -83,44 +83,54 @@ def register():
     Validates that the email is not already taken. Hashes the
     password for security.
     """
-    error = None
-    logging.debug(f"=== Register request: {request}")
     if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
-        confirm_password = request.form["confirm_password"]
-        first_name = request.form["first_name"]
-        last_name = request.form["last_name"]
-        affiliation = request.form["affiliation"]
-        logging.debug(f"Register: {email} | {password}")
-        if confirm_password != password:
-            error = "The password should matched."
-            return render_template("auth/register.html", error=[error], isError=True)
-
-        if error is None:
-            password_hash = generate_password_hash(password)
-            g.user = manager.create_user(
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                password_hash=password_hash,
-                affiliation=affiliation,
-            )
-            if g.user is not None and g.user.get("id"):
-                session["user_id"] = g.user["id"]
-                logging.debug("=== Create plan after registration")
-                manager.create_user_plan(g.user["id"], tier="free")
-                token = generate_token(g.user["email"])
-                confirm_url = url_for("auth.activate", token=token)
-                body = f"Here is your account activation link: {request.base_url.split('auth/register')[0][:-1]}{confirm_url}"
-                send_email(
-                    subject="Account Activation Link", body=body, recipients=[email]
+        error = None
+        logging.debug(f"=== Register request: {request}")
+        if request.method == "POST":
+            email = request.form["email"]
+            password = request.form["password"]
+            confirm_password = request.form["confirm_password"]
+            first_name = request.form["first_name"]
+            last_name = request.form["last_name"]
+            affiliation = request.form["affiliation"]
+            logging.debug(f"Register: {email} | {password}")
+            if confirm_password != password:
+                error = "The password should matched."
+                return render_template(
+                    "auth/register.html", error=[error], isError=True
                 )
-                return redirect(url_for("index"))
-        else:
-            return render_template("auth/register.html", error=[error], isError=True)
 
-    return render_template("auth/register.html", error=[error], isError=False)
+            # check if user exists
+            try:
+                stored_user = manager.get_user_by_email(email)
+                if stored_user is not None:
+                    error = "Invalid email or password"
+            except Error as e:
+                logging.debug(f"=== Error registration: {e} ===")
+
+            if error is None:
+                password_hash = generate_password_hash(password)
+                try:
+                    g.user = manager.create_user(
+                        first_name=first_name,
+                        last_name=last_name,
+                        email=email,
+                        password_hash=password_hash,
+                        affiliation=affiliation,
+                    )
+                    if g.user is not None and g.user.get("id"):
+                        session["user_id"] = g.user["id"]
+                        logging.debug("=== Create plan after registration")
+                        manager.create_user_plan(g.user["id"], tier="free")
+                        return redirect(url_for("auth.activation"))
+                except Error as e:
+                    logging.debug(f"=== Error registration: {e} ===")
+            else:
+                return render_template(
+                    "auth/register.html", error=[error], isError=True
+                )
+
+    return render_template("auth/register.html", error=[], isError=False)
 
 
 @bp.route("/login", methods=("GET", "POST"))
@@ -151,12 +161,7 @@ def login():
             session["user_id"] = user["id"]
             g.user = user
             if user.get("status") != "active":
-                token = generate_token(user["email"])
-                confirm_url = url_for("auth.activate", token=token)
-                body = f"Here is your account activation link: {request.base_url.split('auth/login')[0][:-1]}{confirm_url}"
-                send_email(
-                    subject="Account Activation Link", body=body, recipients=[email]
-                )
+                return redirect(url_for("auth.activate"))
             return redirect(url_for("index"))
 
     return render_template("auth/login.html", error=[error], isError=False)
@@ -170,9 +175,26 @@ def forgot_password():
         reset_link = url_for("auth.reset", token=token)
         body = f"Here is your password reset link: {request.base_url.split('auth/forgot_password')[0][:-1]}{reset_link}"
         send_email(subject="Password Reset Link", body=body, recipients=[email])
-        return redirect(url_for("index"))
+        flash(f"Password reset link sent to your email {email}")
 
     return render_template("auth/forgot_password.html")
+
+
+@bp.route("/activation", methods=("GET", "POST"))
+def activation():
+    if request.method == "POST":
+        user = g.user
+        if user is None:
+            return redirect(url_for("auth.login"))
+
+        email = user.get("email")
+        token = generate_token(user["email"])
+        confirm_url = url_for("auth.activate", token=token)
+        body = f"Here is your account activation link: {request.base_url.split('auth/activation')[0][:-1]}{confirm_url}"
+        send_email(subject="Account Activation Link", body=body, recipients=[email])
+        return redirect(url_for("index"))
+
+    return render_template("auth/activation.html")
 
 
 @bp.route("/reset/<token>", methods=("GET", "POST"))
@@ -205,6 +227,7 @@ def reset(token):
                         user = manager.reset_password(email, new_password_hash)
                     except Error as e:
                         logging.debug(f"Error password reset {e}")
+                    flash("Password reset successfully!")
                     return redirect(url_for("index"))
 
     return render_template("auth/reset.html")

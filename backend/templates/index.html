@@ -1,39 +1,34 @@
-{% extends "layout.html" %}
-{% block content %}
-  <div id="home" class="panel">
-    <div class="main" style="width: 70%">
-      {% if g.user %}
+{% extends "layout.html" %} {% block content %}
 
-      <h1>Welcome {{ g.user['last_name'] }}</h1>
+<div id="home" class="panel">
+  <div class="main" style="width: 70%">
+    {% if g.user %}
 
-      <p>Account status: {{g.user['status']}}</p>
+    <h1>Welcome {{ g.user['last_name'] }}</h1>
 
-      <p>Account plan id: {{g.user['plan_id']}}</p>
+    <p>Account status: {{g.user['status']}}</p>
 
-      <p>Email: {{g.user['email']}}</p>
+    <p>Account plan id: {{g.user['plan_id']}}</p>
 
-      <p>First name: {{g.user['first_name']}}</p>
+    <p>Email: {{g.user['email']}}</p>
 
-      <p>Last name: {{g.user['last_name']}}</p>
+    <p>First name: {{g.user['first_name']}}</p>
 
-      <p>Affiliation: {{g.user['affiliation']}}</p>
+    <p>Last name: {{g.user['last_name']}}</p>
 
-      <p>Status (Activation via email): {{g.user['status']}}</p>
+    <p>Affiliation: {{g.user['affiliation']}}</p>
 
-      <p>Account Creation Timestamp: {{g.user['created_at']}}</p>
+    <p>Status (Activation via email): {{g.user['status']}}</p>
 
-      <p>Last Login: {{g.user['last_login']}}</p>
+    <p>Account Creation Timestamp: {{g.user['created_at']}}</p>
 
-      <p>Last Updated: {{g.user['updated_at']}}</p>
+    <p>Last Login: {{g.user['last_login']}}</p>
 
-      {% else %}
+    <p>Last Updated: {{g.user['updated_at']}}</p>{% else %}
 
-      <h1>This will be the home page eventually.</h1>
+    <h1>This will be the home page eventually.</h1>
 
-      <p>Will add information about the concept, work, and
-      contributors later.</p>
-
-      {% endif %}
-    </div>
+    <p>Will add information about the concept, work, and
+    contributors later.</p>{% endif %}
   </div>
-{% endblock %}
+</div>{% endblock %}

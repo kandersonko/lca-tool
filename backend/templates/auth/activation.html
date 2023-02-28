@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div id="activation" class="panel">
+    <div class="main" style="width: 70%">
+        <h1>Activate Your Account</h1>
+        {% if g.user.get('status') == 'active' %}
+        <p>Account already activated</p>
+        {% else %}
+        <div> An activation link will be sent to your email {{ g.user.get('email') }} </div> <br>
+        <form  method="POST">
+            <input type="submit" value="Request Activation Link">
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
