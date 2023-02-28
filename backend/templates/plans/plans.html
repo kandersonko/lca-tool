@@ -1,0 +1,13 @@
+{% extends "layout.html" %} {% block content %}
+<div class="main" style="width: 70%">
+  <form id="plans" method="POST">
+    <select name="plan" form="plans" id="plans" autofocus>
+      <option value="free">Free</option>
+      <option value="premium">Premium</option>
+      <option value="enterprise">Enterprise</option>
+    </select>
+    <br><br>
+    <input type="submit">
+  </form>
+</div>
+{% endblock %}

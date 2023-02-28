@@ -48,6 +48,35 @@ def load_logged_in_user():
             logging.debug(f"=== load_logged_in_user error: {e} ===")
 
 
+@bp.route("/plans", methods=("GET", "POST"))
+def plans():
+    user = g.user
+    if user is None:
+        return redirect(url_for("auth.login"))
+
+    if request.method == "POST":
+        plan = request.form["plan"]
+        try:
+            user_id = user.get("id")
+            user_email = user.get("email")
+            plan = plan.upper()
+            body = f"""
+            The following user requested a new plan:
+            User ID: {user_id}
+            User email: {user_email}
+            Plan: {plan}
+            """
+            admin_email = (
+                "kandersonko@gmail.com"  # TODO Change this to real administrator email
+            )
+            send_email(subject="New Plan Request", body=body, recipients=[admin_email])
+            return redirect(url_for("index"))
+        except Error as e:
+            logging.debug(f"Error plan update: {e} ===")
+
+    return render_template("plans/plans.html")
+
+
 @bp.route("/register", methods=("GET", "POST"))
 def register():
     """Register a new user.
