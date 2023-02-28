@@ -215,6 +215,22 @@ class DBManager:
                 user = self.get_user_by_email(email)
         return user
 
+    def reset_password(self, email, new_password_hash):
+        user = None
+        connection = db_connection()
+        if connection:
+            with connection.cursor(buffered=True) as cursor:
+                cursor.execute(
+                    """
+                    UPDATE users SET password=%s
+                    WHERE email=%s
+                    """,
+                    (new_password_hash, email),
+                )
+                connection.commit()
+                user = self.get_user_by_email(email)
+        return user
+
 
 manager = DBManager()
 # manager.create_users_table()

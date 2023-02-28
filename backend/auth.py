@@ -124,15 +124,61 @@ def login():
             if user.get("status") != "active":
                 token = generate_token(user["email"])
                 confirm_url = url_for("auth.activate", token=token)
-                body = f"Here is your account activation link: {request.base_url.split('auth/register')[0][:-1]}{confirm_url}"
+                body = f"Here is your account activation link: {request.base_url.split('auth/login')[0][:-1]}{confirm_url}"
                 send_email(
                     subject="Account Activation Link", body=body, recipients=[email]
                 )
-                return redirect(url_for("index"))
-            else:
-                return redirect(url_for("index"))
+            return redirect(url_for("index"))
 
     return render_template("auth/login.html", error=[error], isError=False)
+
+
+@bp.route("/forgot_password", methods=("GET", "POST"))
+def forgot_password():
+    if request.method == "POST":
+        email = request.form["email"]
+        token = generate_token(email)
+        reset_link = url_for("auth.reset", token=token)
+        body = f"Here is your password reset link: {request.base_url.split('auth/forgot_password')[0][:-1]}{reset_link}"
+        send_email(subject="Password Reset Link", body=body, recipients=[email])
+        return redirect(url_for("index"))
+
+    return render_template("auth/forgot_password.html")
+
+
+@bp.route("/reset/<token>", methods=("GET", "POST"))
+def reset(token):
+    if request.method == "POST":
+        email = request.form["email"]
+        old_password = request.form["old_password"]
+        new_password = request.form["new_password"]
+
+        user = None
+        error = None
+        if confirm_token(token) != email:
+            flash("Invalid token or email")
+        else:
+            try:
+                user = manager.get_user_by_email(email)
+
+            except Error as e:
+                logging.debug(f"=== Error login: {e} ===")
+                return render_template("auth/login.html", error=[error], isError=True)
+            if user is not None:
+                if check_password_hash(user["password"], old_password) == False:
+                    error = "Incorrect email or password."
+                    return render_template(
+                        "auth/forgot_password.html", error=[error], isError=True
+                    )
+                else:
+                    new_password_hash = generate_password_hash(new_password)
+                    try:
+                        user = manager.reset_password(email, new_password_hash)
+                    except Error as e:
+                        logging.debug(f"Error password reset {e}")
+                    return redirect(url_for("index"))
+
+    return render_template("auth/reset.html")
 
 
 @bp.route("/activate/<token>")
