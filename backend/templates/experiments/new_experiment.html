@@ -3,59 +3,356 @@
 <div id="home" class="panel">
     <div class="main" style="width: 70%">
 
-        <script src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}"></script>
+        <script src="../../static/js/jquery-3.5.1.min.js"></script>
+
+        <!-- scripts to run LCA, will need to be changed later-->
+        <link rel="stylesheet" href="../../css/lca.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css">
+        <link href="twoColLiqLtHdr.css" rel="stylesheet" type="text/css" />
+        <script>
+            (function (i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                    m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+            ga('create', 'UA-101336701-1', 'auto');
+            ga('send', 'pageview');
+        </script>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            if (typeof jQuery == 'undefined') {
+                document.write(unescape("%3Cscript src='../../static/js/jquery-3.5.1.min.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
+        <script>
+            if (typeof jQuery == 'undefined') {
+                document.write(unescape("%3Cscript src='../../static/js/jquery.csv-0.71.min.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
+
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+        <script>
+            if (typeof jQuery == 'undefined') {
+                document.write(unescape("%3Cscript src='../../static/js/jquery.dataTables.min.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
+
+        <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+        <script>
+            if (typeof jQuery == 'undefined') {
+                document.write(unescape("%3Cscript src='../../static/js/dataTables.select.min.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
+
+        <script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
+        <script>
+            if (typeof jQuery == 'undefined') {
+                document.write(unescape("%3Cscript src='../../static/js/dataTables.buttons.min.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
+
+        <script src="https://editor.datatables.net/extensions/Editor/js/dataTables.editor.min.js"></script>
+        <script>
+            if (typeof jQuery == 'undefined') {
+                document.write(unescape("%3Cscript src='../../static/js/dataTables.editor.min.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
+
+        <!-- The library for the pdf creation -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.1.1/jspdf.umd.min.js" type="module"></script>
+        <!-- <script>
+      if (typeof jQuery == 'undefined') {
+        document.write(unescape("%3Cscript src='/js/jspdf.umd.min.js' type='text/javascript'%3E%3C/script%3E"));
+      }
+    </script> -->
+
+        <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+        <script>
+            if (typeof jQuery == 'undefined') {
+                document.write(unescape("%3Cscript src='../../static/js/html2canvas.min.js' type='text/javascript'%3E%3C/script%3E"));
+            }
+        </script>
+
+        <script src="../../static/js/html2csv.js" type="text/javascript"></script>
+
+        <!-- Move the logic at the end of this file to lca.js -->
+        <script src="../../static/js/lca_social.js" type="text/javascript"></script>
+        <!-- End of scripts to run LCA, will need to be changed later-->
+
 
         <script>
             $(document).ready(function () {
                 $("div.desc").hide();
-                text = "Help"
-                document.getElementById("demo").innerHTML = text;
                 $("input[name$='methodology' ]").click(function () {
-                    var test = $(this).val();
+                    var methodology = $(this).val();
                     var num = 0
                     var count = 1
-                    const Methodologies = ["LCA:", "MLA:"]
 
-                    for (const methodology of Methodologies) {
-                        if (test == methodology) {
-                            num = count
-                        }
-                        count = count + 1
+                    text = methodology
+                    document.getElementById("demo").innerHTML = text;
+
+                    if (methodology == "LCA:") {
+                        $("div.desc").hide();
+                        $("#LCA_Options").show();
                     }
-                    $("div.desc").hide();
-                    $("#LoadData" + num).show();
-                    $("#Preoptimization" + num).show();
-                    $("#Method" + num).show();
-                    $("#Validation" + num).show();
-                    $("#Metric" + num).show();
+
+                    if (methodology == "MLA:") {
+                        $("div.desc").hide();
+                        $("#MLA_Options").show();
+                    }
                 });
             });
         </script>
 
 
-        <h1>Welcome, please fill out the following information to start an experiment.</h1>
+        <h1>Welcome, fill out the following information to start an experiment.</h1>
 
         <p id="demo"></p>
 
-        <form method="post" onsubmit="return validateForm();">
 
-            <!-- Methodology section 1 -->
-            {% if g.Methodologies %}
+        <!-- Methodology section 1 -->
+        {% if g.Methodologies %}
 
-            <h2>Phase 1. Please determine which methodology to use.</h2><br>
+        <h2>Available methodologies.</h2><br>
 
-            {% for choices, infos in g.Methodologies%}
-            <input type="radio" id={{ choices }} name="methodology" value={{ choices }}> <label for={{ choices }}>{{ choices }}</label><br>
-            {% for sentence in infos%}
-            {% if sentence != null and sentence != ""%}
-            <p>{{ sentence }}</p><br>
-            {% endif %}
-            {% endfor %}
-            {% endfor %}
-            {% endif %}
+        {% for choices, infos in g.Methodologies%}
+        <input type="radio" id={{ choices }} name="methodology" value={{ choices }}> <label for={{ choices }}>{{ choices }}</label><br>
+        {% for sentence in infos%}
+        {% if sentence != null and sentence != ""%}
+        <p>{{ sentence }}</p><br>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+        {% endif %}
 
-            <!-- Experiment Informationsection -->
-            <h2>Phase 2. Experiment information.</h2>
+
+
+        <!-- Section for LCA -->
+        <div id="LCA_Options" class="desc">
+                <h2>Life Cycle Assessment (LCA) v0.01</h2>
+
+            <p align="justify" class="panel">An open-source software for LCA and sustainability assessment.</p>
+            <p>&nbsp;</p>
+            <h3>Getting started:</h3>
+            <li style="font-size:12pt">
+                Manuals, case studies, and databases are available <b>
+                    <a href="manual.html">here.
+                </b></a>
+            </li>
+
+            <p>&nbsp;</p>
+
+            <h3>-----------------------------------</h3>
+
+            <h2>Phase 1. Experiment information.</h2>
+            <h3 id="infoHeader">Name of the project, Name and Email:</h3>
+
+            <table>
+                <tr>
+                    <td><input id="projectName" type="text" name="projectName" placeholder="Name of the project" /></td>
+                </tr>
+                <tr>
+                    <td><input id="name" type="text" name="name" placeholder="Name" /></td>
+                    <td><input id="email" type="email" name="email" placeholder="Email" /></td>
+                </tr>
+            </table>
+
+
+            <p>&nbsp;</p>
+            <h3 id="scopeHeader">Goal and scope definition:</h3>
+            <li style="font-size:12pt">
+                <b>
+                    Define your goal, scope, system boundary, functional unit, and case study
+                    assumptions down here:
+                </b>
+            </li>
+
+            <textarea id="phase1Text" name="phase1Text" rows="4" cols="50">
+
+            </textarea>
+            <p>&nbsp;</p>
+
+            <h3>-----------------------------------</h3>
+
+            <h2>Phase 2. Objective</h2>
+            <!-- The same name allows the one of the two radio buttons to be selected -->
+            <input type="radio" id="socialMethod" name="method" value="socialMethod">
+            <label for="socialMethod"><i>Social</i></label>
+            <input type="radio" id="economicMethod" name="method" value="economicMethod">
+            <label for="economicMethod"><i>Economic</i></label>
+            <input type="radio" id="environmentalMethod" name="method" value="environmentalMethod">
+            <label for="environmentalMethod"><i>Environmental </i> </label>
+
+            <!-- <li style="font-size:12pt"> <b>Example:</b> LCA performed herein evaluates GWP for the manure to valueadded
+                products life cycle. GHG emission factors are used to calculate the
+                GWP (in kg CO2 equivalent) with the key factors being 28 kg CO2 eq./kg
+                CH4 and 265 kg CO2 eq./kg N2O, which are acquired from the Intergovernmental
+                Panel on Climate Change for a 100-year time horizon. The <b>scope</b> of this study includes four distinct
+                stages that can be
+                categorized into two processes: (i) upstream processes, including raw material (cattle manure) collection,
+                and (ii) midstream processes,
+                involving on-site pretreatment (dewatering and size reduction), on-site converting manure to intermediate
+                products (biochar, bio-oil, and pyrolysis
+                gas), on-site reusing intermediate products (e.g., bio-oil and pyrolysis gas) for pretreatment purposes
+                (i.e., heat and electricity), and
+                biochar distribution. This <b>scope considers a cradle-to-gate system boundary</b>. The <b>functional
+                unit</b> in this study is one kilogram of
+                biochar, using the identified scope.</li> -->
+
+            <p>&nbsp;</p>
+
+            <h3>-----------------------------------</h3>
+
+            <h2 id="phase2Header">Phase 3. Life cycle inventory (LCI):</h2>
+            <!-- <li style="font-size:12pt"> Creating a database</li> -->
+
+            <input type="radio" id="createDatabase" name="databaseMethod" value="createDatabase">
+            <label for="createDatabase"><i>Creating a database</i></label>
+
+            <div id="customTables" style="display: none;">
+                <!-- <div id="customTableDiv_1">
+                    <table id="customTable_1" style="table-layout:fixed; width: 100%;">
+                    <thead>
+                        <tr>
+                        <th>Indicator</th>
+                        <th>Metric</th>
+                        <th>Location</th>
+                        <th>Score</th>
+                        <th>Total Score</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                            <input id="indicator" type="text" name="indicator" placeholder="Indicator" class="indicator"/>
+                            </td>
+                            <td><input id="metric" type="text" name="metric" placeholder="Metric" class="metric"/></td>
+                            <td><input id="location" type="text" name="location" placeholder="Location" class="location" /></td>
+                            <td><input id="score" type="text" name="score" placeholder="score" class="score" /></td>
+                            <td><input id="totalScore" type="text" name="totalScore" placeholder="Total Score" class="totalScore" /></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <input id="addButton_1" type="button" value="Add new record" class="addButton"/>
+                    <input id="addNewProcessButton1_1" type="button" value="Add new process" class="addNewProcessButton1"/>
+                    <label id="processCount_1"> Processes: 0/2 </label>
+                    <label id="customTableErrorMessage_1" value="" style="color:red"></label>
+                    <br>
+                    <input id="exportDatabase_1" value="Export as CSV" type="button" style="display: none;">
+
+                </div> -->
+                <p>&nbsp;</p>
+            </div>
+
+            <p>&nbsp;</p>
+            <input id="addCustomTable" type="button" value="Add new Custom Table" class="addCustomTable" />
+            <label id="csvTableErrorMessage_2" value="" style="color:red"></label>
+
+            <p>&nbsp;</p>
+
+            <!-- <li style="font-size:12pt"> Importing a database</li> -->
+            <input type="radio" id="importDatabase" name="databaseMethod" value="importDatabase">
+            <label for="importDatabase"><i>Importing a database</i></label>
+
+            <div id="readyTables" style="display: none;">
+                <div id="readyTableDiv_1" class="container mt-4 a">
+                    <!-- <canvas id="canvasLifeExpectancy"> -->
+                    <div id="dvImportSegments_1" class="fileupload ">
+                        <fieldset>
+                            <legend id="legend_1">Upload your CSV File for indicator 1</legend>
+                            <input type="file" name="File Upload" id="txtFileUpload_1" accept=".csv" />
+                        </fieldset>
+                        <div id="csv-display_1">
+                            <table id="CSVtable_1" class="display"></table>
+                        </div>
+                        <input id="addNewProcessButton2_1" type="button" value="Add new process" class="addNewProcessButton2" />
+                        <label id="processCount2_1"> Processes: 0/2 </label>
+                        <label id="csvTableErrorMessage_1" value="" style="color:red"></label>
+                    </div>
+                    <!-- </canvas> -->
+                </div>
+            </div>
+
+            <p>&nbsp;</p>
+            <input id="addCSVUpload" type="button" value="Add new CSV Upload" class="addCSVUpload" />
+
+            <p>&nbsp;</p>
+
+            <h3>-----------------------------------</h3>
+            <h2 id="methodHeader">Phase 4. Life cycle impact assessment (LCIA):</h2>
+            <li style="font-size:12pt"> Calculation method</li>
+            <!-- The same name allows the one of the two radio buttons to be selected -->
+            <input type="radio" id="socialMethodCalculation" name="methodCalculation" value="socialMethodCalculation">
+            <label for="socialMethodCalculation">
+                <i>Social analysis method: </i> <br>
+                <i>Indicator Value = Sum m-n [Sum i-n (Score/Total Score)] x Score / Number of Metrics  (see the example on social assessment page)</i><br>
+                <!-- <img id="indicator_image" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/4RD0RXhpZgAATU0AKgAAAAgABAE7AAIAAAAOAAAISodpAAQAAAABAAAIWJydAAEAAAAcAAAQ0OocAAcAAAgMAAAAPgAAAAAc6gAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEFtaW4gTWlya291ZWkAAAWQAwACAAAAFAAAEKaQBAACAAAAFAAAELqSkQACAAAAAzY3AACSkgACAAAAAzY3AADqHAAHAAAIDAAACJoAAAAAHOoAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAyMDIwOjEyOjA5IDExOjEwOjQzADIwMjA6MTI6MDkgMTE6MTA6NDMAAABBAG0AaQBuACAATQBpAHIAawBvAHUAZQBpAAAA/+ELIGh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8APD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4NCjx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iPjxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+PHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9InV1aWQ6ZmFmNWJkZDUtYmEzZC0xMWRhLWFkMzEtZDMzZDc1MTgyZjFiIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iLz48cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0idXVpZDpmYWY1YmRkNS1iYTNkLTExZGEtYWQzMS1kMzNkNzUxODJmMWIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyI+PHhtcDpDcmVhdGVEYXRlPjIwMjAtMTItMDlUMTE6MTA6NDMuNjczPC94bXA6Q3JlYXRlRGF0ZT48L3JkZjpEZXNjcmlwdGlvbj48cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0idXVpZDpmYWY1YmRkNS1iYTNkLTExZGEtYWQzMS1kMzNkNzUxODJmMWIiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyI+PGRjOmNyZWF0b3I+PHJkZjpTZXEgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj48cmRmOmxpPkFtaW4gTWlya291ZWk8L3JkZjpsaT48L3JkZjpTZXE+DQoJCQk8L2RjOmNyZWF0b3I+PC9yZGY6RGVzY3JpcHRpb24+PC9yZGY6UkRGPjwveDp4bXBtZXRhPg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8P3hwYWNr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">
+                <canvas id="indicator_image_canvas"></canvas> -->
+            </label><br>
+            <input type="radio" id="economicMethodCalculation" name="methodCalculation" value="economicMethodCalculation">
+            <label for="economicMethodCalculation">
+                <i>Cost analysis method: </i> <br>
+                <i>
+                    Cup = Raw Material Mass * Collection/Transportation Cost,<br> Cmid = Raw Material Mass * Production Cost, <br>
+                    Cdown = Final Product Mass * Distribution Cost
+                </i> <br>
+            </label><br>
+            <input type="radio" id="environmentalMethodCalculation" name="methodCalculation" value="environmentalMethodCalculation">
+            <label for="environmentalMethodCalculation">
+                <i>Environmental analysis method: </i> <br>
+                <i>
+                    Eup = Mass * Emission Factor Up,<br> Emid = Mass * Emission Factor Mid, <br>
+                    Edown = Mass * Emission Factor Down * Distance
+                </i> <br>
+
+            </label><br>
+            <p>&nbsp;</p>
+
+            <!-- <input type="radio" id="exportDatabase" name="databaseMethod" value="exportDatabase">
+            <label for="exportDatabase"><i>Exporting a database</i></label> -->
+
+            <h3>-----------------------------------</h3>
+
+            <h2 id="resultsHeader">Phase 5. Results and Interpretation:</h2>
+
+            <!-- <input type="radio" id="method4" name="method" value="method4">
+            <label for="method4"><i>Method developed by user (comming soon)</i></label><br>
+
+            <h3>-----------------------------------</h3> -->
+            <!-- <p>&nbsp;</p> -->
+            <!-- <li style="font-size:12pt">Results</li> -->
+            <p id='Result1'>Case Study Result : </p>
+            <p id='Result2'>Proposed Study Result : </p>
+            <!-- <input id="displayResults" type="button" value="Show Results" class="displayResults"/> -->
+            <p>&nbsp;</p>
+
+            <li style="font-size:12pt"> Analyzing the results and comparison</li>
+
+            <canvas id="myChart" style="height: 370px; width: 100%;"></canvas>
+            <p>&nbsp;</p>
+            <li style="font-size:12pt">
+                Generating a PDF report <button type="reportButton"
+                                                id="generateReport">
+                    Generate
+                </button>
+            </li>
+            <p>&nbsp;</p>
+
+            </ul>
+            <p>&nbsp;</p>
+        </div>
+
+
+
+        <!-- Section for MLA -->
+        <div id="MLA_Options" class="desc">
+            <h2>Phase 1. Experiment information.</h2>
             <h3>Name of the project, Name and Email:</h3>
 
             <table>
@@ -78,128 +375,1131 @@
 
             <textarea id="phase1Text" name="phase1Text" rows="2" cols="50">
 
-                </textarea>
+            </textarea>
             <p>&nbsp;</p>
 
-            <h3> Objective</h3>
-            <!-- The same name allows the one of the two radio buttons to be selected -->
-            <input type="radio" id="socialMethod" name="method" value="socialMethod">
-            <label for="socialMethod"><i>Social</i></label>
-            <input type="radio" id="economicMethod" name="method" value="economicMethod">
-            <label for="economicMethod"><i>Economic</i></label>
-            <input type="radio" id="environmentalMethod" name="method" value="environmentalMethod">
-            <label for="environmentalMethod"><i>Environmental </i> </label>
+            <h3>-----------------------------------</h3>
 
 
             <!-- Dataset section -->
-            {% if g.LoadDataset %}
-            {% for choices, infos in g.LoadDataset%}
-            <div id="LoadData{{ loop.index }}" class="desc">
-                <h2>Phase 3. Please Load Dataset.</h2><br>
-                <input type="file" id="csv" name="csv" accept=".csv">
+            <h2>Phase 2. Load Dataset.</h2><br>
+            <input type="file" id="csv" name="csv" accept=".csv">
 
-                {% for sentence in infos%}
-                {% if sentence != null and sentence != ""%}
-                <p>{{ sentence }}</p>
-                {% endif %}
-                {% endfor %}
-            </div>
-            {% endfor %}
-            {% endif %}
+            <p>&nbsp;</p>
+
+            <h3>-----------------------------------</h3>
 
 
             <!-- Preprocess section-->
-            {% if g.Preoptimization %}
-            {% for choices, infos in g.Preoptimization %}
-            <div id="Preoptimization{{ loop.index }}" class="desc">
-                {% if choices != null or choices != "" %}
-                <h2>Phase 4. Please select a Preoptimization option.</h2><br>
-                {% endif %}
-                {% for choice in choices %}
-                {% if choice != null or choice != "" %}
-                <input type="radio" id={{ choice }} name="preoptimization" value={{ choice }}> <label for={{ choice }}>{{ choice }}</label><br>
-                {% endif %}
-                {% endfor %}
-                {% for sentence in infos %}
-                {% if sentence != null and sentence != "" %}
-                <p>{{ sentence }}</p>
-                {% endif %}
-                {% endfor %}
-            </div>
-            {% endfor %}
-            {% endif %}
+            <h2>Phase 3. Preoptimization</h2><br>
+
+            <input type="radio" id=PreOpt_None name="preoptimization" value=PreOpt_None> <label for=PreOpt_None>None</label><br>
+            <input type="radio" id=PreOpt_PCA name="preoptimization" value=PreOpt_PCA> <label for=PreOpt_PCA>PCA: Principal Component Analysis</label><br>
+
+            <p>None: No preoptimization will be performed</p>
+            <p>PCA: (Info will be added later) </p>
+
+            <p>&nbsp;</p>
+
+            <h3>-----------------------------------</h3>
 
             <!-- Methods section-->
-            {% if g.Methods %}
-            {% for choices, infos in g.Methods %}
-            <div id="Method{{ loop.index }}" class="desc">
-                {% if choices != null or choices != "" %}
-                <h2>Phase 5. Please select a method option.</h2><br>
-                {% endif %}
-                {% for choice in choices %}
-                {% if choice != null or choice != "" %}
-                <input type="radio" id={{ choice }} name="methods" value={{ choice }}> <label for={{ choice }}>{{ choice }}</label><br>
-                {% endif %}
-                {% endfor %}
-                {% for sentence in infos %}
-                {% if sentence != null and sentence != "" %}
-                <p>{{ sentence }}</p>
-                {% endif %}
-                {% endfor %}
-            </div>
-            {% endfor %}
-            {% endif %}
+            <h2>Phase 4. Method.</h2><br>
+
+            <input type="radio" id=Method_SVM name="methods" value=Method_SVM> <label for=Method_SVM>SVM</label><br>
+            <input type="radio" id=Method_KNN name="methods" value=Method_KNN> <label for=Method_KNN>KNN</label><br>
+
+            <p>SVM: (Info will be added later) </p>
+            <p>KNN: (Info will be added later) </p>
+
+            <p>&nbsp;</p>
+
+            <h3>-----------------------------------</h3>
 
             <!-- Validation section-->
-            {% if g.Validation %}
-            {% for choices, infos in g.Validation %}
-            <div id="Validation{{ loop.index }}" class="desc">
-                {% if choices != null and choices != "" and choices != None %}
-                <h2>Phase 6. Please select a Validation option.</h2><br>
-                {% endif %}
-                {% for choice in choices %}
-                {% if choice != null and choice != "" and choice != None %}
-                <input type="radio" id={{ choice }} name="validation" value={{ choice }}> <label for={{ choice }}>{{ choice }}</label>
-                <input type="text" id="{{ choice }}_text" name="{{ choice }}_textInput"><br>
-                {% else %}
-                <p>No validation methods are currently available for the choosen methodology.</p>
-                {% endif %}
-                {% endfor %}
-                {% for sentence in infos %}
-                {% if sentence != null and sentence != "" and sentence != None %}
-                <p>{{ sentence }}</p>
-                {% endif %}
-                {% endfor %}
-            </div>
-            {% endfor %}
-            {% endif %}
+            <h2>Phase 5. Validation.</h2><br>
+
+            <input type="radio" id=Val_k-Fold name="validation" value=Val_k-Fold> <label for=Val_k-Fold>k-Fold</label>
+            <input type="text" id="Val_k-Fold_text" name="Val_k-Fold_textInput"><br>
+
+            <input type="radio" id=Val_Split name="validation" value=Val_Split> <label for=Val_Split>Split</label>
+            <input type="text" id="Val_Split" name="Val_Split_textInput"><br>
+
+            <p>k-Fold: Please give one number for the number of folds</p>
+            <p>Split: Please give the percentage for the training, testing, sets or training, testing and validation sets organized in train - test or train - test - validation format. Example: 80 - 10 - 10 </p>
+
+            <p>&nbsp;</p>
+
+            <h3>-----------------------------------</h3>
 
             <!-- Metrics section-->
-            {% if g.Metric %}
-            {% for choices, infos in g.Metric %}
-            <div id="Metric{{ loop.index }}" class="desc">
-                {% if choices != null and choices != "" and choices != None %}
-                <h2>Phase 7. Please select metrics to show results.</h2><br>
-                {% endif %}
-                {% for choice in choices %}
-                {% if choice != null and choice != "" and choice != None %}
-                <input type="checkbox" id={{ choice }} name="metric" value={{ choice }}> <label for={{ choice }}>{{ choice }}</label><br>
-                {% else %}
-                <p>No metrics are currently available for the choosen methodology.</p>
-                {% endif %}
-                {% endfor %}
-                {% for sentence in infos %}
-                {% if sentence != null and sentence != "" and sentence != None %}
-                <p>{{ sentence }}</p>
-                {% endif %}
-                {% endfor %}
-            </div>
-            {% endfor %}
-            {% endif %}
+            <h2>Phase 6. Metric.</h2><br>
 
+            <input type="checkbox" id=Met_ACC name="metric" value=Met_ACC> <label for=Met_ACC>ACC</label><br>
+            <input type="checkbox" id=Met_F1 name="metric" value=Met_F1> <label for=Met_F1>F1</label><br>
+            <input type="checkbox" id=Met_ROC name="metric" value=Met_ROC> <label for=Met_ROC>ROC</label><br>
 
-            <button type="button" onclick="window.location.href='{{ url_for('experiments.results') }}';">Run Experiment</button>
-        </form>
+            <p>ACC: (Info will be added later) </p>
+            <p>F1: (Info will be added later) </p>
+            <p>ROC: (Info will be added later) </p>
+
+            <p>&nbsp;</p>
+
+            <h3>-----------------------------------</h3>
+
+            <h2 id="resultsHeader">Phase 7. Results and Interpretation:</h2>
+        </div>
     </div>
 </div>
+
+
+
+
+<!-- This is the old javascript method for running LCA. Will need to change to json file, run on python and run on seprate vm later.-->
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        //$('#customTable').DataTable();
+
+        var tableLifeExpectancy = null;
+        var tableHealth = null;
+        var tableEducation = null;
+        var tableSafety = null;
+
+        var tables = [];
+
+        var selectedMethodId = null;
+
+        var customTables = [];
+
+        var customTable_1 = $('#customTable_1').dataTable();
+        customTables.push(customTable_1);
+
+        // var customTableEducation = $('#customTableEducation').dataTable();
+        // var customTableHealth = $('#customTableHealth').dataTable();
+        // var customTableSafety = $('#customTableSafety').dataTable();
+
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var chart = initializeChart(ctx);
+
+        //Initialize an array with same objects but differnt id
+        var results = new Array(10).fill().map((_, i) => ({
+            id: i, indicator: "",
+            result1: 0,
+            result2: 0,
+            error: null
+        })
+        );
+
+        var resultsLifeExpectancy = {
+            result1: 0,
+            result2: 0,
+            error: null
+        };
+        var resultsEducation = {
+            result1: 0,
+            result2: 0,
+            error: null
+        };
+        var resultsHealth = {
+            result1: 0,
+            result2: 0,
+            error: null
+        };
+        var resultsSafety = {
+            result1: 0,
+            result2: 0,
+            error: null
+        };
+
+        var readyTablesCounter = 1;
+        $("#addCSVUpload").on('click', function () {
+
+            // If the previous table element is empty clone it and add it
+            if (readyTablesCounter != 10 && ($("#CSVtable_" + readyTablesCounter + " tr").length == 0)) {
+
+                var el = $("#readyTableDiv_" + readyTablesCounter).clone().attr('id', 'readyTableDiv_' + ++readyTablesCounter).appendTo("#readyTables");
+                // Fing all child elements and change their ID
+                el.find("[id]").add(el).each(function () {
+                    // Remove the trailing one and replace it with the counter
+                    this.id = this.id.slice(0, -1) + readyTablesCounter;
+                });
+
+                $("#legend_" + readyTablesCounter).text("Upload your CSV File for indicator " + readyTablesCounter);
+
+                // Add the required event to populate the table
+                $('#txtFileUpload_' + readyTablesCounter).on('change', upload);
+
+                $("#addNewProcessButton2_" + readyTablesCounter).on('click', addNewProcessCSV);
+                // console.log(results);
+                // Add a new table variable for each new CSV table
+
+            }
+        });
+
+        $("#addCustomTable").on("click", function () {
+            if ($('input:radio[name="method"]:checked').val() == "socialMethod" && (methodLocked != 2 || methodLocked != 3)) {
+                $('#csvTableErrorMessage_2').text("");
+                createNewTable("socialMethod");
+            }
+            else if ($('input:radio[name="method"]:checked').val() == "economicMethod" && (methodLocked != 1 || methodLocked != 3)) {
+                $('#csvTableErrorMessage_2').text("");
+                createNewTable("economicMethod");
+            }
+            else if ($('input:radio[name="method"]:checked').val() == "environmentalMethod" && (methodLocked != 1 || methodLocked != 2)) {
+                $('#csvTableErrorMessage_2').text("");
+                createNewTable("environmentalMethod");
+            }
+            else {
+                $('#csvTableErrorMessage_2').text("You must select an objective in Phase 1 first");
+            }
+        });
+
+        $('input:radio[name="databaseMethod"]').click(
+            function () {
+
+                if (this.value == 'createDatabase') {
+                    $("#customTables").css("display", "block");
+                    // $("#customTableDivHealth").css("display", "block");
+                    // $("#customTableDivEducation").css("display", "block");
+                    // $("#customTableDivSafety").css("display", "block");
+
+                    $("#readyTables").css("display", "none");
+                    // $("#readyTableDivHealth").css("display", "none");
+                    // $("#readyTableDivEducation").css("display", "none");
+                    // $("#readyTableDivSafety").css("display", "none");
+
+                    resultsLifeExpectancy.result1 = 0;
+                    resultsLifeExpectancy.result2 = 0;
+                    resultsLifeExpectancy.error = null;
+
+                    resultsEducation.result1 = 0;
+                    resultsEducation.result2 = 0;
+                    resultsEducation.error = null;
+
+                    resultsHealth.result1 = 0;
+                    resultsHealth.result2 = 0;
+                    resultsHealth.error = null;
+
+                    resultsSafety.result1 = 0;
+                    resultsSafety.result2 = 0;
+                    resultsSafety.error = null;
+
+                }
+                if (this.value == 'importDatabase') {
+                    $("#readyTables").css("display", "block");
+                    // $("#readyTableDivHealth").css("display", "block");
+                    // $("#readyTableDivEducation").css("display", "block");
+                    // $("#readyTableDivSafety").css("display", "block");
+
+                    $("#customTables").css("display", "none");
+                    // $("#customTableDivHealth").css("display", "none");
+                    // $("#customTableDivEducation").css("display", "none");
+                    // $("#customTableDivSafety").css("display", "none");
+
+                    resultsLifeExpectancy.result1 = 0;
+                    resultsLifeExpectancy.result2 = 0;
+                    resultsLifeExpectancy.error = null;
+
+                    resultsEducation.result1 = 0;
+                    resultsEducation.result2 = 0;
+                    resultsEducation.error = null;
+
+                    resultsHealth.result1 = 0;
+                    resultsHealth.result2 = 0;
+                    resultsHealth.error = null;
+
+                    resultsSafety.result1 = 0;
+                    resultsSafety.result2 = 0;
+                    resultsSafety.error = null;
+                }
+            }
+        );
+
+        $('input:radio[name="methodCalculation"]').click(
+            function () {
+                var selectedMethod = $('input:radio[name="method"]:checked').next('label:first').text();
+
+                var finalString1 = "<p id='Result1'>Case Study Result for " + selectedMethod + " method: <br>";
+                var finalString2 = "<p id='Result2'>Proposed Study Result for " + selectedMethod + " method: <br>";
+
+                results.forEach(function (result, index) {
+
+                    // Add only the results that are not zero and have an indicator
+                    if (result.indicator && result.result1 !== 0 && result.result1 !== 1) {
+                        finalString1 += result.indicator + ": <i> " + result.result1 + " </i>";
+                        finalString2 += result.indicator + ": <i> " + result.result2 + " </i>";
+                    }
+
+                    if (index == 9) {
+                        finalString1 += "</i></p>";
+                        finalString2 += "</i></p>";
+                    }
+
+                });
+
+                $('#Result1').replaceWith(finalString1);
+                $('#Result2').replaceWith(finalString2);
+
+                let indicators = results.map(result => result.indicator);
+
+                // updateChart(chart, label, results.result1, results.result2);
+                updateChart(chart, results);
+            }
+        );
+
+        $('input:radio[name="method"]').click(
+            function () {
+                if (this.value == "socialMethod" && customTablesCounter == 1 && (methodLocked != 2 || methodLocked != 3)) {
+                    methodLocked = 1;
+                    createNewTable("socialMethod");
+                }
+                else if (this.value == "economicMethod" && customTablesCounter == 1 && (methodLocked != 1 || methodLocked != 3)) {
+                    methodLocked = 2;
+                    createNewTable("economicMethod");
+                }
+                else if (this.value == "environmentalMethod" && customTablesCounter == 1 && (methodLocked != 1 || methodLocked != 2)) {
+                    methodLocked = 3;
+                    createNewTable("environmentalMethod");
+                }
+            }
+        );
+
+        // $(".addNewTableButton").click(
+        //   function () {
+        //     addTable();
+        //   }
+        // );
+
+        var customTablesCounter = 1;
+        var methodLocked = 0;
+        function createNewTable(method) {
+            // Here we do not need to have the previous elements empty, we can clone them anyways, it speeds up the creation of new tables
+            if (customTablesCounter != 10) {
+
+                addTable(customTablesCounter, method);
+
+                // $('#customTable_'+customTablesCounter).destroy();
+                var newCustomTable = $('#customTable_' + customTablesCounter).dataTable();
+                customTables.push(newCustomTable);
+
+                $("#addButton_" + customTablesCounter).on('click', function () {
+                    addRows(newCustomTable, method);
+                });
+
+                $("#addNewProcessButton1_" + customTablesCounter).on('click', addNewProcessCustomTable);
+
+                customTablesCounter++;
+            }
+        }
+
+        // Here based on the button click we perform the corresponding calculation and store the values
+        function addNewProcessCSV(evt) {
+
+            var buttonId = this.id;
+
+            var el_number = buttonId.slice(buttonId.length - 1);
+            // selectedMethodId = $(this).attr("id");
+
+            $("#csvTableErrorMessage").text("");
+
+
+            //Make these functions more generic (have all the checks etc and before and call only the function based on the user's selection)
+            if ($('input:radio[name="method"]:checked').val() == "socialMethod") {
+
+                if (tables[el_number - 1] != null && typeof tables[el_number - 1] !== 'undefined') {
+                    if (results[el_number - 1].result1 == 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var values = createResultsFromCSVTableSocial(tables[el_number - 1]);
+                        results[objIndex].indicator = values.indicator;
+                        results[objIndex].result1 = values.result;
+
+                        $("#processCount2_" + el_number).replaceWith("<label id='processCount2_" + el_number + "''> Processes: 1/2 </label>");
+                        return;
+                    }
+
+                    if (results[el_number - 1].result1 != 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var values = createResultsFromCSVTableSocial(tables[el_number - 1]);
+                        results[objIndex].indicator = values.indicator;
+                        results[objIndex].result2 = values.result;
+
+                        $("#processCount2_" + el_number).replaceWith("<label id='processCount2_" + el_number + "''> Processes: 2/2 </label>");
+                        return;
+                    }
+
+                    // if (typeof results[el_number-1] !== 'undefined' && results[el_number-1].error === "One or more values in w_i is not a number") {
+                    //   $("#csvTableErrorMessage").text("One or more values in w_i is not a number");
+                    // }
+
+
+                }
+            }
+            if ($('input:radio[name="method"]:checked').val() == "economicMethod") {
+
+                if (tables[el_number - 1] != null && typeof tables[el_number - 1] !== 'undefined') {
+                    if (results[el_number - 1].result1 == 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var values = createResultsFromCSVTableEconomic(tables[el_number - 1]);
+                        results[objIndex].indicator = values.indicator;
+                        results[objIndex].result1 = values.result;
+
+                        $("#processCount2_" + el_number).replaceWith("<label id='processCount2_" + el_number + "''> Processes: 1/2 </label>");
+                        return;
+                    }
+
+                    if (results[el_number - 1].result1 != 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var values = createResultsFromCSVTableEconomic(tables[el_number - 1]);
+                        results[objIndex].indicator = values.indicator;
+                        results[objIndex].result2 = values.result;
+
+                        $("#processCount2_" + el_number).replaceWith("<label id='processCount2_" + el_number + "''> Processes: 2/2 </label>");
+                        return;
+                    }
+
+                    // if (typeof results[el_number-1] !== 'undefined' && results[el_number-1].error === "One or more values in w_i is not a number") {
+                    //   $("#csvTableErrorMessage").text("One or more values in w_i is not a number");
+                    // }
+
+
+                }
+            }
+            else if ($('input:radio[name="method"]:checked').val() == "environmentalMethod") {
+
+                if (tables[el_number - 1] != null && typeof tables[el_number - 1] !== 'undefined') {
+                    if (results[el_number - 1].result1 == 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var type = 1;
+                        var tempTable = tables[el_number - 1];
+
+                        if (tempTable.columns().nodes().length == 6 && $(tempTable.column(5).header()).html() === "Distance") {
+                            type = 3;
+                        }
+
+                        var values = createResultsFromCSVTableEnvironmental(tables[el_number - 1], type);
+                        results[objIndex].indicator = values.indicator;
+                        results[objIndex].result1 = values.result;
+
+                        $("#processCount2_" + el_number).replaceWith("<label id='processCount2_" + el_number + "''> Processes: 1/2 </label>");
+                        return;
+                    }
+
+                    if (results[el_number - 1].result1 != 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var type = 1;
+                        var tempTable = tables[el_number - 1];
+                        if (tempTable.columns().nodes().length == 6 && $(tempTable.column(5).header()).html() === "Distance") {
+                            type = 3;
+                        }
+
+                        var values = createResultsFromCSVTableEnvironmental(tables[el_number - 1], type);
+                        results[objIndex].indicator = values.indicator;
+                        results[objIndex].result2 = values.result;
+
+                        $("#processCount2_" + el_number).replaceWith("<label id='processCount2_" + el_number + "''> Processes: 2/2 </label>");
+                        return;
+                    }
+
+                    // if (typeof results[el_number-1] !== 'undefined' && results[el_number-1].error === "One or more values in w_i is not a number") {
+                    //   $("#csvTableErrorMessage").text("One or more values in w_i is not a number");
+                    // }
+
+
+                }
+            }
+
+        }
+
+        // This function should be for the manually populated table
+        function addNewProcessCustomTable(evt) {
+            var buttonId = this.id;
+
+            var el_number = buttonId.slice(buttonId.length - 1);
+
+            if ($('input:radio[name="method"]:checked').val() == "socialMethod") {
+                // if ($(this).attr("id") === 'addNewProcessButton1LifeExpectancy' && customTableLifeExpectancy != null) {
+                var metric_elements = $('#customTable_' + el_number + ' tbody .metric');
+                var location_elements = $('#customTable_' + el_number + ' tbody .location');
+                var score_elements = $('#customTable_' + el_number + ' tbody .score');
+                var totalScore_elements = $('#customTable_' + el_number + ' tbody .totalScore');
+
+                var elements = [metric_elements, location_elements, score_elements, totalScore_elements];
+
+                var indicator = $('#customTableDiv_' + el_number + ' .indicator')[0].value;
+
+                if (customTables[el_number - 1] != null && typeof customTables[el_number - 1] !== 'undefined') {
+
+                    if (results[el_number - 1].result1 == 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var values = getResultsSocial(location_elements, metric_elements, score_elements, totalScore_elements);
+                        results[objIndex].indicator = indicator;
+                        results[objIndex].result1 = values;
+
+                        $("#processCount_" + el_number).replaceWith("<label id='processCount_" + el_number + "''> Processes: 1/2 </label>");
+
+                        exportTableToCSV(results[objIndex].indicator, results[objIndex].indicator + '_Process1.csv',
+                            el_number, 1, elements);
+                        return;
+                    }
+
+                    if (results[el_number - 1].result1 != 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var values = getResultsSocial(location_elements, metric_elements, score_elements, totalScore_elements);
+                        results[objIndex].indicator = indicator;
+                        results[objIndex].result2 = values;
+
+                        $("#processCount_" + el_number).replaceWith("<label id='processCount_" + el_number + "''> Processes: 2/2 </label>");
+
+                        $("#exportDatabase_" + el_number).click(function () {
+                            exportTableToCSV(results[objIndex].indicator, results[objIndex].indicator + '_Process2.csv',
+                                el_number, 2, elements)
+                        });
+                        $("#exportDatabase_" + el_number).css("display", "block");
+                        return;
+                    }
+
+                    // if (typeof results[el_number-1] !== 'undefined' && results[el_number-1].error === "One or more values in w_i is not a number") {
+                    //   $("#csvTableErrorMessage").text("One or more values in w_i is not a number");
+                    // }
+
+
+                }
+            }
+
+            if ($('input:radio[name="method"]:checked').val() == "economicMethod") {
+
+                var metric_elements = $('#customTable_' + el_number + ' tbody .metric');
+                var location_elements = $('#customTable_' + el_number + ' tbody .location');
+                var mass_elements = $('#customTable_' + el_number + ' tbody .mass');
+                var cost_elements = $('#customTable_' + el_number + ' tbody .cost');
+
+                var elements = [metric_elements, location_elements, mass_elements, cost_elements];
+
+                var indicator = $('#customTableDiv_' + el_number + ' .indicator')[0].value;
+
+                if (customTables[el_number - 1] != null && typeof customTables[el_number - 1] !== 'undefined') {
+
+                    if (results[el_number - 1].result1 == 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var values = getResultsEconomic(mass_elements, cost_elements);
+                        results[objIndex].indicator = indicator;
+                        results[objIndex].result1 = values;
+
+                        $("#processCount_" + el_number).replaceWith("<label id='processCount_" + el_number + "''> Processes: 1/2 </label>");
+
+                        exportTableToCSVEconomic(results[objIndex].indicator, results[objIndex].indicator + '_Process1.csv',
+                            el_number, 1, elements);
+                        return;
+                    }
+
+                    if (results[el_number - 1].result1 != 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var values = getResultsEconomic(mass_elements, cost_elements);
+                        results[objIndex].indicator = indicator;
+                        results[objIndex].result2 = values;
+
+                        $("#processCount_" + el_number).replaceWith("<label id='processCount_" + el_number + "''> Processes: 2/2 </label>");
+
+                        $("#exportDatabase_" + el_number).click(function () {
+                            exportTableToCSVEconomic(results[objIndex].indicator, results[objIndex].indicator + '_Process2.csv',
+                                el_number, 2, elements)
+                        });
+                        $("#exportDatabase_" + el_number).css("display", "block");
+                        return;
+                    }
+                }
+            }
+
+            if ($('input:radio[name="method"]:checked').val() == "environmentalMethod") {
+
+                var metric_elements = $('#customTable_' + el_number + ' tbody .metric');
+                var location_elements = $('#customTable_' + el_number + ' tbody .location');
+                var mass_elements = $('#customTable_' + el_number + ' tbody .mass');
+                var emFactor_elements = $('#customTable_' + el_number + ' tbody .emissionFactor');
+                var distance_elements = $('#customTable_' + el_number + ' tbody .distance');
+
+                var indicator = $('#customTableDiv_' + el_number + ' .indicator')[0].value;
+
+                var elements = [metric_elements, location_elements, mass_elements, emFactor_elements, distance_elements];
+
+                if (customTables[el_number - 1] != null && typeof customTables[el_number - 1] !== 'undefined') {
+
+                    if (results[el_number - 1].result1 == 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var values = getResultsEnvironmental(mass_elements, emFactor_elements, distance_elements);
+                        results[objIndex].indicator = indicator;
+                        results[objIndex].result1 = values;
+
+                        // console.log(distance_elements);
+                        var type = 1;
+                        distance_elements.each(function () {
+                            if ($(this).val() !== null) {
+                                type = 3;
+                            }
+                        });
+
+                        $("#processCount_" + el_number).replaceWith("<label id='processCount_" + el_number + "''> Processes: 1/2 </label>");
+
+                        exportTableToCSVEnvironmental(results[objIndex].indicator, results[objIndex].indicator + '_Process1.csv',
+                            el_number, 1, type, elements);
+                        return;
+                    }
+
+                    if (results[el_number - 1].result1 != 0 && results[el_number - 1].result2 == 0) {
+
+                        var objIndex = results.findIndex((obj => obj.id == el_number - 1));
+
+                        var values = getResultsEnvironmental(mass_elements, emFactor_elements, distance_elements);
+                        results[objIndex].indicator = indicator;
+                        results[objIndex].result2 = values;
+
+                        var type = 1;
+                        distance_elements.each(function () {
+                            if ($(this).val() !== null) {
+                                type = 3;
+                            }
+                        });
+
+                        $("#processCount_" + el_number).replaceWith("<label id='processCount_" + el_number + "''> Processes: 2/2 </label>");
+
+                        $("#exportDatabase_" + el_number).click(function () {
+                            exportTableToCSVEnvironmental(results[objIndex].indicator, results[objIndex].indicator + '_Process2.csv',
+                                el_number, 2, type, elements)
+                        });
+                        $("#exportDatabase_" + el_number).css("display", "block");
+                        return;
+                    }
+                }
+            }
+        }
+
+        function getResultsSocial(location_elements, metric_elements, score_elements, totalScore_elements) {
+            // selectedMethodId = "Social Analysis Method";
+
+            var metrics = 0;
+            metric_elements.each(function () {
+                metrics++;
+            });
+
+            var location = [];
+            location_elements.each(function () {
+                location.push($(this).val());
+            });
+
+            var score = [];
+            score_elements.each(function () {
+                score.push($(this).val());
+            });
+
+            var totalScore = [];
+            totalScore_elements.each(function () {
+                totalScore.push($(this).val());
+            });
+
+            return createResultsFromCustomTableSocial(metrics, location, score, totalScore);
+        }
+
+        function getResultsEconomic(mass_elements, cost_elements) {
+            var masses = [];
+
+            mass_elements.each(function () {
+                masses.push($(this).val());
+            });
+
+            var costElements = [];
+            cost_elements.each(function () {
+                costElements.push($(this).val());
+            });
+
+            return createResultsFromCustomTableEconomic(masses, costElements);
+        }
+
+        function getResultsEnvironmental(mass_elements, emFactor_elements, distance_elements) {
+            var masses = [];
+            mass_elements.each(function () {
+                masses.push($(this).val());
+            });
+
+            var emFactors = [];
+            emFactor_elements.each(function () {
+                emFactors.push($(this).val());
+            });
+
+            var distances = [];
+            if (distance_elements != null) {
+                distance_elements.each(function () {
+                    distances.push($(this).val());
+                });
+            }
+
+            return createResultsFromCustomTableEnvironmental(masses, emFactors, distances);
+        }
+
+        // The event listener for the file uploads
+        document.getElementById('txtFileUpload_1').addEventListener('change', upload, false);
+        document.getElementById('addNewProcessButton2_1').addEventListener('click', addNewProcessCSV, false);
+        // document.getElementById('addButton_1').addEventListener('click', function() {
+        //   addRows(customTable_1);
+        // }, false);
+        // document.getElementById('addNewProcessButton1_1').addEventListener('click', addNewProcessCustomTable, false);
+        // document.getElementById('txtFileUploadHealth').addEventListener('change', upload, false);
+        // document.getElementById('txtFileUploadEducation').addEventListener('change', upload, false);
+        // document.getElementById('txtFileUploadSafety').addEventListener('change', upload, false);
+
+        // TODO: Add the rest of the events here, pass the ID of the csv somehow (see this.id) and then convert the addNewProcessButton2
+        // to have the appropriate button ID and to call the same fucntion based on the if statements
+
+        // Method that checks that the browser supports the HTML5 File API
+        function browserSupportFileUpload() {
+            var isCompatible = false;
+            if (window.File && window.FileReader && window.FileList && window.Blob) {
+                isCompatible = true;
+            }
+            return isCompatible;
+        }
+
+        // var addRowsHandler = function(customTable) {
+
+        //   //var str ="<tr><td></td><td><input id='email' type='email' name='email' placeholder='Email'/></td><td><input id='email' type='email' name='email' placeholder='Email' /></td><td><input id='email' type='email' name='email' placeholder='Email' /></td><td><input id='email' type='email' name='email' placeholder='Email' /></td><td><input id='email' type='email' name='email' placeholder='Email' /></td><td><input id='email' type='email' name='email' placeholder='Email' /></td></tr>'";
+
+        //   // $('#customTable tbody').append(str);
+
+        //   // if($(this).attr('id') === 'addButtonLifeExpectancy'){
+        //   //     addRows(customTableLifeExpectancy);
+        //   // }
+
+        //   // if($(this).attr('id') === 'addButtonEducation'){
+        //   //     addRows(customTableEducation);
+        //   // }
+
+        //   // if($(this).attr('id') === 'addButtonHealth'){
+        //   //     addRows(customTableHealth);
+        //   // }
+
+        //   // if($(this).attr('id') === 'addButtonSafety'){
+        //   //     addRows(customTableSafety);
+        //   // }
+        //   return function addRows(e){
+
+        //   };
+
+        // };
+
+        function addRows(customTable, method) {
+            if (method == 'socialMethod') {
+                customTable.dataTable().fnAddData([
+                    "",
+                    "<input id='metric' type='text' name='metric' placeholder='Metric' class='metric' />",
+                    "<input id='location' type='text' name='location' placeholder='Location' class='location' />",
+                    "<input id='score' type='text' name='score' placeholder='Score' class='score' />",
+                    "<input id='totalScore' type='text' name='totalScore' placeholder='Total Score' class='totalScore' />"
+                ]);
+            }
+            else if (method == 'economicMethod') {
+                customTable.dataTable().fnAddData([
+                    "",
+                    "<input id='metric' type='text' name='metric' placeholder='Metric' class='metric' />",
+                    "<input id='location' tpe='text' name='location' placeholder='Location' class='location' />",
+                    "<input id='mass' type='text' name='mass' placeholder='Mass' class='mass'/>",
+                    "<input id='cost' type='text' name='cost' placeholder='Cost' class='cost' />"
+                ]);
+            }
+            else if (method == 'environmentalMethod') {
+                customTable.dataTable().fnAddData([
+                    "",
+                    "<input id='metric' type='text' name='metric' placeholder='Metric' class='metric' />",
+                    "<input id='location' tpe='text' name='location' placeholder='Location' class='location' />",
+                    "<input id='mass' type='text' name='mass' placeholder='Mass' class='mass'/>",
+                    "<input id='emissionFactor' type='text' name='emissionFactor' placeholder='Emission Factor' class='emissionFactor' />",
+                    "<input id='distance' type='text' name='distance' placeholder='Distance' class='distance' />"
+                ]);
+            }
+        }
+
+        function addTable(number, method) {
+            var newTable = document.createElement('div');
+            if (method == 'socialMethod') {
+
+                // TODO: Must remove all the previous tables first and reset the counter
+                newTable.innerHTML =
+                    '<div id="customTableDiv_' + number + '" style="display: block;">' +
+                    '<table id="customTable_' + number + '" style="table-layout:fixed; width: 100%;">' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th>Indicator</th>' +
+                    '<th>Metric</th>' +
+                    '<th>Location</th>' +
+                    '<th>Score</th>' +
+                    '<th>Total Score</th>' +
+                    '</tr>' +
+                    '<thead>' +
+                    '<tbody>' +
+                    '<tr>' +
+                    '<td>' +
+                    '<input id="indicator" type="text" name="indicator" placeholder="Indicator" class="indicator"/>' +
+                    '</td>' +
+                    '<td><input id="metric" type="text" name="metric" placeholder="Metric" class="metric"/></td>' +
+                    '<td><input id="location" type="text" name="location" placeholder="Location" class="location" /></td>' +
+                    '<td><input id="score" type="text" name="score" placeholder="score" class="score" /></td>' +
+                    '<td><input id="totalScore" type="text" name="totalScore" placeholder="Total Score" class="totalScore" /></td> ' +
+                    '</tr>' +
+                    '</tbody>' +
+                    '</table>' +
+                    '<input id="addButton_' + number + '" type="button" value="Add new record" class="addButton"/>' +
+                    '<input id="addNewProcessButton1_' + number + '" type="button" value="Add new process" class="addNewProcessButton1"/>' +
+                    '<label id="processCount_' + number + '"> Processes: 0/2 </label>' +
+                    '<label id="customTableErrorMessage_' + number + '" value="" style="color:red"></label>' +
+                    '<br>' +
+                    '<input id="exportDatabase_' + number + '" value="Export as CSV" type="button" style="display: none;">' +
+
+                    '</div>';
+
+            }
+
+            else if (method == 'economicMethod') {
+
+                // TODO: Must remove all the previous tables first and reset the counter
+
+                newTable.innerHTML =
+                    '<div id="customTableDiv_' + number + '" style="display: block;">' +
+                    '<table id="customTable_' + number + '" style="table-layout:fixed; width: 100%;">' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th>Indicator</th>' +
+                    '<th>Metric</th>' +
+                    '<th>Location</th>' +
+                    '<th>Mass</th>' +
+                    '<th>Cost</th>' +
+                    '</tr>' +
+                    '<thead>' +
+                    '<tbody>' +
+                    '<tr>' +
+                    '<td>' +
+                    '<input id="indicator" type="text" name="indicator" placeholder="Indicator" class="indicator"/>' +
+                    '</td>' +
+                    '<td><input id="metric" type="text" name="metric" placeholder="Metric" class="metric"/></td>' +
+                    '<td><input id="location" type="text" name="location" placeholder="Location" class="location" /></td>' +
+                    '<td><input id="mass" type="text" name="mass" placeholder="Mass" class="mass"/></td>' +
+                    '<td><input id="cost" type="text" name="cost" placeholder="Cost" class="cost" /></td>' +
+                    '</tr>' +
+                    '</tbody>' +
+                    '</table>' +
+                    '<input id="addButton_' + number + '" type="button" value="Add new record" class="addButton"/>' +
+                    '<input id="addNewProcessButton1_' + number + '" type="button" value="Add new process" class="addNewProcessButton1"/>' +
+                    '<label id="processCount_' + number + '"> Processes: 0/2 </label>' +
+                    '<label id="customTableErrorMessage_' + number + '" value="" style="color:red"></label>' +
+                    '<br>' +
+                    '<input id="exportDatabase_' + number + '" value="Export as CSV" type="button" style="display: none;">' +
+
+                    '</div>';
+            }
+
+            else if (method == 'environmentalMethod') {
+                newTable.innerHTML =
+                    '<div id="customTableDiv_' + number + '" style="display: block;">' +
+                    '<table id="customTable_' + number + '" style="table-layout:fixed; width: 100%;">' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th>Indicator</th>' +
+                    '<th>Metric</th>' +
+                    '<th>Location</th>' +
+                    '<th>Mass</th>' +
+                    '<th>Emission Factor</th>' +
+                    '<th>Distance</th>' +
+                    '</tr>' +
+                    '<thead>' +
+                    '<tbody>' +
+                    '<tr>' +
+                    '<td>' +
+                    '<input id="indicator" type="text" name="indicator" placeholder="Indicator" class="indicator"/>' +
+                    '</td>' +
+                    '<td><input id="metric" type="text" name="metric" placeholder="Metric" class="metric"/></td>' +
+                    '<td><input id="location" type="text" name="location" placeholder="Location" class="location" /></td>' +
+                    '<td><input id="mass" type="text" name="mass" placeholder="Mass" class="mass"/></td>' +
+                    '<td><input id="emissionFactor" type="text" name="emissionFactor" placeholder="Emission Factor" class="emissionFactor" /></td>' +
+                    '<td><input id="distance" type="text" name="distance" placeholder="Distance" class="distance" /></td>' +
+                    '</tr>' +
+                    '</tbody>' +
+                    '</table>' +
+                    '<input id="addButton_' + number + '" type="button" value="Add new record" class="addButton"/>' +
+                    '<input id="addNewProcessButton1_' + number + '" type="button" value="Add new process" class="addNewProcessButton1"/>' +
+                    '<label id="processCount_' + number + '"> Processes: 0/2 </label>' +
+                    '<label id="customTableErrorMessage_' + number + '" value="" style="color:red"></label>' +
+                    '<br>' +
+                    '<input id="exportDatabase_' + number + '" value="Export as CSV" type="button" style="display: none;">' +
+
+                    '</div>';
+            }
+
+            document.getElementById("customTables").appendChild(newTable);
+
+            // var newCustomTable = $('#customTable_'+number).dataTable();
+            // customTables.push(newCustomTable);
+            // console.log(customTables);
+        }
+
+
+        // Method that reads and processes the selected file
+        function upload(evt) {
+            if (!browserSupportFileUpload()) {
+                alert('The File APIs are not fully supported in this browser!');
+            }
+            else {
+                var data = null;
+                var file = evt.target.files[0];
+                var reader = new FileReader();
+                reader.readAsText(file);
+
+                var uploadId = this.id;
+
+                reader.onload = function (event) {
+                    var csvData = event.target.result;
+                    data = $.csv.toArrays(csvData);
+
+                    // if(uploadId === 'txtFileUpload_1'){
+
+                    // We get the number of the selected upload field and we use it to populate the table and store the data to the 'tables' array
+                    var el_number = uploadId.slice(uploadId.length - 1);
+                    // We clear the table from previous data
+                    if (tables[el_number - 1] != null && typeof tables[el_number - 1] !== 'undefined') {
+                        tables[el_number - 1].destroy();
+                        $('#CSVtable_' + el_number).empty();
+                    }
+
+                    if ($('input:radio[name="method"]:checked').val() == "socialMethod") {
+                        if (checkCSVHeaderSocial(data) == false) {
+                            $("#csvTableErrorMessage_" + el_number).text("Dataset must have five columns and have the header of 'Indicator,Metric,Location,Score,Total Score'");
+                            return;
+                        }
+                        $("#csvTableErrorMessage_" + el_number).text("");
+                    }
+                    else if ($('input:radio[name="method"]:checked').val() == "economicMethod") {
+                        if (checkCSVHeaderEconomic(data) == false) {
+                            $("#csvTableErrorMessage_" + el_number).text("Dataset must have five columns and have the header of 'Indicator,Metric,Location,Mass,Cost (Colection/Transportation, Production, Distribution)'");
+                            return;
+                        }
+                        $("#csvTableErrorMessage_" + el_number).text("");
+
+                    }
+                    else if ($('input:radio[name="method"]:checked').val() == "environmentalMethod") {
+
+                        var type = 1;
+                        if (data[0][5] === "Distance") {
+                            type = 3;
+                        }
+                        if (checkCSVHeaderEnvironmental(data, type) == false) {
+                            $("#csvTableErrorMessage_" + el_number).text("Dataset must have five or six columns and have the header of 'Indicator,Metric,Location,Mass,Emission Factor,(Distance)'");
+                            return;
+                        }
+                        $("#csvTableErrorMessage_" + el_number).text("");
+
+                    }
+
+
+                    tables[el_number - 1] = populateTable(data, $('#CSVtable_' + el_number));
+
+                    // console.log(tables);
+                    // }
+
+                    // if(uploadId === 'txtFileUpload_2'){
+                    //   if (tableHealth != null) {
+                    //     tableHealth.destroy();
+                    //     $('#CSVtable_2').empty();
+                    //   }
+
+                    //   if(checkCSVHeader(data) == false){
+                    //     console.log("Dataset must have five columns and have the header of 'Indicator,Metric,Location,Score,Total Score'");
+                    //   }
+
+                    //   tableHealth = populateTable(data,$('#CSVtable_2'));
+                    // }
+
+                    // if(uploadId === 'txtFileUploadEducation'){
+                    //   if (tableEducation != null) {
+                    //     tableEducation.destroy();
+                    //     $('#CSVtableEducation').empty();
+                    //   }
+
+                    //   if(checkCSVHeader(data) == false){
+                    //     console.log("Dataset must have five columns and have the header of 'Indicator,Metric,Location,Score,Total Score'");
+                    //   }
+
+                    //   tableEducation = populateTable(data,$('#CSVtableEducation'));
+                    // }
+
+                    // if(uploadId === 'txtFileUploadSafety'){
+                    //   if (tableSafety != null) {
+                    //     tableSafety.destroy();
+                    //     $('#CSVtableSafety').empty();
+                    //   }
+
+                    //   if(checkCSVHeader(data) == false){
+                    //     console.log("Dataset must have five columns and have the header of 'Indicator,Metric,Location,Score,Total Score'");
+                    //   }
+
+                    //   tableSafety = populateTable(data,$('#CSVtableSafety'));
+                    //}
+
+                };
+                reader.onerror = function () {
+                    alert('Unable to read ' + file.fileName);
+                };
+            }
+        }
+
+        $("#generateReport").click(async function () {
+
+            // This fucntionality should be implemented using a Unit Testing framework
+            //updateChart(chart, "Life Exprectancy", 1000000, 3000000);
+
+            //Get the rest of the HTML elemensts here (name, scope, GWP etc.)
+
+            // Get the canvas from the HTML
+            var canvas = document.querySelector('#myChart');
+            //creates image
+            var canvasImg = canvas.toDataURL("image/png", 1.0);
+
+            // We add all the info into one list in order to put them into the pdf
+            var list = [];
+            // Add the info
+            list.push($("#infoHeader").text());
+            list.push($("#projectName").val());
+            list.push($("#name").val());
+            list.push($("#email").val());
+
+            // Add the description
+            list.push($("#scopeHeader").text());
+
+            list.push($("textarea#phase1Text").val());
+
+            // list.push($("#phase2Header").text());
+
+            // TODO:This should be wrapped in an if()
+            // let LifeExpectancyTablePromise = new Promise ((resolve,reject) => {
+            //   window.scrollTo(0, 0);
+            //   html2canvas($('#csv-displayLifeExpectancy')[0]).then(function (canvas) {
+            //         var LifeExpectancyTableImg = canvas.toDataURL("image/png", 1.0);
+            //         resolve(LifeExpectancyTableImg);
+            //       });
+            // });
+
+
+            // Add the selected equation
+            list.push($("#methodHeader").text());
+            //list.push($('input:radio[name="methodCalculation"]:checked').text());
+
+            $('input:radio[name="methodCalculation"]:checked').each(function () {
+                var idVal = $(this).attr("id");
+                list.push($("label[for='" + idVal + "']").text());
+            });
+
+            var equation_image = null;
+
+            // if ($('input[id=socialMethod]:checked')) {
+            //   // list.push($("label[for='socialMethod']").text());
+
+            //   equation_image = document.querySelector('#indicator_image').getAttribute("src");
+            // }
+
+            // Add the result
+            list.push("Results:");
+
+            list.push($("#Result1").text());
+            list.push($("#Result2").text());
+
+            list.push($("#phase4Header").text());
+
+            // Remove the 'screenshot' of CSV table for now, there will be problem if we have table the spans in more than one 'table pages'
+            // var LifeExpectancyTablePromiseResult = await LifeExpectancyTablePromise;
+            // console.log("++++"+LifeExpectancyTablePromiseResult);
+            // createPDF(canvasImg, LifeExpectancyTablePromiseResult, list);
+
+            createPDF(canvasImg, null, equation_image, list);
+        });
+    });
+
+
+
+    function populateTable(dataSet, tableElement) {
+        if (typeof (dataSet[0]) === 'undefined') {
+            return null;
+        }
+        else {
+            var columns = [];
+            var data = [];
+            $.each(dataSet, function (index, row) {
+
+                // The first row of the csv data is going to be represent each column in our HTML table
+                if (index == 0) {
+                    $.each(row, function (index, colData) {
+                        columns.push({ title: colData });
+                    });
+                } // Then we just have the rest of the data
+                else {
+                    data.push(row);
+                }
+
+            });
+
+
+            // We assign the above data and columns and some attributes to display on the table.
+            return tableElement.DataTable({
+                data: data,
+                columns: columns,
+                select: {
+                    style: 'single',
+                    items: 'row'
+                },
+                // dom: 'Bfrtip',
+                // buttons: [
+                //     {
+                //         text: 'Get selected data',
+                //         action: function () {
+                //             // var count = table.rows( { selected: true } ).count();
+
+                //             // events.prepend( '<div>'+count+' row(s) selected</div>' );
+                //             // console.log(table.rows({seleted: true}).data()[0]);
+                //             var data  = table.rows({seleted: true}).data()[0];
+
+                //             var result = data[0]*data[1]+data[2]*data[3];
+                //             console.log(data);
+
+                //             results.append($( "<i>"+result+"</i>"));
+                //         }
+                //     }
+                // ]
+            });
+        }
+
+
+    }
+
+</script>
+
+<!-- The library for the charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 {% endblock %}

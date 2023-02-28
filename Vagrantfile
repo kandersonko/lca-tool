@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y git wget curl python3 python3-pip
-    pip3 install flask
+    # pip3 install flask
     
   SHELL
 end
