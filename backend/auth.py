@@ -12,6 +12,7 @@ from backend.config import config
 from mysql.connector import Error
 
 from backend.mail import send_email
+from backend.utils import user_active
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -51,7 +52,7 @@ def load_logged_in_user():
 @bp.route("/plans", methods=("GET", "POST"))
 def plans():
     user = g.user
-    if user is None:
+    if not user_active(user):
         return redirect(url_for("auth.login"))
 
     if request.method == "POST":
@@ -70,6 +71,7 @@ def plans():
                 "kandersonko@gmail.com"  # TODO Change this to real administrator email
             )
             send_email(subject="New Plan Request", body=body, recipients=[admin_email])
+            flash("Plan request sent to admin!")
             return redirect(url_for("index"))
         except Error as e:
             logging.debug(f"Error plan update: {e} ===")
@@ -192,9 +194,38 @@ def activation():
         confirm_url = url_for("auth.activate", token=token)
         body = f"Here is your account activation link: {request.base_url.split('auth/activation')[0][:-1]}{confirm_url}"
         send_email(subject="Account Activation Link", body=body, recipients=[email])
-        return redirect(url_for("index"))
+        # flash(f"Activation link sent to your email {email}")
+        g.activation_link_sent = True
+        return render_template("auth/activation.html")
 
     return render_template("auth/activation.html")
+
+
+@bp.route("/activate/<token>")
+def activate(token):
+    invalid_token = False
+    if g.user is None:
+        return redirect(url_for("auth.login"))
+    else:
+        user_email = g.user.get("email")
+        status = g.user.get("status")
+        email_from_token = confirm_token(token)
+        if status == "active":
+            flash("Account already active")
+            return redirect(url_for("index"))
+        elif user_email == email_from_token:
+            try:
+                manager.activate_user(user_email)
+                return redirect(url_for("index"))
+            except Error as e:
+                logging.debug(f"=== Error account activation: {e}")
+                flash("Error during account activation try again")
+
+        else:
+            flash("Invalid or expired activation token")
+            invalid_token = True
+
+    return render_template("auth/activate.html", invalid_token=invalid_token)
 
 
 @bp.route("/reset/<token>", methods=("GET", "POST"))
@@ -225,37 +256,16 @@ def reset(token):
                     new_password_hash = generate_password_hash(new_password)
                     try:
                         user = manager.reset_password(email, new_password_hash)
+                        if user is not None:
+                            session.clear()
+                            session["user_id"] = user.get("id")
+                            g.user = user
                     except Error as e:
                         logging.debug(f"Error password reset {e}")
                     flash("Password reset successfully!")
                     return redirect(url_for("index"))
 
     return render_template("auth/reset.html")
-
-
-@bp.route("/activate/<token>")
-def activate(token):
-    if g.user is None:
-        return redirect(url_for("auth.login"))
-    else:
-        user_email = g.user.get("email")
-        status = g.user.get("status")
-        email_from_token = confirm_token(token)
-        if status == "active":
-            flash("Account already active")
-            return redirect(url_for("index"))
-        elif user_email == email_from_token:
-            try:
-                manager.activate_user(user_email)
-                return redirect(url_for("index"))
-            except Error as e:
-                logging.debug(f"=== Error account activation: {e}")
-                flash("Error during account activation try again")
-
-        else:
-            flash("Invalid or expired activation token")
-
-    return render_template("auth/activate.html")
 
 
 @bp.route("/logout")

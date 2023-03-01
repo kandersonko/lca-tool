@@ -4,13 +4,19 @@
 <div id="activation" class="panel">
     <div class="main" style="width: 70%">
         <h1>Activate Your Account</h1>
-        {% if g.user.get('status') == 'active' %}
-        <p>Account already activated</p>
+        {% if g.user %}
+            {% if g.user.get('status') == 'active' %}
+                <p>Account already activated</p>
+            {% elif g.activation_link_sent == True %}
+                <div> An activation link was sent to your email</div>
+            {% else %}
+                <form  method="POST">
+                    <input type="submit" value="Request Activation Link">
+                </form> <br>
+                <div> An activation link will be sent to your email {{ g.user.get('email') }} </div> <br>
+            {% endif %}
         {% else %}
-        <div> An activation link will be sent to your email {{ g.user.get('email') }} </div> <br>
-        <form  method="POST">
-            <input type="submit" value="Request Activation Link">
-        </form>
+        <div> You need to login to activate your account</div>
         {% endif %}
     </div>
 </div>

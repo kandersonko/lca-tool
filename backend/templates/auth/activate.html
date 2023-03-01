@@ -4,9 +4,9 @@
 <div id="activation" class="panel">
     <div class="main" style="width: 70%">
         <h1>Account Activation</h1>
-        {% if g.user.get('status') == 'active' %}
+        {% if g.user and g.user.get('status') == 'active' %}
         <p>Account already activated</p>
-        {% else %}
+        {% elif not invalid_token %}
         <p>Click on the link below to activate your account</p>
         <p><a href="{{ confirm_url }}">{{ confirm_url }}</a></p>
         {% endif %}
