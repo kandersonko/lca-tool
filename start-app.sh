@@ -2,7 +2,8 @@
 
 # make sure to edit the cron jobs with the command
 # crontab -e
-# then add @reboot sh /home/ec2-user/start_app.sh
+# then add @reboot sh /home/ec2-user/start-app.sh
+# finally put this script into the home directory: /home/ec2-user/start-app.sh
 
 # start the docker containers
 cd /home/ec2-user
