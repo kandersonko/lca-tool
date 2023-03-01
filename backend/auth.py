@@ -68,7 +68,7 @@ def plans():
             Plan: {plan}
             """
             admin_email = (
-                "kandersonko@gmail.com"  # TODO Change this to real administrator email
+                "lcatool.mail@gmail.com"  # TODO Change this to real administrator email
             )
             send_email(subject="New Plan Request", body=body, recipients=[admin_email])
             flash("Plan request sent to admin!")
