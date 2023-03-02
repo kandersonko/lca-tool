@@ -155,6 +155,9 @@ def login():
             error = "The user does not have an account."
             logging.debug(f"Login user found: {user}")
             return render_template("auth/login.html", error=[error], isError=True)
+        elif user.get("status") == "disabled":
+            error = "A password reset link was sent to your email, use it to reset your password."
+            flash(error)
         elif check_password_hash(user["password"], password) == False:
             error = "Incorrect email or password."
             return render_template("auth/login.html", error=[error], isError=True)
@@ -188,11 +191,11 @@ def forgot_password():
                 body = f"Here is your password reset link: {request.base_url.split('auth/forgot_password')[0][:-1]}{reset_link}"
                 send_email(subject="Password Reset Link", body=body, recipients=[email])
                 try:
-                    manager.set_user_status(email, status="inactive")
+                    manager.set_user_status(email, status="disabled")
                 except Error as e:
-                    logging.debug(f"=== failed to set the user status to inactive: {e}")
+                    logging.debug(f"=== failed to set the user status to disabled: {e}")
 
-                flash(f"Password reset link sent to your email {email}")
+                flash(f"Password reset link sent to your email {email}.")
         except Error as e:
             logging.debug(f"Error during forgot password: {e}")
 
