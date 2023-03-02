@@ -163,7 +163,7 @@ def login():
             session["user_id"] = user["id"]
             g.user = user
             if user.get("status") != "active":
-                return redirect(url_for("auth.activate"))
+                return redirect(url_for("auth.activation"))
             return redirect(url_for("index"))
 
     return render_template("auth/login.html", error=[error], isError=False)
@@ -177,6 +177,11 @@ def forgot_password():
         reset_link = url_for("auth.reset", token=token)
         body = f"Here is your password reset link: {request.base_url.split('auth/forgot_password')[0][:-1]}{reset_link}"
         send_email(subject="Password Reset Link", body=body, recipients=[email])
+        try:
+            manager.set_user_status(email, status="inactive")
+        except Error as e:
+            logging.debug(f"=== failed to set the user status to inactive: {e}")
+
         flash(f"Password reset link sent to your email {email}")
 
     return render_template("auth/forgot_password.html")

@@ -231,6 +231,22 @@ class DBManager:
                 user = self.get_user_by_email(email)
         return user
 
+    def set_user_status(self, email, status):
+        user = None
+        connection = db_connection()
+        if connection:
+            with connection.cursor(buffered=True) as cursor:
+                cursor.execute(
+                    """
+                    UPDATE users SET status=%s
+                    WHERE email=%s
+                    """,
+                    (status, email),
+                )
+                connection.commit()
+                user = self.get_user_by_email(email)
+        return user
+
 
 manager = DBManager()
 # manager.create_users_table()
