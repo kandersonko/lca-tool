@@ -232,7 +232,6 @@ def activate(token):
 def reset(token):
     if request.method == "POST":
         email = request.form["email"]
-        old_password = request.form["old_password"]
         new_password = request.form["new_password"]
 
         user = None
@@ -247,13 +246,13 @@ def reset(token):
                 logging.debug(f"=== Error login: {e} ===")
                 return render_template("auth/login.html", error=[error], isError=True)
             if user is not None:
-                if check_password_hash(user["password"], old_password) == False:
-                    error = "Incorrect email or password."
-                    return render_template(
-                        "auth/forgot_password.html", error=[error], isError=True
-                    )
+                old_password_hash = user.get("password") or ""
+                new_password_hash = generate_password_hash(new_password)
+
+                if check_password_hash(old_password_hash, new_password):
+                    error = "Cannot reset password with old password."
+                    flash(error)
                 else:
-                    new_password_hash = generate_password_hash(new_password)
                     try:
                         user = manager.reset_password(email, new_password_hash)
                         if user is not None:

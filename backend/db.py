@@ -222,7 +222,7 @@ class DBManager:
             with connection.cursor(buffered=True) as cursor:
                 cursor.execute(
                     """
-                    UPDATE users SET password=%s
+                    UPDATE users SET password=%s, status='inactive'
                     WHERE email=%s
                     """,
                     (new_password_hash, email),
