@@ -173,16 +173,28 @@ def login():
 def forgot_password():
     if request.method == "POST":
         email = request.form["email"]
-        token = generate_token(email)
-        reset_link = url_for("auth.reset", token=token)
-        body = f"Here is your password reset link: {request.base_url.split('auth/forgot_password')[0][:-1]}{reset_link}"
-        send_email(subject="Password Reset Link", body=body, recipients=[email])
+        # check if user's email is in the database
         try:
-            manager.set_user_status(email, status="inactive")
-        except Error as e:
-            logging.debug(f"=== failed to set the user status to inactive: {e}")
+            user = manager.get_user_by_email(email)
+            has_email = user and user.get("email") is None
 
-        flash(f"Password reset link sent to your email {email}")
+            logging.debug(f"forgot password: {has_email}")
+            if has_email is None:
+                error = f"No account registered with this email {email}"
+                flash(error)
+            else:
+                token = generate_token(email)
+                reset_link = url_for("auth.reset", token=token)
+                body = f"Here is your password reset link: {request.base_url.split('auth/forgot_password')[0][:-1]}{reset_link}"
+                send_email(subject="Password Reset Link", body=body, recipients=[email])
+                try:
+                    manager.set_user_status(email, status="inactive")
+                except Error as e:
+                    logging.debug(f"=== failed to set the user status to inactive: {e}")
+
+                flash(f"Password reset link sent to your email {email}")
+        except Error as e:
+            logging.debug(f"Error during forgot password: {e}")
 
     return render_template("auth/forgot_password.html")
 
