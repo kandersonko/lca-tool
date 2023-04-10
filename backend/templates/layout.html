@@ -1,66 +1,103 @@
 <!DOCTYPE html>
 <html lang="en-US">
-  <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/lca.css') }}">
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IDEAL Research Group @ Uni. of Idaho</title>
-  </head>
 
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberTraining @ Uni. of Idaho</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/lca.css') }}">
+  <style>
+    .header {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #FFC300;
+      padding: 20px;
+      box-shadow: 0px 0px 10px #000000;
+      transition: all 0.3s ease;
+    }
 
-  <body>
-    <div class="main">
-      <div class="header">
-        <div>
-          <div style="height: 35px; background-color: #FFC300  ; border-bottom: #000000; margin-bottom: 10px;">
-          </div>
-          <h2 class="text">
-            <a href="https://www.uidaho.edu/idaho-falls">
-              <img src="{{ url_for('static', filename='UI.jpg') }}" class="panel" style="width: 271px; height: 90px; float: left;" />
-            </a>
-          </h2>
-          <h2 class="panel" align="center">
-                   Cycon
-            <a href="https://www.uidaho.edu/idaho-falls">
-              <img src="{{ url_for('static', filename='rsml.jpg') }} " class="panel" style="width: 271px; height: 90px; float:right;" />
-            </a>
-          </h2>
-        </div>
-        <div style="height: 17px; background-color: #808080; border-bottom: #b39700; margin-bottom: 30px;">
-        </div>
-        <!-- end .header -->
-      </div>
+    .header:hover {
+      transform: translateY(-10px);
+    }
 
-      <div class="sidenav">
-        <p><a href="{{ url_for('index') }}">Home</a></p>
-        {% if g.user %}
-          <a href="{{ url_for('auth.logout') }}">Log Out</a>
-          {% if g.user['status'] != 'active' %}
-            <a href="{{ url_for('auth.activation') }}">Activation</a>
-          {% else %}
-            <a href="{{ url_for('auth.plans') }}">Plans</a>
-            <a href="{{ url_for('experiments.new_experiment') }}">Experiments</a>
-            <a href="{{ url_for('experiments.results') }}">Results</a>
-          {% endif %}
-        {% else %}
-          <a href="{{ url_for('auth.register') }}">Register</a>
-          <a href="{{ url_for('auth.login') }}">Log In</a>
-        {% endif %}
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo {
+      height: 70px;
+      margin-right: 20px;
+    }
+
+    .title {
+      font-size: 36px;
+      font-weight: bold;
+      color: #000000;
+      margin: 0;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .title:hover {
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main">
+    <div class="header">
+      <div class="logo-container">
+        <a href="https://www.uidaho.edu/idaho-falls">
+          <img src="https://www.linkpicture.com/q/UI_3.jpg" alt="University of Idaho" class="logo" />
+        </a>
       </div>
-      {% block content %}
-      {% endblock %}
-      <div class="main">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          <ul>
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-          </ul>
-        {% endif %}
-        {% endwith %}
-        <p>&nbsp;</p>
+      <a href="http://cycon.nkn.uidaho.edu/" class="title">CyberTraining</a>
+      <div class="logo-container">
+        <a href="https://webpages.uidaho.edu/rsml/lca.html">
+          <img src="https://www.linkpicture.com/q/rsml-1_3.jpg" alt="Research and Innovation in Sustainable Manufacturing and Materials" class="logo" />
+        </a>
       </div>
-  </body>
+    </div>
+
+    <div class="sidenav">
+      <p><a href="{{ url_for('index') }}">Home</a></p>
+      {% if g.user %}
+      <a href="{{ url_for('auth.logout') }}">Log Out</a>
+      {% if g.user['status'] != 'active' %}
+      <a href="{{ url_for('auth.activation') }}">Activation</a>
+      {% else %}
+      <a href="{{ url_for('auth.plans') }}">Plans</a>
+      <a href="{{ url_for('experiments.new_experiment') }}">Experiments</a>
+      <a href="{{ url_for('experiments.results') }}">Results</a>
+      {% endif %}
+      {% else %}
+      <a href="{{ url_for('auth.register') }}">Register</a>
+      <a href="{{ url_for('auth.login') }}">Log In</a>
+      {% endif %}
+    </div>
+    
+    {% block content %}
+    {% endblock %}
+
+    <div class="message">
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% endwith %}
+      <p>&nbsp;</p>
+
+    </div>
+    </div>
+</body>
 </html>
+   
