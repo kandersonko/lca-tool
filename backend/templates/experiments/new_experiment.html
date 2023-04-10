@@ -148,15 +148,11 @@
             <h3>-----------------------------------</h3>
 
             <h2>Phase 1. Experiment information.</h2>
-            <h3 id="infoHeader">Name of the project, Name and Email:</h3>
+            <h3 id="infoHeader">Name of the project:</h3>
 
             <table>
                 <tr>
                     <td><input id="projectName" type="text" name="projectName" placeholder="Name of the project" /></td>
-                </tr>
-                <tr>
-                    <td><input id="name" type="text" name="name" placeholder="Name" /></td>
-                    <td><input id="email" type="email" name="email" placeholder="Email" /></td>
                 </tr>
             </table>
 
@@ -181,10 +177,12 @@
             <!-- The same name allows the one of the two radio buttons to be selected -->
             <input type="radio" id="socialMethod" name="method" value="socialMethod">
             <label for="socialMethod"><i>Social</i></label>
-            <input type="radio" id="economicMethod" name="method" value="economicMethod">
-            <label for="economicMethod"><i>Economic</i></label>
+            <input type="radio" id="Techno-EconomicMethod" name="method" value="Techno-EconomicMethod">
+            <label for="Techno-EconomicMethod"><i>Techno-Economic</i></label>
             <input type="radio" id="environmentalMethod" name="method" value="environmentalMethod">
             <label for="environmentalMethod"><i>Environmental </i> </label>
+            <input type="radio" id="Eco-EnvironmentalMethod" name="method" value="Eco-EnvironmentalMethod">
+            <label for="Eco-EnvironmentalMethod"><i>Eco-Environmental </i> </label>
 
             <!-- <li style="font-size:12pt"> <b>Example:</b> LCA performed herein evaluates GWP for the manure to valueadded
                 products life cycle. GHG emission factors are used to calculate the
@@ -207,51 +205,9 @@
             <h3>-----------------------------------</h3>
 
             <h2 id="phase2Header">Phase 3. Life cycle inventory (LCI):</h2>
-            <!-- <li style="font-size:12pt"> Creating a database</li> -->
+           <!-- Deleting the creating Database option for now -->
 
-            <input type="radio" id="createDatabase" name="databaseMethod" value="createDatabase">
-            <label for="createDatabase"><i>Creating a database</i></label>
-
-            <div id="customTables" style="display: none;">
-                <!-- <div id="customTableDiv_1">
-                    <table id="customTable_1" style="table-layout:fixed; width: 100%;">
-                    <thead>
-                        <tr>
-                        <th>Indicator</th>
-                        <th>Metric</th>
-                        <th>Location</th>
-                        <th>Score</th>
-                        <th>Total Score</th>
-                        </tr>
-                        <thead>
-                        <tbody>
-                        <tr>
-                            <td>
-                            <input id="indicator" type="text" name="indicator" placeholder="Indicator" class="indicator"/>
-                            </td>
-                            <td><input id="metric" type="text" name="metric" placeholder="Metric" class="metric"/></td>
-                            <td><input id="location" type="text" name="location" placeholder="Location" class="location" /></td>
-                            <td><input id="score" type="text" name="score" placeholder="score" class="score" /></td>
-                            <td><input id="totalScore" type="text" name="totalScore" placeholder="Total Score" class="totalScore" /></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <input id="addButton_1" type="button" value="Add new record" class="addButton"/>
-                    <input id="addNewProcessButton1_1" type="button" value="Add new process" class="addNewProcessButton1"/>
-                    <label id="processCount_1"> Processes: 0/2 </label>
-                    <label id="customTableErrorMessage_1" value="" style="color:red"></label>
-                    <br>
-                    <input id="exportDatabase_1" value="Export as CSV" type="button" style="display: none;">
-
-                </div> -->
-                <p>&nbsp;</p>
-            </div>
-
-            <p>&nbsp;</p>
-            <input id="addCustomTable" type="button" value="Add new Custom Table" class="addCustomTable" />
-            <label id="csvTableErrorMessage_2" value="" style="color:red"></label>
-
-            <p>&nbsp;</p>
+            
 
             <!-- <li style="font-size:12pt"> Importing a database</li> -->
             <input type="radio" id="importDatabase" name="databaseMethod" value="importDatabase">
@@ -355,10 +311,6 @@
             <table>
                 <tr>
                     <td><input id="projectName" type="text" name="projectName" placeholder="Name of the project" /></td>
-                </tr>
-                <tr>
-                    <td><input id="name" type="text" name="name" placeholder="Name" /></td>
-                    <td><input id="email" type="email" name="email" placeholder="Email" /></td>
                 </tr>
             </table>
 
@@ -737,7 +689,7 @@
 
                 }
             }
-            if ($('input:radio[name="method"]:checked').val() == "economicMethod") {
+            if ($('input:radio[name="method"]:checked').val() == "Techno-EconomicMethod") {
 
                 if (tables[el_number - 1] != null && typeof tables[el_number - 1] !== 'undefined') {
                     if (results[el_number - 1].result1 == 0 && results[el_number - 1].result2 == 0) {
