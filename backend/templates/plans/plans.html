@@ -1,13 +1,16 @@
-{% extends "layout.html" %} {% block content %}
-<div class="main" style="width: 70%">
-  <form id="plans" method="POST">
-    <select name="plan" form="plans" id="plans" autofocus>
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="main" style="width: 70%; margin: 0 auto; text-align: center;">
+  <h2>Choose a Plan</h2>
+  <form id="plans" method="POST" style="display: inline-block; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
+    <select name="plan" form="plans" id="plans" autofocus style="font-size: 16px; padding: 8px; margin-bottom: 10px;">
       <option value="free">Free</option>
       <option value="premium">Premium</option>
       <option value="enterprise">Enterprise</option>
     </select>
-    <br><br>
-    <input type="submit">
+    <br>
+    <button type="submit" style="background-color: #008CBA; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Choose Plan</button>
   </form>
 </div>
 {% endblock %}
