@@ -307,95 +307,151 @@
 
 
         <!-- Section for MLA -->
-        <div id="MLA_Options" class="desc">
-            <h2>Phase 1. Experiment information.</h2>
-            <h3>Name of the project, Name and Email:</h3>
+       <div id="MLA_Options" class="desc">
+      <h2>Phase 1. Experiment information.</h2>
+      <h3>Name of the project</h3>
+      <form>
+      <table>
+       <tr>
+        <td><input id="projectName" type="text" name="projectName" placeholder="Name of the project" /></td>
+        <td><input type="button" value="Submit" onclick="displayProjectName()" /></td>
+        </tr>
+       </table>
+       </form>
+       </div>
 
-            <table>
-                <tr>
-                    <td><input id="projectName" type="text" name="projectName" placeholder="Name of the project" /></td>
-                </tr>
-            </table>
+
 
             <h3>Goal and scope definition:</h3>
-            <li style="font-size:12pt">
-                <b>
-                    Define your goal, scope, system boundary, functional unit, and case study
-                    assumptions down here:
-                </b>
-            </li>
+<form>
+  <li style="font-size:12pt">
+      <b>
+          Define your goal, scope, system boundary, functional unit, and case study
+          assumptions down here:
+      </b>
+  </li>
 
-            <textarea id="phase1Text" name="phase1Text" rows="2" cols="50">
+  <textarea id="phase1Text" name="phase1Text" rows="2" cols="50"></textarea>
+  <br><br>
+  <input type="button" value="Submit" onclick="submitPhase1Text()">
+</form>
 
-            </textarea>
-            <p>&nbsp;</p>
 
             <h3>-----------------------------------</h3>
 
-
             <!-- Dataset section -->
-            <h2>Phase 2. Load Dataset.</h2><br>
+             <h2>Phase 2. Load Dataset.</h2><br>
+              <form>
             <input type="file" id="csv" name="csv" accept=".csv">
+           <br><br>
+         <input type="button" value="Submit" onclick="submitDataset()">
+         </form>
 
-            <p>&nbsp;</p>
+           
 
             <h3>-----------------------------------</h3>
 
 
             <!-- Preprocess section-->
-            <h2>Phase 3. Preoptimization</h2><br>
+<h2>Phase 3. Preoptimization</h2><br>
 
-            <input type="radio" id=PreOpt_None name="preoptimization" value=PreOpt_None> <label for=PreOpt_None>None</label><br>
-            <input type="radio" id=PreOpt_PCA name="preoptimization" value=PreOpt_PCA> <label for=PreOpt_PCA>PCA: Principal Component Analysis</label><br>
+<form id="preOptForm">
+  <input type="radio" id="PreOpt_None" name="preoptimization" value="PreOpt_None">
+  <label for="PreOpt_None">None</label><br>
+  <input type="radio" id="PreOpt_PCA" name="preoptimization" value="PreOpt_PCA">
+  <label for="PreOpt_PCA">PCA: Principal Component Analysis</label><br>
 
-            <p>None: No preoptimization will be performed</p>
-            <p>PCA: (Info will be added later) </p>
+  <p>None: No preoptimization will be performed</p>
+  <p>PCA: (Info will be added later) </p>
+
+  <br>
+  <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+</form>
+
+<script>
+  $(document).ready(function() {
+    $('input[type=radio][name=preoptimization]').change(function() {
+      var formData = $('#preOptForm').serialize();
+      $.ajax({
+        type: 'POST',
+        url: '/preoptimization',
+        data: formData,
+        success: function(response) {
+          alert('Preoptimization submitted');
+          // do something with the response from the server
+        },
+        error: function() {
+          alert('Preoptimization submission failed');
+        }
+      });
+    });
+  });
+</script>
+
 
             <p>&nbsp;</p>
 
             <h3>-----------------------------------</h3>
 
             <!-- Methods section-->
-            <h2>Phase 4. Method.</h2><br>
+<h2>Phase 4. Method.</h2><br>
 
-            <input type="radio" id=Method_SVM name="methods" value=Method_SVM> <label for=Method_SVM>SVM</label><br>
-            <input type="radio" id=Method_KNN name="methods" value=Method_KNN> <label for=Method_KNN>KNN</label><br>
+<form id="methodForm">
+  <input type="radio" id="Method_SVM" name="methods" value="Method_SVM">
+  <label for="Method_SVM">SVM</label><br>
+  <input type="radio" id="Method_KNN" name="methods" value="Method_KNN">
+  <label for="Method_KNN">KNN</label><br>
 
-            <p>SVM: (Info will be added later) </p>
-            <p>KNN: (Info will be added later) </p>
+  <p>SVM: (Info will be added later) </p>
+  <p>KNN: (Info will be added later) </p>
 
-            <p>&nbsp;</p>
+  <br>
+  <input type="button" value="Submit" onclick="submitMethod()">
+</form>
 
             <h3>-----------------------------------</h3>
 
             <!-- Validation section-->
-            <h2>Phase 5. Validation.</h2><br>
+<h2>Phase 5. Validation.</h2><br>
 
-            <input type="radio" id=Val_k-Fold name="validation" value=Val_k-Fold> <label for=Val_k-Fold>k-Fold</label>
-            <input type="text" id="Val_k-Fold_text" name="Val_k-Fold_textInput"><br>
+<form id="validationForm">
+  <input type="radio" id="Val_k-Fold" name="validation" value="Val_k-Fold">
+  <label for="Val_k-Fold">k-Fold</label>
+  <input type="text" id="Val_k-Fold_text" name="Val_k-Fold_textInput"><br>
 
-            <input type="radio" id=Val_Split name="validation" value=Val_Split> <label for=Val_Split>Split</label>
-            <input type="text" id="Val_Split" name="Val_Split_textInput"><br>
+  <input type="radio" id="Val_Split" name="validation" value="Val_Split">
+  <label for="Val_Split">Split</label>
+  <input type="text" id="Val_Split_textInput" name="Val_Split_textInput"><br>
 
-            <p>k-Fold: Please give one number for the number of folds</p>
-            <p>Split: Please give the percentage for the training, testing, sets or training, testing and validation sets organized in train - test or train - test - validation format. Example: 80 - 10 - 10 </p>
+  <p>k-Fold: Please give one number for the number of folds</p>
+  <p>Split: Please give the percentage for the training, testing, sets or training, testing and validation sets organized in train - test or train - test - validation format. Example: 80 - 10 - 10 </p>
 
-            <p>&nbsp;</p>
+  <br>
+  <input type="button" value="Submit" onclick="submitValidation()">
+</form>
+
 
             <h3>-----------------------------------</h3>
 
-            <!-- Metrics section-->
-            <h2>Phase 6. Metric.</h2><br>
+           <!-- Metrics section-->
+<h2>Phase 6. Metric.</h2><br>
 
-            <input type="checkbox" id=Met_ACC name="metric" value=Met_ACC> <label for=Met_ACC>ACC</label><br>
-            <input type="checkbox" id=Met_F1 name="metric" value=Met_F1> <label for=Met_F1>F1</label><br>
-            <input type="checkbox" id=Met_ROC name="metric" value=Met_ROC> <label for=Met_ROC>ROC</label><br>
+<form id="metricForm">
+  <input type="checkbox" id="Met_ACC" name="metric" value="Met_ACC">
+  <label for="Met_ACC">ACC</label><br>
+  <input type="checkbox" id="Met_F1" name="metric" value="Met_F1">
+  <label for="Met_F1">F1</label><br>
+  <input type="checkbox" id="Met_ROC" name="metric" value="Met_ROC">
+  <label for="Met_ROC">ROC</label><br>
 
-            <p>ACC: (Info will be added later) </p>
-            <p>F1: (Info will be added later) </p>
-            <p>ROC: (Info will be added later) </p>
+  <p>ACC: (Info will be added later) </p>
+  <p>F1: (Info will be added later) </p>
+  <p>ROC: (Info will be added later) </p>
 
-            <p>&nbsp;</p>
+  <br>
+  <input type="button" value="Submit" onclick="submitMetric()">
+</form>
+
 
             <h3>-----------------------------------</h3>
 
@@ -1449,6 +1505,72 @@
 
 
     }
+    <!-- Script for the Mla info-->
+function displayProjectName() {
+    var projectName = document.getElementById("projectName").value;
+    alert("Project Name: " + projectName);
+  }
+  function submitPhase1Text() {
+    var phase1Text = document.getElementById("phase1Text").value;
+    alert("Phase 1 Text: " + phase1Text);
+  }
+  function submitDataset() {
+    var csv = document.getElementById("csv").files[0];
+    alert("File Name: " + csv.name);
+    // Here you can use the file object to read the contents of the CSV file
+  }
+  function submitMethod() {
+  var formData = $('#methodForm').serialize();
+  var selectedMethod = $('input[name="methods"]:checked').val();
+  if (selectedMethod) {
+    $.ajax({
+      type: 'POST',
+      url: '/method',
+      data: formData,
+      success: function(response) {
+        alert('Method submitted');
+        // do something with the response from the server
+      },
+      error: function() {
+        alert('Method submission failed');
+      }
+    });
+  } else {
+    alert('Please select a method');
+  }
+}
+
+  function submitValidation() {
+    var formData = $('#validationForm').serialize();
+    $.ajax({
+      type: 'POST',
+      url: '/validate',
+      data: formData,
+      success: function(response) {
+        alert('Validation successful');
+        // do something with the response from the server
+      },
+      error: function() {
+        alert('Validation failed');
+      }
+    });
+  }
+  function submitMetric() {
+    var formData = $('#metricForm').serialize();
+    $.ajax({
+      type: 'POST',
+      url: '/metric',
+      data: formData,
+      success: function(response) {
+        alert('Metric submitted');
+        // do something with the response from the server
+      },
+      error: function() {
+        alert('Metric submission failed');
+      }
+    });
+  }
+          
 
 </script>
 
