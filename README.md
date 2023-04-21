@@ -11,7 +11,7 @@ The application has the following structure:
 ## Development
 
 ### Docker
-For development, the easiest approach is to use the docker destop application. After installation, any editor can be used to edit the code. However, to spawn a locally development server with the application running, start the docker containers:
+For development, the easiest approach is to use the docker desktop application. After installation, any editor can be used to edit the code. However, to spawn a local development server to run the application locally, start the docker desktop application. Then, in a terminal prompt, run the command:
 
 ```bash
 # inside the root folder of the repository, run the command:
@@ -20,4 +20,10 @@ docker compose up
 
 ### Vagrant 
 For development with `vagrant`, use `vagrant up` in the root of the repository to build the VM.
-Then use `vagrant ssh` to login to the VM. Also, `cd /vagrant` and `./init-database.sh` to initialize the database. Finally, run `docker compose up` to start the containers. 
+Then use `vagrant ssh` to login to the VM. Finally, `cd /vagrant` and run `docker compose up` to start the containers:
+```bash
+vagrant up
+vagrant ssh
+cd vagrant
+docker compose up
+```
