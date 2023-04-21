@@ -4,9 +4,9 @@
 The application uses docker compose to orchestrate three containers or services:  a MYSQL database (db), a Flask application (backend) an NGINX proxy to route the request to the backend. The services communicate internally using docker networking and only the proxy is exposed to the internet. When a user sends a request, it is routed from the proxy to the backend.
 
 The application has the following structure:
-1. db: contains the database password and Dockerfile
-2. backend: contains the Flask application code and Dockerfile
-3. proxy: contains the NGINX proxy configuration and Dockerfile
+1. db: contains the database password and database schema files
+2. backend: contains the Flask application code and a Dockerfile
+3. proxy: contains the NGINX proxy configuration and a Dockerfile
 
 ## Development
 
