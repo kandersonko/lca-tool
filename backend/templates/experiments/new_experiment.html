@@ -319,12 +319,7 @@
        </table>
        </form>
        </div>
-<script>
-function displayProjectName() {
-    var projectName = document.getElementById("projectName").value;
-    alert("Project Name: " + projectName);
-  }
-    </script>
+
 
 
             <h3>Goal and scope definition:</h3>
@@ -340,12 +335,6 @@ function displayProjectName() {
   <br><br>
   <input type="button" value="Submit" onclick="submitPhase1Text()">
 </form>
-<script>
- function submitPhase1Text() {
-    var phase1Text = document.getElementById("phase1Text").value;
-    alert("Phase 1 Text: " + phase1Text);
-  }
-    </script>
 
 
             <h3>-----------------------------------</h3>
@@ -357,13 +346,7 @@ function displayProjectName() {
            <br><br>
          <input type="button" value="Submit" onclick="submitDataset()">
          </form>
-<script>
- function submitDataset() {
-    var csv = document.getElementById("csv").files[0];
-    alert("File Name: " + csv.name);
-    // Here you can use the file object to read the contents of the CSV file
-  }
-    </script>
+
            
 
             <h3>-----------------------------------</h3>
@@ -424,29 +407,6 @@ function displayProjectName() {
   <br>
   <input type="button" value="Submit" onclick="submitMethod()">
 </form>
-<script>
-function submitMethod() {
-  var formData = $('#methodForm').serialize();
-  var selectedMethod = $('input[name="methods"]:checked').val();
-  if (selectedMethod) {
-    $.ajax({
-      type: 'POST',
-      url: '/method',
-      data: formData,
-      success: function(response) {
-        alert('Method submitted');
-        // do something with the response from the server
-      },
-      error: function() {
-        alert('Method submission failed');
-      }
-    });
-  } else {
-    alert('Please select a method');
-  }
-}
-    </script>
-
 
             <h3>-----------------------------------</h3>
 
@@ -468,23 +428,6 @@ function submitMethod() {
   <br>
   <input type="button" value="Submit" onclick="submitValidation()">
 </form>
-    <script>
-        function submitValidation() {
-    var formData = $('#validationForm').serialize();
-    $.ajax({
-      type: 'POST',
-      url: '/validate',
-      data: formData,
-      success: function(response) {
-        alert('Validation successful');
-        // do something with the response from the server
-      },
-      error: function() {
-        alert('Validation failed');
-      }
-    });
-  }
-    </script>
 
 
             <h3>-----------------------------------</h3>
@@ -507,23 +450,6 @@ function submitMethod() {
   <br>
   <input type="button" value="Submit" onclick="submitMetric()">
 </form>
-    <script>
-        function submitMetric() {
-    var formData = $('#metricForm').serialize();
-    $.ajax({
-      type: 'POST',
-      url: '/metric',
-      data: formData,
-      success: function(response) {
-        alert('Metric submitted');
-        // do something with the response from the server
-      },
-      error: function() {
-        alert('Metric submission failed');
-      }
-    });
-  }
-        </script>
 
 
             <h3>-----------------------------------</h3>
@@ -1578,7 +1504,74 @@ function submitMethod() {
 
 
     }
-   
+    <!-- Script for the Mla info-->
+function displayProjectName() {
+    var projectName = document.getElementById("projectName").value;
+    alert("Project Name: " + projectName);
+  }
+  function submitPhase1Text() {
+    var phase1Text = document.getElementById("phase1Text").value;
+    alert("Phase 1 Text: " + phase1Text);
+  }
+  function submitDataset() {
+    var csv = document.getElementById("csv").files[0];
+    alert("File Name: " + csv.name);
+    // Here you can use the file object to read the contents of the CSV file
+  }
+  function submitMethod() {
+  var formData = $('#methodForm').serialize();
+  var selectedMethod = $('input[name="methods"]:checked').val();
+  if (selectedMethod) {
+    $.ajax({
+      type: 'POST',
+      url: '/method',
+      data: formData,
+      success: function(response) {
+        alert('Method submitted');
+        // do something with the response from the server
+      },
+      error: function() {
+        alert('Method submission failed');
+      }
+    });
+  } else {
+    alert('Please select a method');
+  }
+}
+
+  function submitValidation() {
+    var formData = $('#validationForm').serialize();
+    $.ajax({
+      type: 'POST',
+      url: '/validate',
+      data: formData,
+      success: function(response) {
+        alert('Validation successful');
+        // do something with the response from the server
+      },
+      error: function() {
+        alert('Validation failed');
+      }
+    });
+  }
+  function submitMetric() {
+    var formData = $('#metricForm').serialize();
+    $.ajax({
+      type: 'POST',
+      url: '/metric',
+      data: formData,
+      success: function(response) {
+        alert('Metric submitted');
+        // do something with the response from the server
+      },
+      error: function() {
+        alert('Metric submission failed');
+      }
+    });
+  }
+          
+
+</script>
 
 <!-- The library for the charts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
