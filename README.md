@@ -10,6 +10,8 @@ The application has the following structure:
 
 ## Development
 
+The MySQL database requires a `password.txt` file to be present in the `db` folder. Create the `password.txt` file and put a password inside. Delete the MySQL docker volume `lca-tool_db-data` and restart the containers.
+
 ### Docker
 For development, the easiest approach is to use the docker desktop application. After installation, any editor can be used to edit the code. However, to spawn a local development server to run the application locally, start the docker desktop application. Then, in a terminal prompt, run the command:
 
