@@ -1,16 +1,152 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="main" style="width: 70%; margin: 0 auto; text-align: center;">
-  <h2>Choose a Plan</h2>
-  <form id="plans" method="POST" style="display: inline-block; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
-    <select name="plan" form="plans" id="plans" autofocus style="font-size: 16px; padding: 8px; margin-bottom: 10px;">
-      <option value="free">Free</option>
-      <option value="premium">Premium</option>
-      <option value="enterprise">Enterprise</option>
-    </select>
-    <br>
-    <button type="submit" style="background-color: #008CBA; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Choose Plan</button>
-  </form>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>My Page</title>
+  <style>
+    /* Style for the form */
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Style for the select box */
+select {
+  font-size: 16px;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Style for the button */
+button {
+  background-color: #008CBA;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #005D7A;
+}
+
+/* Style for the CSV files list */
+#csv-files {
+  display: none;
+  margin-top: 20px;
+}
+
+#csv-files h3 {
+  font-size: 20px;
+  margin-top: 0;
+}
+
+#csv-files ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#csv-files li {
+  margin-bottom: 10px;
+}
+
+#csv-files li a {
+  color: #008CBA;
+  text-decoration: none;
+}
+
+#csv-files li a:hover {
+  text-decoration: underline;
+}
+
+  </style>
+</head>
+<body>
+  <div class="main">
+    <h2>Choose a Plan</h2>
+    <form id="plans" method="POST">
+      <select name="plan" form="plans" id="plan-select" autofocus>
+        <option value="free">Free</option>
+        <option value="premium">Premium</option>
+        <option value="enterprise">Enterprise</option>
+      </select>
+      <button type="submit" id="choose-plan-btn">Choose Plan</button>
+    </form>
+
+    <div id="csv-files">
+      <h3>CSV Files</h3>
+      <ul>
+        <li><a href="data:text/txt;base64,SmFudWFyeSxGZWJydWFyeSxNYXJjaCxBcHJpbA0KMTAwLDEwMCw1MDAsMTIwDQoxNjAsMTAwLDMwMCwxMzANCjIwNSwxNDAsMjEwLDE1MA0KMzMzLDEwMiwxMzAsMTAwDQo=" download>SampleCSV.csv</a></li>
+        <li><a href="data:text/txt;base64,SW5kaWNhdG9yLE1ldHJpYyxMb2NhdGlvbixWYWx1ZSxUb3RhbCBQb3B1bGF0aW9uLFdlaWdodCx3X2kNCkxpZmUgRXhwZWN0YW5jeSxDYW5jZXIgTW9ydGFsaXR5LFVuaXRlZCBTdGF0ZXMsNjE2NzE0LDMyNzIwMDAwMCwwLjAwMTg4NDgyMywxMTYyLjM5NjU3DQosSGVhcnQgRGlzZWFzZSBNb3J0YWxpdHksVW5pdGVkIFN0YXRlcyw2NDcwMDAsLDAuMDAxOTc3Mzg0LDEyNzkuMzY3MzU5DQo=" download>SLCA Equation Example_2</a></li>
+        <li><a href="data:text/txt;base64,SW5kaWNhdG9yLE1ldHJpYyxMb2NhdGlvbixWYWx1ZSxUb3RhbCBQb3B1bGF0aW9uLFdlaWdodCx3X2kNCkxpZmUgRXhwZWN0YW5jeSxDYW5jZXIgTW9ydGFsaXR5LFVuaXRlZCBTdGF0ZXMsNjE2NzE0LDMyNzIwMDAwMCwwLjAwMTg4NDgyMywxMTYyLjM5NjU3DQosSGVhcnQgRGlzZWFzZSBNb3J0YWxpdHksVW5pdGVkIFN0YXRlcyw2NDcwMDAsLDAuMDAxOTc3Mzg0LDEyNzkuMzY3MzU5DQosLCwsLCwNCkhlYWx0aCxDYW5jZXIgTW9ydGFsaXR5LFVuaXRlZCBTdGF0ZXMsNjE2NzE0LDMyNzIwMDAwMCwwLjAwMTg4NDgyMywxMTYyLjM5NjU3DQosSGVhcnQgRGlzZWFzZSBNb3J0YWxpdHksVW5pdGVkIFN0YXRlcyw2NDcwMDAsLDAuMDAxOTc3Mzg0LDEyNzkuMzY3MzU5DQo=" download>SLCA Equation Example</a></li>
+        <li><a href="data:text/txt;base64,PDw8PDw8PCBIRUFEDQpJbmRpY2F0b3IsTWV0cmljLExvY2F0aW9uLE1hc3MsQ29zdA0KQ3VwIEV4YW1wbGUsLFVTQSwxMCwxMA0KLCxVU0EsMTAsMTANCj09PT09PT0NCu+7v0luZGljYXRvcixSYXcgTWF0ZXJpYWwgTWFzcyxDb2xlY3Rpb24vVHJhbnNwb3J0YXRpb24gQ29zdA0KQ3VwIEV4YW1wbGUsMTAsMTANCiwxMCwxMA0KPj4+Pj4+PiBtYXN0ZXINCg==" download>SLCA_Cup_Example</a></li>
+        <li><a href="data:text/txt;base64,77u/SW5kaWNhdG9yLE1ldHJpYyxMb2NhdGlvbixTY29yZSxUb3RhbCBTY29yZQ0KQmFzaWMgRWR1Y2F0aW9uLE1hdGggU2tpbGxzIChvdXQgb2YgNTAwIHNjb3JlKSxVbml0ZWQgU3RhdGVzLDI0MCw1MDANCixSZWFkaW5nIFNraWxscyAob3V0IG9mIDUwMCBzY29yZSksVW5pdGVkIFN0YXRlcywyMjIsNTAwDQo=" download>SLCA_Education_Example</a></li>
+        <li><a href="data:text/txt;base64,77u/SW5kaWNhdG9yLE1ldHJpYyxMb2NhdGlvbixTY29yZSxUb3RhbCBTY29yZQ0KSGVhbHRoY2FyZSxTYXRpc2ZhY3Rpb24gd2l0aCBIZWFsdGhjYXJlIChvdXQgb2YgMTAwIHNjb3JlKSxJZGFobyw3NiwxMDANCixQb3AuIHdpdGggUmVndWxhciBGYW1pbHkgRG9jICgjIHZpc2l0cyBwZXIgMTAwIHBlb3BsZSBwZXIgeWVhciksVW5pdGVkIFN0YXRlcyw2My43LDEwMA0K" download>SLCA_Healthcare_Example_1</a></li>
+        <li><a href="data:text/txt;base64,77u/SW5kaWNhdG9yLE1ldHJpYyxMb2NhdGlvbixTY29yZSxUb3RhbCBTY29yZQ0KSGVhbHRoY2FyZSxTYXRpc2ZhY3Rpb24gd2l0aCBIZWFsdGhjYXJlIChvdXQgb2YgMTAwIHNjb3JlKSxJZGFobyw2MCwxMDANCixQb3AuIHdpdGggUmVndWxhciBGYW1pbHkgRG9jICgjIHZpc2l0cyBwZXIgMTAwIHBlb3BsZSBwZXIgeWVhciksVW5pdGVkIFN0YXRlcyw1My43LDEwMA0K" download>SLCA_Healthcare_Example_2</a></li>
+        <li><a href="data:text/txt;base64,77u/SW5kaWNhdG9yLE1hc3MsRW1pc3Npb24gRmFjdG9yIERvd24sIERpc3RhbmNlDQpQZG93biBFeGFtcGxlLDEwLDEwLDEwDQosMTAsMTAsMTANCg==" download>SLCA_Pdown_Example</a></li>
+
+
+
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const planSelect = document.getElementById('plan-select');
+    const csvFilesDiv = document.getElementById('csv-files');
+    const choosePlanBtn = document.getElementById('choose-plan-btn');
+
+    // Hide the CSV files list by default
+    csvFilesDiv.style.display = 'none';
+
+    // Show the CSV files list when the user selects the "Premium" plan
+    planSelect.addEventListener('change', (event) => {
+      if (event.target.value === 'premium') {
+        csvFilesDiv.style.display = 'block';
+      } else {
+        csvFilesDiv.style.display = 'none';
+      }
+    });
+
+    // Download the selected CSV file when the user clicks on a file link
+    csvFilesDiv.addEventListener('click', (event) => {
+      const link = event.target.closest('a');
+      if (link) {
+        event.preventDefault();
+        const filename = link.getAttribute('href');
+        const downloadLink = document.createElement('a');
+        downloadLink.setAttribute('href', filename);
+        downloadLink.setAttribute('download', '');
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      }
+    });
+
+    // Prevent the form from submitting when the user clicks the "Choose Plan" button
+    choosePlanBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+    });
+  </script>
+</body>
+</html>
+
 {% endblock %}
