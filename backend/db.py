@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 import os
 from uuid import uuid4
-from flask import Flask
+from flask import Flask, g
 from mysql.connector import connect, pooling, Error
 
 
@@ -25,7 +25,7 @@ def create_connection_pool(password_file, pool_size=20, pool_name="db_pool", **k
     )
 
 
-def db_connection(password_file="/run/secrets/db-password"):
+def db_connection(password_file):
     global connection_pool
 
     connection = None
@@ -48,9 +48,23 @@ def db_connection(password_file="/run/secrets/db-password"):
     return connection
 
 
-class DBManager:
+# Use singleton pattern
+class DBManager(object):
+    _instance = None
+    password_file = None
+
     def __init__(self):
-        db_connection()
+        raise RuntimeError("Call instance() instead")
+
+    @classmethod
+    def instance(cls, password_file):
+        if cls._instance is None:
+            print("Creating new instance")
+            cls._instance = cls.__new__(cls)
+            # Put any initialization here.
+            cls._instance.password_file = password_file
+            db_connection(password_file)
+        return cls._instance
 
     def _unpack_user(self, query_result):
         if query_result is None:
@@ -84,7 +98,7 @@ class DBManager:
         return user
 
     def create_user(self, first_name, last_name, email, password_hash, affiliation):
-        connection = db_connection()
+        connection = db_connection(self.password_file)
         if connection:
             with connection.cursor(buffered=True) as cursor:
                 try:
@@ -111,7 +125,7 @@ class DBManager:
 
     def get_user_by_email(self, email):
         user = None
-        connection = db_connection()
+        connection = db_connection(self.password_file)
         if connection:
             with connection.cursor(buffered=True) as cursor:
                 cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
@@ -127,7 +141,7 @@ class DBManager:
     def get_user_by_id(self, user_id):
         user = None
         logging.debug(f"=== Retrieving user by user_id: {user_id} ===")
-        connection = db_connection()
+        connection = db_connection(self.password_file)
         if connection:
             with connection.cursor(buffered=True) as cursor:
                 cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
@@ -139,7 +153,7 @@ class DBManager:
     def update_user_last_login(self, user_id):
         user = None
         logging.debug(f"=== Updating last_login_on for user with id : {user_id} ===")
-        connection = db_connection()
+        connection = db_connection(self.password_file)
         if connection:
             with connection.cursor(buffered=True) as cursor:
                 cursor.execute(
@@ -159,7 +173,7 @@ class DBManager:
         price = plan_prices.get(tier)
         storage_url = str(uuid4())
 
-        connection = db_connection()
+        connection = db_connection(self.password_file)
         if connection:
             with connection.cursor(buffered=True) as cursor:
                 try:
@@ -201,7 +215,7 @@ class DBManager:
     def activate_user(self, email):
         logging.debug(f"=== Activating user with email : {email} ===")
         user = None
-        connection = db_connection()
+        connection = db_connection(self.password_file)
         if connection:
             with connection.cursor(buffered=True) as cursor:
                 cursor.execute(
@@ -217,7 +231,7 @@ class DBManager:
 
     def reset_password(self, email, new_password_hash):
         user = None
-        connection = db_connection()
+        connection = db_connection(self.password_file)
         if connection:
             with connection.cursor(buffered=True) as cursor:
                 cursor.execute(
@@ -233,7 +247,7 @@ class DBManager:
 
     def set_user_status(self, email, status):
         user = None
-        connection = db_connection()
+        connection = db_connection(self.password_file)
         if connection:
             with connection.cursor(buffered=True) as cursor:
                 cursor.execute(
@@ -246,7 +260,3 @@ class DBManager:
                 connection.commit()
                 user = self.get_user_by_email(email)
         return user
-
-
-manager = DBManager()
-# manager.create_users_table()

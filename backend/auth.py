@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, flash
+from flask import Blueprint, current_app, flash
 from flask import request, render_template, g, redirect, url_for
 from flask import session
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from itsdangerous import URLSafeTimedSerializer
 import logging
 
-from backend.db import manager
+from backend.db import DBManager
 from backend.config import config
 from mysql.connector import Error
 
@@ -43,6 +43,9 @@ def load_logged_in_user():
         g.user = None
     else:
         try:
+            manager = DBManager.instance(
+                password_file=current_app.config["DB_PASSWORD"]
+            )
             g.user = manager.get_user_by_id(user_id)
             logging.debug(f"=== User: {g.user} ")
         except Error as e:
@@ -87,6 +90,7 @@ def register():
     """
     if request.method == "POST":
         error = None
+        manager = DBManager.instance(password_file=current_app.config["DB_PASSWORD"])
         logging.debug(f"=== Register request: {request}")
         if request.method == "POST":
             email = request.form["email"]
@@ -143,6 +147,7 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
         user = None
+        manager = DBManager.instance(password_file=current_app.config["DB_PASSWORD"])
         try:
             user = manager.get_user_by_email(email)
             logging.debug(f"=== Login: ", email, password, user)
@@ -177,6 +182,7 @@ def forgot_password():
     if request.method == "POST":
         email = request.form["email"]
         # check if user's email is in the database
+        manager = DBManager.instance(password_file=current_app.config["DB_PASSWORD"])
         try:
             user = manager.get_user_by_email(email)
             has_email = user and user.get("email") is None
@@ -230,6 +236,7 @@ def activate(token):
         user_email = g.user.get("email")
         status = g.user.get("status")
         email_from_token = confirm_token(token)
+        manager = DBManager.instance(password_file=current_app.config["DB_PASSWORD"])
         if status == "active":
             flash("Account already active")
             return redirect(url_for("index"))
@@ -256,6 +263,7 @@ def reset(token):
 
         user = None
         error = None
+        manager = DBManager.instance(password_file=current_app.config["DB_PASSWORD"])
         if confirm_token(token) != email:
             flash("Invalid token or email")
         else:
@@ -265,6 +273,7 @@ def reset(token):
             except Error as e:
                 logging.debug(f"=== Error login: {e} ===")
                 return render_template("auth/login.html", error=[error], isError=True)
+
             if user is not None:
                 old_password_hash = user.get("password") or ""
                 new_password_hash = generate_password_hash(new_password)

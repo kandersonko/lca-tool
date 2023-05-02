@@ -13,6 +13,9 @@ instance
 # Jetbrains
 .idea
 
+# vscode
+.vscode
+
 # swap files
 *.swp
 
