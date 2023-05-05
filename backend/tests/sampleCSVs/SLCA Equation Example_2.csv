@@ -1,0 +1,6 @@
+Indicator,Metric,Location,Value,Total Population,Weight,w_i
+Life Expectancy,Cancer Mortality,United States,616714,327200000,0.001884823,1162.39657
+,Heart Disease Mortality,United States,647000,,0.001977384,1279.367359
+,,,,,,
+Health,Cancer Mortality,United States,616714,327200000,0.001884823,1162.39657
+,Heart Disease Mortality,United States,647000,,0.001977384,1279.367359
