@@ -28,3 +28,4 @@ ENV/
 env.bak/
 venv.bak/
 password.txt
+.DS_Store
