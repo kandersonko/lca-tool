@@ -1,8 +1,9 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, expect, BrowserContext
 
 
-def test_plans(page: Page) -> None:
-    page.goto("http://localhost/")
+def test_plans(browser_context: BrowserContext) -> None:
+    page = browser_context.new_page()
+    page.goto("https://localhost/")
 
     # login
     page.get_by_role("link", name="Log In").click()

@@ -1,8 +1,9 @@
 import re
-from playwright.sync_api import Page, expect
+from playwright.sync_api import expect, BrowserContext
 
 
-def test_homepage(page: Page) -> None:
+def test_homepage(browser_context: BrowserContext) -> None:
+    page = browser_context.new_page()
     page.goto("http://localhost/")
     expect(page).to_have_title(re.compile("CyberTraining @ Uni. of Idaho"))
 

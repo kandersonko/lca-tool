@@ -1,8 +1,16 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, expect, Playwright, BrowserContext
+import pytest
+
+# TODO add more tests
+# validations
+# failing test cases
+#
 
 
-def test_login(page: Page) -> None:
-    page.goto("http://localhost/")
+def test_login(browser_context: BrowserContext) -> None:
+    page = browser_context.new_page()
+
+    page.goto("https://localhost/")
 
     page.get_by_role("link", name="Log In").click()
     page.get_by_label("Email:").click()

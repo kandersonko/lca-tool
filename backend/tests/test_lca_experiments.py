@@ -1,8 +1,11 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import expect, BrowserContext
 
-
-def test_lca_experiments(page: Page) -> None:
-    page.goto("http://localhost/")
+# TODO split the test into multiple parts
+# improve the test cases
+# add more tests
+def test_lca_experiments(browser_context: BrowserContext) -> None:
+    page = browser_context.new_page()
+    page.goto("https://localhost/")
 
     # login
     page.get_by_role("link", name="Log In").click()
