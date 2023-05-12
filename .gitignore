@@ -29,3 +29,6 @@ env.bak/
 venv.bak/
 password.txt
 .DS_Store
+*.crt
+*.key
+*.webm
