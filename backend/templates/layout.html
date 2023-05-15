@@ -73,7 +73,8 @@
       {% else %}
       <a href="{{ url_for('auth.plans') }}">Plans</a>
       <a href="{{ url_for('experiments.new_experiment') }}">LCA</a>
-      <a href="{{ url_for('experiments.results') }}">Cycon</a>
+      <a href="{{ url_for('experiments.cycon') }}">Cycon</a>
+      <a href="{{ url_for('experiments.results') }}">Results</a>
       {% endif %}
       {% else %}
       <a href="{{ url_for('auth.register') }}">Register</a>
