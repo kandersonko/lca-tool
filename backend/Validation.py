@@ -3,7 +3,7 @@ import sys
 import io
 import base64
 
-import MLA
+from backend import MLA
 
 import pandas as pd
 import numpy as np
