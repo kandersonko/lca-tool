@@ -3,6 +3,8 @@ import sys
 import json
 from flask import Blueprint
 from flask import Flask, request, render_template, g, redirect, url_for, flash
+from flask import jsonify
+import logging
 
 import pandas as pd
 import numpy as np
@@ -25,10 +27,14 @@ from sklearn.neighbors import KNeighborsClassifier
 # sys.path.insert(1, '/Classes/')
 from backend import MLA
 from backend import Validation
+from backend.calculator import Calculator
 
 from sklearn.model_selection import KFold
 
 bp = Blueprint("experiments", __name__, url_prefix="/experiments")
+
+
+logger = logging.getLogger()
 
 # should be modified to work with a db or class if necessary.
 # Otherwise, the choces being pre-available on page load will slightly speed the process.
@@ -123,6 +129,11 @@ def load_possible_experiments():
     g.Metric = zip(g.section_Choices, g.section_Info)
 
 
+@bp.route("/mla")
+def mla():
+    return render_template("experiments/mla.html")
+
+
 @bp.route("/lca")
 def lca():
     return render_template("experiments/lca.html")
@@ -131,6 +142,240 @@ def lca():
 @bp.route("/cycon")
 def cycon():
     return render_template("experiments/cycon.html")
+
+
+@bp.route("/calculate", methods=["POST"])
+def calculate():
+    variables = request.form.get("variables")
+    equation = request.form.get("equation")
+    csv_file = request.files.get("csv_file")
+    calculator = Calculator(equation=equation, variables=variables, csv_file=csv_file)
+
+    evaluated, results = calculator.evaluate()
+    logger.debug("calculate: %s", csv_file)
+
+    if not evaluated:
+        flash(str(results))
+        return jsonify(results=[])
+    else:
+        return jsonify(results=results.to_html(index=False))
+
+
+@bp.route("/run_experiment_1", methods=["POST"])
+def run_experiment_1():
+    output = request.get_json()
+    data = json.loads(output)
+
+    fileName = data["fileName"]
+    csvFile = data["csvFile"]
+    PreOpt = data["PreOpt"]
+    Method = data["Method"]
+    Validation = data["Validation"]
+    Validation_Option = data["Validation_Option"]
+
+    # convert csv to usable dataset
+    ## Manual location currently...Will be changed when implemented in Host.
+    ## Should further be changed when database is setup.
+    ManualLoc = (
+        "C://Users//vizen//Documents//College//Research//Cycon//sample_MLA_CSVs//"
+    )
+
+    dataset = pd.read_csv(ManualLoc + csvFile)
+
+    df = dataset.to_numpy()
+
+    # Split
+    if data["Validation"] == "Split":
+        # Split dataset to training and testing set
+        train_set, test_set = train_test_split(
+            df, test_size=float(Validation_Option), random_state=1, shuffle=True
+        )
+
+        length = train_set.shape[1] - 1
+
+        x_train = train_set[:, 0:length]
+        y_train = train_set[:, length]
+        x_test = test_set[:, 0:length]
+        y_test = test_set[:, length]
+
+        if data["Method"] == "KNN":
+            model = KNeighborsClassifier(n_neighbors=3)
+
+        elif data["Method"] == "SVM":
+            model = SVC(kernel="rbf", random_state=1)
+
+        # Perform the Method.
+        model.fit(x_train, y_train)
+
+        # Predict the testset
+        y_pred = model.predict(x_test)
+
+        # Obtain the Metrics
+        Accuracy = accuracy_score(y_test, y_pred)
+        F1 = f1_score(y_test, y_pred, average=None)
+        F1_micro = f1_score(y_test, y_pred, average="micro")
+        F1_macro = f1_score(y_test, y_pred, average="macro")
+        Precision = precision_score(y_test, y_pred, average=None)
+        Precision_micro = precision_score(y_test, y_pred, average="micro")
+        Precision_macro = precision_score(y_test, y_pred, average="macro")
+
+        # create a confusion matrix
+        # def fig_to_base64(fig):
+        #    img = io.BytesIO()
+        #    fig.savefig(img, format='png',
+        #            bbox_inches='tight')
+        #    img.seek(0)
+
+        #    return base64.b64encode(img.getvalue())
+
+        confusion_matrix(y_test, y_pred)
+
+        cm = confusion_matrix(y_test, y_pred, labels=model.classes_)
+        color = "white"
+        disp = ConfusionMatrixDisplay(
+            confusion_matrix=cm, display_labels=model.classes_
+        )
+        disp.plot()
+        temp = os.getcwd()
+        plt.savefig(temp + "\\backend\\static\\Images\\" + fileName + ".png")
+
+        # data_uri = base64.b64encode(open('conf_matrix.png', 'rb').read()).decode('utf-8')
+        # img_tag = '<img src="data:image/png;base64,{0}">'.format(data_uri)
+
+        # encoded = fig_to_base64(fig)
+        # my_html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8'))
+
+        # Send the Metrics
+        Metrics = {
+            "Accuracy": Accuracy,
+            "F1": F1.tolist(),
+            "F1_micro": F1_micro,
+            "F1_macro": F1_macro,
+            "Precision": Precision.tolist(),
+            "Precision_micro": Precision_micro,
+            "Precision_macro": Precision_macro,
+        }
+
+    # K-Fold
+    elif data["Validation"] == "K-Fold":
+        length = df.shape[1] - 1
+
+        X = df[:, 0:length]
+        y = df[:, length]
+
+        kf = KFold(
+            n_splits=int(data["Validation_Option"]), shuffle=True, random_state=1
+        )
+        kf.get_n_splits(X)
+
+        acc_list = []
+        prec_list = []
+        prec_micro_list = []
+        prec_macro_list = []
+        f1_list = []
+        f1_micro_list = []
+        f1_macro_list = []
+        y_test_list = np.empty(1)
+        y_predict_list = np.empty(1)
+
+        for i, (train_index, test_index) in enumerate(kf.split(X)):
+            print("Fold: " + str(i) + " ===============================")
+            x_train = X[train_index]
+            y_train = y[train_index]
+            x_test = X[test_index]
+            y_test = y[test_index]
+
+            if data["Method"] == "KNN":
+                model = KNeighborsClassifier(n_neighbors=3)
+
+            elif data["Method"] == "SVM":
+                model = SVC(kernel="rbf", random_state=1)
+
+            model.fit(X[train_index], y[train_index])
+
+            y_pred = model.predict(X[test_index])
+
+            acc = accuracy_score(y[test_index], y_pred)
+            prec = precision_score(y[test_index], y_pred, average=None)
+            prec_micro = precision_score(y[test_index], y_pred, average="micro")
+            prec_macro = precision_score(y[test_index], y_pred, average="macro")
+            f1 = f1_score(y[test_index], y_pred, average=None)
+            f1_micro = f1_score(y[test_index], y_pred, average="micro")
+            f1_macro = f1_score(y[test_index], y_pred, average="macro")
+
+            acc_list.append(acc)
+            prec_list.append(prec)
+            prec_micro_list.append(prec_micro)
+            prec_macro_list.append(prec_macro)
+            f1_list.append(f1)
+            f1_micro_list.append(f1_micro)
+            f1_macro_list.append(f1_macro)
+            y_test_list = np.concatenate((y_test_list, y[test_index]))
+            y_predict_list = np.concatenate((y_predict_list, y_pred))
+
+            cm = confusion_matrix(y[test_index], y_pred, labels=model.classes_)
+            color = "white"
+            disp = ConfusionMatrixDisplay(
+                confusion_matrix=cm, display_labels=model.classes_
+            )
+            disp.plot()
+            temp = os.getcwd()
+            plt.savefig(
+                temp
+                + "\\backend\\static\\Images\\"
+                + fileName
+                + "_fold_"
+                + str(i)
+                + ".png"
+            )
+
+        acc_list = np.array(acc_list)
+        prec_list = np.array(prec_list)
+        prec_micro_list = np.array(prec_micro_list)
+        prec_macro_list = np.array(prec_macro_list)
+        f1_list = np.array(f1_list)
+        f1_micro_list = np.array(f1_micro_list)
+        f1_macro_list = np.array(f1_macro_list)
+
+        y_test_list = np.delete(y_test_list, 0)
+        y_predict_list = np.delete(y_predict_list, 0)
+
+        acc_average = np.average(acc_list)
+        prec_average = np.average(prec_list, axis=0)
+        prec_micro_average = np.average(prec_micro_list)
+        prec_macro_average = np.average(prec_macro_list)
+        f1_average = np.average(f1_list, axis=0)
+        f1_micro_average = np.average(f1_micro_list)
+        f1_macro_average = np.average(f1_macro_list)
+
+        cm = confusion_matrix(y_test_list, y_predict_list, labels=model.classes_)
+        color = "white"
+        disp = ConfusionMatrixDisplay(
+            confusion_matrix=cm, display_labels=model.classes_
+        )
+        disp.plot()
+        temp = os.getcwd()
+        plt.savefig(temp + "\\backend\\static\\Images\\" + fileName + "_Collective.png")
+
+        # Send the Metrics
+        Metrics = {
+            "acc_list": acc_list.tolist(),
+            "prec_list": prec_list.tolist(),
+            "prec_micro_list": prec_micro_list.tolist(),
+            "prec_macro_list": prec_macro_list.tolist(),
+            "f1_list": f1_list.tolist(),
+            "f1_micro_list": f1_micro_list.tolist(),
+            "f1_macro_list": f1_macro_list.tolist(),
+            "acc_average": acc_average,
+            "prec_average": prec_average.tolist(),
+            "prec_micro_average": prec_micro_average,
+            "prec_macro_average": prec_macro_average,
+            "f1_average": f1_average.tolist(),
+            "f1_micro_average": f1_micro_average,
+            "f1_macro_average": f1_macro_average,
+        }
+
+    return json.dumps(Metrics)
 
 
 @bp.route("/run_experiment", methods=["POST"])
