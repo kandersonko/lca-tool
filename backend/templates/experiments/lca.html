@@ -158,7 +158,6 @@
                   <label id="processCount2_1"> Processes: 0/2 </label>
                   <label id="csvTableErrorMessage_1" value="" style="color:red"></label>
                 </div>
-              <!-- </canvas> -->
             </div>
           </div>
 
@@ -283,7 +282,6 @@
 
   $(document).ready(function () {
 
-    //$('#customTable').DataTable();
 
     var tableLifeExpectancy = null;
     var tableHealth = null;
@@ -379,14 +377,8 @@
 
         if (this.value == 'createDatabase') {
           $("#customTables").css("display", "block");
-          // $("#customTableDivHealth").css("display", "block");
-          // $("#customTableDivEducation").css("display", "block");
-          // $("#customTableDivSafety").css("display", "block");
 
           $("#readyTables").css("display", "none");
-          // $("#readyTableDivHealth").css("display", "none");
-          // $("#readyTableDivEducation").css("display", "none");
-          // $("#readyTableDivSafety").css("display", "none");
 
           resultsLifeExpectancy.result1 = 0;
           resultsLifeExpectancy.result2 = 0;
@@ -407,14 +399,8 @@
         }
         if (this.value == 'importDatabase') {
           $("#readyTables").css("display", "block");
-          // $("#readyTableDivHealth").css("display", "block");
-          // $("#readyTableDivEducation").css("display", "block");
-          // $("#readyTableDivSafety").css("display", "block");
-          
+
           $("#customTables").css("display", "none");
-          // $("#customTableDivHealth").css("display", "none");
-          // $("#customTableDivEducation").css("display", "none");            
-          // $("#customTableDivSafety").css("display", "none");
 
           resultsLifeExpectancy.result1 = 0;
           resultsLifeExpectancy.result2 = 0;
@@ -484,12 +470,7 @@
       }
     );
 
-    // $(".addNewTableButton").click(
-    //   function () {    
-    //     addTable();
-    //   }
-    // );
-    
+
     var customTablesCounter = 1;
     var methodLocked = 0;
     function createNewTable(method){
