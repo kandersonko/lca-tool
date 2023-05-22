@@ -184,10 +184,15 @@ def getParameters(algorithm_Name):
 # get settings to fill the model parameters.
 def getSettings(data, Parameters):
     settings = {}
+    settings["Parameter_Length"] = len(Parameters)
 
     # Cycle through parameters
     for i in range(len(Parameters)):
         temp = Parameters["Parameter_" + str(i)]["Name"]+"_checked"
+
+        # get name
+        settings["Parameter_" + str(i) + "_Name"] = Parameters["Parameter_" + str(i)]["Name"]
+
         # get default
         if data[Parameters["Parameter_" + str(i)]["Name"]+"_checked"] == "false":
             settings["Parameter_" + str(i)] = Parameters["Parameter_" + str(i)]["Default"]
@@ -281,4 +286,4 @@ def createModel(data):
                     class_weight=settings['Parameter_10'],
                     ccp_alpha=settings['Parameter_11'])
         
-    return model
+    return model, settings
