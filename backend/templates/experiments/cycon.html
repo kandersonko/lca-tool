@@ -1,6 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.4/jspdf.min.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.1/html2pdf.bundle.min.js"></script>
+
+
 <div id="home" class="panel">
     <div class="main" style="width: 70%">
 
@@ -32,12 +39,12 @@
         </script>
 
         <!--
-    <script type="text/javascript">
-        function changeMethod(methods, Parameters) {
-            document.getElementById("Results").innerHTML = "Hello?"
-        }
-    </script>
-        -->
+        <script type="text/javascript">
+            function changeMethod(methods, Parameters) {
+                document.getElementById("Results").innerHTML = "Hello?"
+            }
+        </script>
+            -->
         <form id="cyconForm">
             <h1>Welcome, fill out the following information to start an experiment.</h1>
 
@@ -149,10 +156,17 @@
                 <input type="text" id="K-Fold_Input" name="K-Fold_Input"><br>
 
                 <input type="radio" id=Split name="validation" value=Split> <label for=Split>Split</label>
-                <input type="text" id="Split_Input" name="Split_Input"><br>
+                <input type="text" id="Split_Input" name="Split_Input"><br><br>
 
-                <p>k-Fold: Please give one number for the number of folds</p>
-                <p>Split: Please give the percentage for the training, testing, sets or training, testing and validation sets organized in train - test or train - test - validation format. Example: 80 - 10 - 10 </p>
+                <p>k-Fold: Number for the number of folds</p>
+                <p>Split: The percentage for the training set. </p>
+                <br><br>
+
+                <p><b>Additional Options:</b></p><br>
+                <label for=Random_State>Random State </label><input type="text" id="Random_State_Input" name="Random_State_Input"><br>
+                <label for=Shuffle>Shuffle </label>
+                <input type="radio" id="Shuffle_True" name="Shuffle" value=True> <label for="Shuffle_True">True</label>
+                <input type="radio" id="Shuffle_False" name="Shuffle" value=False checked> <label for="Shuffle_False">False</label><br>
 
                 <p>&nbsp;</p>
 
@@ -191,14 +205,14 @@
 
         <form id="resultForm">
 
-            <input type="checkbox" id=Met_ACC name="Met_ACC" value=Met_ACC> <label for=Met_ACC>ACC</label><br>
-            <input type="checkbox" id=Met_Precision name="Met_Precision" value=Met_Precision> <label for=Met_Precision>Precision</label><br>
-            <input type="checkbox" id=Met_Precision_Micro name="Met_Precision_Micro" value=Met_Precision_Micro> <label for=Met_Precision_Micro>Precision (Micro)</label><br>
-            <input type="checkbox" id=Met_Precision_Macro name="Met_Precision_Macro" value=Met_Precision_Macro> <label for=Met_Precision_Macro>Precision (Macro)</label><br>
-            <input type="checkbox" id=Met_F1 name="Met_F1" value=Met_F1> <label for=Met_F1>F1</label><br>
-            <input type="checkbox" id=Met_F1_Micro name="Met_F1_Micro" value=Met_F1_Micro> <label for=Met_F1_Micro>F1 (Micro)</label><br>
-            <input type="checkbox" id=Met_F1_Macro name="Met_F1_Macro" value=Met_F1_Macro> <label for=Met_F1_Macro>F1 (Macro)</label><br>
-            <input type="checkbox" id=Met_CM name="Met_CM" value=Met_CM> <label for=Met_CM>Confusion Matrix</label><br>
+            <input type="checkbox" id=Met_ACC name="Met_ACC" value=Met_ACC checked> <label for=Met_ACC>ACC</label><br>
+            <input type="checkbox" id=Met_Precision name="Met_Precision" value=Met_Precision checked> <label for=Met_Precision>Precision</label><br>
+            <input type="checkbox" id=Met_Precision_Micro name="Met_Precision_Micro" value=Met_Precision_Micro checked> <label for=Met_Precision_Micro>Precision (Micro)</label><br>
+            <input type="checkbox" id=Met_Precision_Macro name="Met_Precision_Macro" value=Met_Precision_Macro checked> <label for=Met_Precision_Macro>Precision (Macro)</label><br>
+            <input type="checkbox" id=Met_F1 name="Met_F1" value=Met_F1 checked> <label for=Met_F1>F1</label><br>
+            <input type="checkbox" id=Met_F1_Micro name="Met_F1_Micro" value=Met_F1_Micro checked> <label for=Met_F1_Micro>F1 (Micro)</label><br>
+            <input type="checkbox" id=Met_F1_Macro name="Met_F1_Macro" value=Met_F1_Macro checked> <label for=Met_F1_Macro>F1 (Macro)</label><br>
+            <input type="checkbox" id=Met_CM name="Met_CM" value=Met_CM checked> <label for=Met_CM>Confusion Matrix</label><br>
 
 
             <button type="submit"
@@ -207,41 +221,43 @@
             </button>
             <p>&nbsp;</p>
 
-        </form>     
+            <h3>-----------------------------------</h3>
 
-        <h3>-----------------------------------</h3>
-        
 
-        <!-- <input type="radio" id="method4" name="method" value="method4">
-        <label for="method4"><i>Method developed by user (comming soon)</i></label><br>
-        <h3>-----------------------------------</h3> -->
-        <!-- <p>&nbsp;</p> -->
-        <!-- <li style="font-size:12pt">Results</li> -->
-        <p id="Status">Current Status of experiment.</p>
-        <p id="StatusInfo"></p>
-        <p>&nbsp;</p>
-        <p id="Results_Title">RESULTS.</p>
-        <p id="Results"></p>
+            <!-- <input type="radio" id="method4" name="method" value="method4">
+            <label for="method4"><i>Method developed by user (comming soon)</i></label><br>
+            <h3>-----------------------------------</h3> -->
+            <!-- <p>&nbsp;</p> -->
+            <!-- <li style="font-size:12pt">Results</li> -->
 
-        <!-- <input id="displayResults" type="button" value="Show Results" class="displayResults"/> -->
-        <p>&nbsp;</p>
+            <p id="Status">Current Status of experiment.</p>
+            <p id="StatusInfo"></p>
+            <p>&nbsp;</p>
+            <p id="Results_Title">RESULTS.</p>
+            <p id="Results" style="background-color: white;"></p>
 
-        <!--
-    <li style="font-size:12pt"> Analyzing the results</li>
+            <!-- <input id="displayResults" type="button" value="Show Results" class="displayResults"/> -->
+            <p>&nbsp;</p>
 
-    <canvas id="myChart" style="height: 370px; width: 100%;"></canvas>
-    <p>&nbsp;</p>
-        -->
-        <li style="font-size:12pt">
-            Generating a PDF report <button type="reportButton"
-                                            id="generateReportMLA">
-                Generate
-            </button>
-        </li>
-        <p>&nbsp;</p>
+            <!--
+            <li style="font-size:12pt"> Analyzing the results</li>
 
-        </ul>
-        <p>&nbsp;</p>
+            <canvas id="myChart" style="height: 370px; width: 100%;"></canvas>
+            <p>&nbsp;</p>
+                -->
+            <li style="font-size:12pt">
+                Generating a PDF report <button type="button"
+                                                id="generateReport" onclick="generatePDF()">
+                    Generate
+                </button>
+            </li>
+            <p>&nbsp;</p>
+
+            </ul>
+            <p>&nbsp;</p>
+
+
+        </form>
 
     </div>
 </div>
@@ -250,9 +266,9 @@
 
 
 <!-- This is the old javascript method for running LCA. Will need to change to json file, run on python and run on seprate vm later.-->
-<script src="../../static/js/Cycon_javabackend.js"></script>
+<script src="../../static/js/Cycon_events.js"></script>
 
-<!-- This is the javascript method for running MLA-->
+<!-- This is the javascript method for running MLA-->>
 
 
 <!-- The library for the charts -->
