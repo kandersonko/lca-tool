@@ -22,6 +22,9 @@ from sklearn.metrics import confusion_matrix
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
+#sys.path.append("backend")
+#sys.path.append("Classes")
+#sys.path.insert(1, '/Classes/')
 from backend import MLA
 from backend import Validation
 from backend.calculator import Calculator
@@ -61,6 +64,15 @@ def load_possible_experiments():
 
 
 
+# Old LCA for testing purposes, REMOVE BEFORE SUBMITTING.
+@bp.route("/LCA_Old")
+def LCA_Old():
+    return render_template("experiments/LCA_Old.html")
+
+# REMOVE ASAP
+@bp.route("/new_experiment")
+def new_experiment():
+    return render_template("experiments/new_experiment.html")
 
 @bp.route("/lca")
 def lca():
@@ -90,7 +102,7 @@ def calculate():
 
 
 @bp.route("/run_experiment", methods=["POST"])
-def run_experiment():   
+def run_experiment():    
     output = request.get_json()
     formData = json.loads(output)
 
@@ -103,6 +115,7 @@ def run_experiment():
     # K-Fold
     elif data['validation'] == "K-Fold":
         Metrics = Validation.K_Fold(data)
+
     
     # Open json file for the experiment.
     baseFolder = os.getcwd()
