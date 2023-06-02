@@ -143,6 +143,36 @@ function changeAlgorithm(algorithms, Parameters) {
                             }
                         }
 
+                        if (data[Parameter]["Type"][Type_Int] == "option_float") {
+                            for (var Option_Int in data[Parameter]["Possible"]) {
+                                // create radio button
+                                var radio_name = pair + "_Input";
+                                var option = data[Parameter]["Possible"][Option_Int];
+                                var radio = document.createElement("input");
+                                radio.type = "radio";
+                                radio.name = radio_name;
+                                radio.id = option;
+                                radio.value = option;
+                                s1.appendChild(radio);
+
+                                // create label for radio button
+                                var name_label = option;
+                                var label = document.createElement('label')
+                                label.htmlFor = name_label;
+                                label.appendChild(document.createTextNode(name_label));
+
+                                s1.appendChild(label);
+
+                                if (option == "float") {
+                                    var selection = pair + "_Float_Input";
+                                    var textbox = document.createElement("input");
+                                    textbox.type = "text";
+                                    textbox.name = selection;
+                                    s1.appendChild(textbox);
+                                }
+                            }
+                        }
+
                         // Input of type int will create a textbox.
                         else if (data[Parameter]["Type"][Type_Int] == "int") {
 
@@ -154,6 +184,15 @@ function changeAlgorithm(algorithms, Parameters) {
                         }
 
                         else if (data[Parameter]["Type"][Type_Int] == "int_or_null") {
+
+                            var selection = pair + "_Input";
+                            var textbox = document.createElement("input");
+                            textbox.type = "text";
+                            textbox.name = selection;
+                            s1.appendChild(textbox);
+                        }
+
+                        else if (data[Parameter]["Type"][Type_Int] == "float_or_null") {
 
                             var selection = pair + "_Input";
                             var textbox = document.createElement("input");
@@ -286,7 +325,7 @@ function getData(form) {
                 // Phase 2
                 // Name of Dataset
             writeData.paragraph += "Dataset Information".bold().italics().big() + "<br\>"
-            writeData.paragraph += "Dataset File: ".bold().italics() + "<br\>" + dict_data["csvFIle"] + "<br\><br\>"
+            writeData.paragraph += "Dataset File: ".bold().italics() + "<br\>" + dict_data["csvFileName"] + "<br\><br\>"
                 // Preoptimization
             writeData.paragraph += "Preoptimization: ".bold().italics() + "<br\>" + dict_data["preoptimization"] + "<br\><br\>"
                 // Phase 3
@@ -446,7 +485,7 @@ function displayResults(form) {
             var writeData = {
                 paragraph: ''
             }
-            
+
             // Experiment info
             // Phase 1
             // Name of Experiment
@@ -640,15 +679,15 @@ function generatePDF(form) {
 
     let element = document.getElementById('Results')
 
+    
     html2pdf(element, {
         margin: 10,
         filename: "Results.pdf",
         image: { type: 'jpeg', quality: 2 },
         html2canvas: { dpi: 300, letterRendering: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-    }).toPdf().get('pdf')
-        .then(function (pdf) {
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    }).get('pdf').then(function (pdf) {
             var totalPages = pdf.internal.getNumberOfPages();
 
             for (let i = 1; i <= totalPages; i++) {
@@ -659,6 +698,7 @@ function generatePDF(form) {
                 pdf.text("Created using the IDeaL Cycon Tool: https://cycon.nkn.uidaho.edu/cycon", pdf.internal.pageSize.getWidth() - 120, pdf.internal.pageSize.getHeight() - 10);
             }
         }).save();
+
 }
 
 document.getElementById("resultForm").addEventListener("button", function (e) {

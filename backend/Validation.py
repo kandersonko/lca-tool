@@ -24,6 +24,7 @@ def getDataset(fileName):
      # convert csv to usable dataset
     ## Manual location currently...Will be changed when implemented in Host.
     ## Should further be changed when database is setup.
+
     ManualLoc = "/backend/tests/sampleCSV_MLA_Classification/"
 
     dataset = pd.read_csv(ManualLoc + fileName)
@@ -32,8 +33,6 @@ def getDataset(fileName):
 
 
 def Split(data):
-
-    # return getDataset(data['csvFileName'])
     # convert csv to usable dataset
     df = getDataset(data['csvFileName'])
 
@@ -120,7 +119,10 @@ def Split(data):
                 "F1_micro": F1_micro,
                 "F1_macro": F1_macro,
 
-                "cm_overall": my_base64_jpgData}
+                "cm_overall": my_base64_jpgData,
+                
+                "Val_Random_State": random_state,
+                "Val_Shuffle": shuffle}
 
     Metrics.update(settings)
 
