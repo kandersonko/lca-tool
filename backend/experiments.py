@@ -45,7 +45,8 @@ def load_possible_experiments():
     #----------------new Cycon--------------------------->
     # First choice is between various categories of ML 
     g.section_Method = ["MLA: Machine Learning Algorithm", "DLANN: Deep Learning Artifical Neural Networks"]
-    g.section_Info = [["MLA info"],["DLANN info"]]
+    g.section_Info = [["Machine learning algorithms are mathematical model mapping methods. They are used to learn patterns embedded in the existing training dataset in order to perform pattern recognition, classification, and prediction.\n\nCurrently, the only algorithms available on cycon is under the classification objective. Other objectives that will be added later include clustering and regression."],
+                      ["DLANN info"]]
     g.Methodologies = zip(g.section_Method, g.section_Info)
 
     # Obtain the selection of Algorithm Names and Definition.
@@ -169,3 +170,5 @@ def getAlgorithmParameters():
 @bp.route("/results")
 def results():
     return render_template("experiments/results.html")
+
+

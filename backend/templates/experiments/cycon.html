@@ -6,6 +6,83 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.1/html2pdf.bundle.min.js"></script>
 
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Popup container - can be anything you want */
+        .popup {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+            /* The actual popup */
+            .popup .popuptext {
+                visibility: hidden;
+                width: 800px;
+                background-color: #555;
+                font-size: 12pt;
+                color: #fff;
+                text-align: left;
+                border-radius: 12px;
+                padding: 20px 20px;
+                position: absolute;
+                z-index: 1;
+                bottom: 125%;
+                left: 50%;
+                margin-left: -80px;
+            }
+
+                /* Popup arrow */
+                .popup .popuptext::after {
+                    content: "";
+                    position: absolute;
+                    top: 100%;
+                    left: 9.5%;
+                    margin-left: -5px;
+                    border-width: 5px;
+                    border-style: solid;
+                    border-color: #555 transparent transparent transparent;
+                }
+
+            /* Toggle this class - hide and show the popup */
+            .popup .show {
+                visibility: visible;
+                -webkit-animation: fadeIn 1s;
+                animation: fadeIn 1s;
+            }
+
+            /* Show the tooltip text when you mouse over the tooltip container */
+            .popup:hover .popuptext {
+                visibility: visible;
+            }
+
+        /* Add animation (fade in the popup) */
+        @-webkit-keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
 
 <div id="home" class="panel">
     <div class="main" style="width: 70%">
@@ -38,12 +115,12 @@
         </script>
 
         <!--
-        <script type="text/javascript">
-            function changeMethod(methods, Parameters) {
-                document.getElementById("Results").innerHTML = "Hello?"
-            }
-        </script>
-            -->
+    <script type="text/javascript">
+        function changeMethod(methods, Parameters) {
+            document.getElementById("Results").innerHTML = "Hello?"
+        }
+    </script>
+        -->
         <form id="cyconForm">
             <h1>Welcome, fill out the following information to start an experiment.</h1>
 
@@ -53,7 +130,17 @@
             <h2>Phase 1. Experiment information.</h2>
             <hr />
 
-            <h3 id="infoHeader">Name of the project:</h3>
+            <h3 id="infoHeader">
+                Name of the project:
+                <!-- information to display for the name of the project -->
+                <div class="popup" onclick="popupInformation('Experiment_Name_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span class="popuptext" id="Experiment_Name_Info">Project name that will be used for future reference.</span>
+                </div>
+            </h3>
+
             <table>
                 <tr>
                     <td><input id="projectName" type="text" name="projectName" placeholder="Name of the project" /></td>
@@ -61,7 +148,17 @@
 
             </table>
 
-            <h3 id="scopeHeader">Goal and scope definition:</h3>
+            <h3 id="scopeHeader">
+                Goal and scope definition:
+                <!-- information to display for the definition of the project -->
+                <div class="popup" onclick="popupInformation('Experiment_Definition_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span class="popuptext" id="Experiment_Definition_Info">Project definition. <br><br> Will be shown for viewer`s understanding when displaying the results.</span>
+                </div>
+            </h3>
+
             <li style="font-size:12pt">
                 <b>
                     Define your goal, scope, system boundary, functional unit, and case study
@@ -78,7 +175,16 @@
 
             <!-- Dataset section -->
             <hr />
-            <h2>Phase 2. Load Dataset.</h2><br>
+            <h2>
+                Phase 2. Load Dataset.
+                <!-- information to display for the loadable dataset -->
+                <div class="popup" onclick="popupInformation('Experiment_Dataset_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span style="white-space: pre-wrap" class="popuptext" id="Experiment_Dataset_Info">File to load for cycon project. <br><br> Currently accepts CSVs (comma-separated values) only.</span>
+                </div>
+            </h2><br>
             <hr />
             <input type="file" id="csvFile" name="csvFile" accept=".csv">
 
@@ -88,7 +194,16 @@
 
 
             <!-- Preprocess section-->
-            <h2>Phase 2a. Preoptimization</h2><br>
+            <h2>
+                Phase 2a. Preoptimization
+                <!-- information to display for the preoptimization section -->
+                <div class="popup" onclick="popupInformation('Experiment_Dataset_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span style="white-space: pre-wrap" class="popuptext" id="Experiment_Preoptimization_Info">Currently not implemented. <br><br> Will eventually allow such optimization as balancing dataset, removing null values, fill null values with average, set all values to numberic, etc.</span>
+                </div>
+            </h2><br>
 
             <input type="radio" id=PreOpt_None name="preoptimization" value=PreOpt_None> <label for=PreOpt_None>None</label><br>
             <input type="radio" id=PreOpt_PCA name="preoptimization" value=PreOpt_PCA> <label for=PreOpt_PCA>PCA: Principal Component Analysis</label><br>
@@ -108,10 +223,29 @@
             <hr />
 
             {% for choices, infos in g.Methodologies%}
-            <input type="radio" id={{ choices }} name="methodology" value={{ choices }}> <label for={{ choices }}>{{ choices }}</label><br>
+            <input type="radio" id={{ choices }} name="methodology" value={{ choices }}> <label for={{ choices }}>{{ choices }}</label>
             {% for sentence in infos%}
             {% if sentence != null and sentence != ""%}
-            <p>{{ sentence }}</p><br>
+            <!-- information to display for the selectable methodology section
+            Its a mess and will need to fix later as the onclick will not accept variables...-->
+            {% if "MLA" in choices%}
+            <div class="popup" onclick="popupInformation('MLA_info')">
+                <img src="../../static/Images/information_icon.png"
+                     width="20"
+                     height="20" />
+                <span style="white-space: pre-wrap" class="popuptext" id="MLA_info" }>{{ sentence }}</span>
+            </div>
+            <br>
+            {% endif %}
+            {% if "DLANN" in choices%}
+            <div class="popup" onclick="popupInformation('DLANN_info')">
+                <img src="../../static/Images/information_icon.png"
+                     width="20"
+                     height="20" />
+                <span style="white-space: pre-wrap" class="popuptext" id="DLANN_info" }>{{ sentence }}</span>
+            </div>
+            <br>
+            {% endif %}
             {% endif %}
             {% endfor %}
             {% endfor %}
@@ -133,6 +267,9 @@
                 </select>
                 {% endif %}
 
+                <br><br>
+                For more information on MLA algorithms, visit  <a href="https://scikit-learn.org/stable/supervised_learning.html">scikit-learn.org</a>
+
                 <p>&nbsp;</p>
 
                 <h3>-----------------------------------</h3>
@@ -152,20 +289,58 @@
                 <h2>Phase 3b. Validation.</h2><br>
 
                 <input type="radio" id=K-Fold name="validation" value=K-Fold> <label for=K-Fold>K-Fold</label>
-                <input type="text" id="K-Fold_Input" name="K-Fold_Input"><br>
+                <div class="popup" onclick="popupInformation('K-Fold_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span style="white-space: pre-wrap" class="popuptext" id="K-Fold_Info" }>K-Folds cross-validator<br><br>Provides train/test indices to split data in train/test sets. Split dataset into k consecutive folds (without shuffling by default).<br><br>Each fold is then used once as a validation while the k - 1 remaining folds form the training set.<br><br>Input values is the desired number of folds.</span>
+                </div>
+                <input type="text" id="K-Fold_Input" name="K-Fold_Input">
+                <br>
 
                 <input type="radio" id=Split name="validation" value=Split> <label for=Split>Split</label>
-                <input type="text" id="Split_Input" name="Split_Input"><br><br>
+                <div class="popup" onclick="popupInformation('Split_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span style="white-space: pre-wrap" class="popuptext" id="Split_Info" }>Split arrays or matrices into random train and test subsets.<br><br>Quick utility that wraps input validation, next(ShuffleSplit().split(X, y)), and application to input data into a single call for splitting (and optionally subsampling) data into a one-liner.<br><br>Input value is the percent set for the testing dataset given as a decimal.</span>
+                </div>
+                <input type="text" id="Split_Input" name="Split_Input">
+                <br><br>
 
                 <p>k-Fold: Number for the number of folds</p>
                 <p>Split: The percentage for the training set. </p>
                 <br><br>
 
                 <p><b>Additional Options:</b></p><br>
-                <label for=Random_State>Random State </label><input type="text" id="Random_State_Input" name="Random_State_Input"><br>
+                <label for=Random_State>Random State </label>
+                <div class="popup" onclick="popupInformation('Random_State_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span style="white-space: pre-wrap" class="popuptext" id="Random_State_Info" }>Whether to shuffle the data before splitting into batches. Note that the samples within each split will not be shuffled.</span>
+                </div>
+                <input type="text" id="Random_State_Input" name="Random_State_Input"><br>
+
                 <label for=Shuffle>Shuffle </label>
+                <div class="popup" onclick="popupInformation('Random_State_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span style="white-space: pre-wrap" class="popuptext" id="Random_State_Info" }>When shuffle is True, random_state affects the ordering of the indices, which controls the randomness of each fold. Otherwise, this parameter has no effect. Pass an int for reproducible output across multiple function calls.</span>
+                </div>
                 <input type="radio" id="Shuffle_True" name="Shuffle" value=True> <label for="Shuffle_True">True</label>
                 <input type="radio" id="Shuffle_False" name="Shuffle" value=False checked> <label for="Shuffle_False">False</label><br>
+
+                <label for=Shuffle>Stratify. </label>
+                <div class="popup" onclick="popupInformation('Stratify_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span style="white-space: pre-wrap" class="popuptext" id="Stratify_Info" }>If not None, data is split in a stratified fashion, using this as the class labels.<br><br>When using split validation, set to true will statify on the class column information.<br>When usng k-fold, the method will use stratify k-fold.</span>
+                </div>
+                <input type="radio" id="Stratify_True" name="Stratify" value=True> <label for="Stratify_True">True</label>
+                <input type="radio" id="Stratify_False" name="Stratify" value=False checked> <label for="Stratify_False">False</label><br>
 
                 <p>&nbsp;</p>
 
@@ -224,8 +399,8 @@
 
 
             <!-- <input type="radio" id="method4" name="method" value="method4">
-            <label for="method4"><i>Method developed by user (comming soon)</i></label><br>
-            <h3>-----------------------------------</h3> -->
+        <label for="method4"><i>Method developed by user (comming soon)</i></label><br>
+        <h3>-----------------------------------</h3> -->
             <!-- <p>&nbsp;</p> -->
             <!-- <li style="font-size:12pt">Results</li> -->
 
@@ -239,11 +414,11 @@
             <p>&nbsp;</p>
 
             <!--
-            <li style="font-size:12pt"> Analyzing the results</li>
+        <li style="font-size:12pt"> Analyzing the results</li>
 
-            <canvas id="myChart" style="height: 370px; width: 100%;"></canvas>
-            <p>&nbsp;</p>
-                -->
+        <canvas id="myChart" style="height: 370px; width: 100%;"></canvas>
+        <p>&nbsp;</p>
+            -->
             <li style="font-size:12pt">
                 Generating a PDF report <button type="button"
                                                 id="generateReport" onclick="generatePDF()">
