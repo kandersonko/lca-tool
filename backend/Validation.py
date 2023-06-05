@@ -18,6 +18,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 
 from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
 
 
 def getDataset(fileName):
@@ -43,8 +44,11 @@ def Split(data):
     shuffle = False
     if data["Shuffle"] == "True":
         shuffle = True
-
-    train_set, test_set = train_test_split(df, test_size=float(data[data['validation'] + "_Input"]), shuffle=shuffle, random_state = random_state)
+    stratify = None
+    if data["Stratify"] == "True":
+        stratify = df[:,length]
+    
+    train_set, test_set = train_test_split(df, test_size=float(data[data['validation'] + "_Input"]), shuffle=shuffle, random_state = random_state, stratify = stratify)
 
     length = train_set.shape[1] -1
 
@@ -145,7 +149,11 @@ def K_Fold(data):
     if data["Shuffle"] == "True":
         shuffle = True
 
-    kf = KFold(n_splits=int(data[data['validation'] + "_Input"]), shuffle=shuffle, random_state = random_state)
+    if data["Stratify"] == "False":
+        kf = KFold(n_splits=int(data[data['validation'] + "_Input"]), shuffle=shuffle, random_state = random_state)
+    if data["Stratify"] == "True":
+        kf = StratifiedKFold(n_splits=int(data[data['validation'] + "_Input"]), shuffle=shuffle, random_state = random_state)
+
     kf.get_n_splits(X)
 
     acc_list = []

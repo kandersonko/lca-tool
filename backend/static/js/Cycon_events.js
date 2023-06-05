@@ -106,11 +106,33 @@ function changeAlgorithm(algorithms, Parameters) {
 
                     // Create a label, which will be the parameter Name followed by the default value.
                     var name_label = pair + " (Default: " + data[Parameter]["Default"] + ") ";
-                    var label = document.createElement('label')
+                    var label = document.createElement('label');
                     label.htmlFor = name_label;
                     label.appendChild(document.createTextNode(name_label));
+                    let id_info = data[Parameter]["Name"] + "_Info";
 
                     s1.appendChild(label);
+
+                    let newDiv = document.createElement("div");
+                    newDiv.className = "popup";
+                    newDiv.onclick = function () { popupInformation(id_info); };
+
+                    let newImage = document.createElement("img");
+                    newImage.src = "../../static/Images/information_icon.png";
+                    newImage.width = "20";
+                    newImage.height = "20";
+
+                    newDiv.appendChild(newImage);
+
+                    let newSpan = document.createElement("span");
+                    newSpan.style = "white-space: pre-wrap";
+                    newSpan.className = "popuptext";
+                    newSpan.id = id_info;
+                    newSpan.textContent = data[Parameter]["Definition"];
+
+                    newDiv.appendChild(newSpan);
+
+                    s1.appendChild(newDiv);
 
                     //document.getElementById("Results").innerHTML += data[Parameter]["Possible"] + " ";
                     //document.getElementById("Results").innerHTML += data[Parameter]["Possible"][0] + " ";
@@ -446,6 +468,65 @@ document.getElementById("cyconForm").addEventListener("submit", function (e) {
 });
 
 
+function showCSV(form) {
+    //document.getElementById("StatusInfo").innerHTML = "Processing...";
+
+    // Collect all form data instances
+    var formData = new FormData(form);
+
+    var dict_data = {};
+
+    const csvFileName = document.getElementById("csvFile").files[0].name;
+    formData.append("csvFileName", csvFileName);
+
+    var checkbox = $("#cyconForm").find("input[type=checkbox]");
+    $.each(checkbox, function (key, val) {
+        formData.append($(val).attr('name') + "_checked", $(this).is(':checked'));
+    });
+
+    // iterate through entries...
+    for (var pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+        document.getElementById("Preopt_Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        dict_data[pair[0]] = pair[1]
+    }
+
+    //Send information to run model experiment.
+    // will save into a json file tilted the "projectName".json
+    dict_values = { "form": dict_data };
+
+    const sent_data = JSON.stringify(dict_values)
+
+    $.ajax({
+        url: "/experiments/getCSV_PDF",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(sent_data),
+        async: false,
+        dataType: 'json',
+        success: function (Results) {
+
+            var writeData = {
+                paragraph: ''
+            }
+
+            var img = new Image();
+            img.src = 'data:image/jpeg;base64,' + Results['Dataset'];
+
+            writeData.paragraph += `${img.outerHTML} <br\>`
+
+            document.getElementById("Results").innerHTML = writeData.paragraph;
+        }
+    });
+}
+
+
+document.getElementById("Preopt_Form").addEventListener("button", function (e) {
+    e.preventDefault();
+    showCSV(e.target);
+});
+
+
 function displayResults(form) {
     // Collect all form data instances
     var formData = new FormData(form);
@@ -699,6 +780,12 @@ function generatePDF(form) {
             }
         }).save();
 
+}
+
+// When the user clicks on div, open the popup
+function popupInformation(id) {
+    var popup = document.getElementById(id);
+    popup.classList.toggle("show");
 }
 
 document.getElementById("resultForm").addEventListener("button", function (e) {
