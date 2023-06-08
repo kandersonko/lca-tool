@@ -1,9 +1,3 @@
-<<<<<<< HEAD
 Indicator,Metric,Location,Mass,Emission Factor,Distance
 Pup Example,,USA,10,10,10
 ,,USA,10,10,10
-=======
-﻿Indicator,Mass,Emission Factor Up
-Pup Example,10,10
-,10,10
->>>>>>> master

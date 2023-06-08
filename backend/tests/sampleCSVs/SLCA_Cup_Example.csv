@@ -1,9 +1,2 @@
-<<<<<<< HEAD
-Indicator,Metric,Location,Mass,Cost
-Cup Example,,USA,10,10
-,,USA,10,10
-=======
 ﻿Indicator,Raw Material Mass,Colection/Transportation Cost
-Cup Example,10,10
-,10,10
->>>>>>> master
+Cup Example,10,10,10,10
