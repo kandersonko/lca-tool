@@ -32,3 +32,5 @@ password.txt
 *.crt
 *.key
 *.webm
+/proxy/certs/
+.DS_Store
