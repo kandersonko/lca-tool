@@ -25,6 +25,13 @@ def create_app(password_file="/run/secrets/db-password"):
     app.config.from_mapping(**config.config)
     app.config["DB_PASSWORD"] = password_file
 
+    # security
+    app.config.update(
+        SESSION_COOKIE_SECURE=True,
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Lax",
+    )
+
     app.register_blueprint(auth.bp)
     app.register_blueprint(home.bp)
     app.register_blueprint(experiments.bp)

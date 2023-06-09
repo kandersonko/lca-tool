@@ -7,45 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CyberTraining @ Uni. of Idaho</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/lca.css') }}">
-  <style>
-    .header {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      background-color: #ffffff;
-      padding: 20px;
-      box-shadow: 0px 0px 10px #000000;
-      transition: all 0.3s ease;
-    }
-
-    .header:hover {
-      transform: translateY(-10px);
-    }
-
-    .logo-container {
-      display: flex;
-      align-items: center;
-    }
-
-    .logo {
-      height: 70px;
-      margin-right: 20px;
-    }
-
-    .title {
-      font-size: 36px;
-      font-weight: bold;
-      color: #000000;
-      margin: 0;
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .title:hover {
-      color: #6af215;
-    }
-  </style>
 </head>
 
 <body>
@@ -53,13 +14,13 @@
     <div class="header">
       <div class="logo-container">
         <a href="https://www.uidaho.edu/idaho-falls">
-          <img src="https://www.linkpicture.com/q/UI_3.jpg" alt="University of Idaho" class="logo" />
+          <img src="{{ url_for('static', filename='images/UI_3.jpg') }}" alt="University of Idaho" class="logo" />
         </a>
       </div>
       <a href="http://cycon.nkn.uidaho.edu/" class="title">CyberTraining</a>
       <div class="logo-container">
         <a href="https://webpages.uidaho.edu/rsml/lca.html">
-          <img src="https://www.linkpicture.com/q/rsml-1_3.jpg" alt="Research and Innovation in Sustainable Manufacturing and Materials" class="logo" />
+          <img src="{{ url_for('static', filename='images/rsml-1_3.jpg') }}" alt="Research and Innovation in Sustainable Manufacturing and Materials" class="logo" />
         </a>
       </div>
     </div>

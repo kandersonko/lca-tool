@@ -12,7 +12,7 @@ from backend.config import config
 from mysql.connector import Error
 
 from backend.mail import send_email
-from backend.utils import user_active
+from backend.utils import user_active, add_security_headers
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -79,7 +79,7 @@ def plans():
         except Error as e:
             logging.debug(f"Error plan update: {e} ===")
 
-    return render_template("plans/plans.html")
+    return add_security_headers(render_template("plans/plans.html"))
 
 
 @bp.route("/register", methods=("GET", "POST"))
@@ -102,8 +102,8 @@ def register():
             logging.debug(f"Register: {email} | {password}")
             if confirm_password != password:
                 error = "The password should matched."
-                return render_template(
-                    "auth/register.html", error=[error], isError=True
+                return add_security_headers(
+                    render_template("auth/register.html", error=[error], isError=True)
                 )
 
             # check if user exists
@@ -132,11 +132,13 @@ def register():
                 except Error as e:
                     logging.debug(f"=== Error registration: {e} ===")
             else:
-                return render_template(
-                    "auth/register.html", error=[error], isError=True
+                return add_security_headers(
+                    render_template("auth/register.html", error=[error], isError=True)
                 )
 
-    return render_template("auth/register.html", error=[], isError=False)
+    return add_security_headers(
+        render_template("auth/register.html", error=[], isError=False)
+    )
 
 
 @bp.route("/login", methods=("GET", "POST"))
@@ -154,18 +156,24 @@ def login():
 
         except Error as e:
             logging.debug(f"=== Error login: {e} ===")
-            return render_template("auth/login.html", error=[error], isError=True)
+            return add_security_headers(
+                render_template("auth/login.html", error=[error], isError=True)
+            )
 
         if user is None:
             error = "The user does not have an account."
             logging.debug(f"Login user found: {user}")
-            return render_template("auth/login.html", error=[error], isError=True)
+            return add_security_headers(
+                render_template("auth/login.html", error=[error], isError=True)
+            )
         elif user.get("status") == "disabled":
             error = "A password reset link was sent to your email, use it to reset your password."
             flash(error)
         elif check_password_hash(user["password"], password) == False:
             error = "Incorrect email or password."
-            return render_template("auth/login.html", error=[error], isError=True)
+            return add_security_headers(
+                render_template("auth/login.html", error=[error], isError=True)
+            )
         else:
             session.clear()
             session["user_id"] = user["id"]
@@ -174,7 +182,9 @@ def login():
                 return redirect(url_for("auth.activation"))
             return redirect(url_for("index"))
 
-    return render_template("auth/login.html", error=[error], isError=False)
+    return add_security_headers(
+        render_template("auth/login.html", error=[error], isError=False)
+    )
 
 
 @bp.route("/forgot_password", methods=("GET", "POST"))
@@ -205,7 +215,7 @@ def forgot_password():
         except Error as e:
             logging.debug(f"Error during forgot password: {e}")
 
-    return render_template("auth/forgot_password.html")
+    return add_security_headers(render_template("auth/forgot_password.html"))
 
 
 @bp.route("/activation", methods=("GET", "POST"))
@@ -222,9 +232,9 @@ def activation():
         send_email(subject="Account Activation Link", body=body, recipients=[email])
         # flash(f"Activation link sent to your email {email}")
         g.activation_link_sent = True
-        return render_template("auth/activation.html")
+        return add_security_headers(render_template("auth/activation.html"))
 
-    return render_template("auth/activation.html")
+    return add_security_headers(render_template("auth/activation.html"))
 
 
 @bp.route("/activate/<token>")
@@ -252,7 +262,9 @@ def activate(token):
             flash("Invalid or expired activation token")
             invalid_token = True
 
-    return render_template("auth/activate.html", invalid_token=invalid_token)
+    return add_security_headers(
+        render_template("auth/activate.html", invalid_token=invalid_token)
+    )
 
 
 @bp.route("/reset/<token>", methods=("GET", "POST"))
@@ -272,7 +284,9 @@ def reset(token):
 
             except Error as e:
                 logging.debug(f"=== Error login: {e} ===")
-                return render_template("auth/login.html", error=[error], isError=True)
+                return add_security_headers(
+                    render_template("auth/login.html", error=[error], isError=True)
+                )
 
             if user is not None:
                 old_password_hash = user.get("password") or ""
@@ -293,7 +307,7 @@ def reset(token):
                     flash("Password reset successfully!")
                     return redirect(url_for("index"))
 
-    return render_template("auth/reset.html")
+    return add_security_headers(render_template("auth/reset.html"))
 
 
 @bp.route("/logout")
