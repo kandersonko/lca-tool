@@ -292,6 +292,11 @@ function readTextFile(file, callback) {
 }
 
 function getData(form) {
+    // Copy over information from element outside of form to the copy inside form
+    document.getElementById("projectName_copy").value = document.getElementById("projectName").value;
+    document.getElementById("phase1Text_copy").value = document.getElementById("phase1Text").value;
+    document.getElementById("csvFile_copy").value = document.getElementById("csvFile").value;
+
     //document.getElementById("StatusInfo").innerHTML = "Processing...";
 
     // Collect all form data instances
@@ -327,9 +332,6 @@ function getData(form) {
         data: JSON.stringify(sent_data),
         async: false,
         dataType: 'json',
-        error: function (request, errorInfo) {
-            document.getElementById("Results").innerHTML = " Can't do because: " + errorInfo;
-        },
         success: function (Results) {
 
             var writeData = {
@@ -340,7 +342,6 @@ function getData(form) {
                 // Phase 1
             // Name of Experiment
             writeData.paragraph += "Experiment Information".bold().italics().big() + "<br\>"
-
             writeData.paragraph += "Name of Experiment: ".bold().italics() + "<br\>" + dict_data["projectName"] + "<br\><br\>"
                 // Goal and Scope
             writeData.paragraph += "Goal and Scope: ".bold().italics() + "<br\>" + dict_data["phase1Text"] + "<br\><br\>"
@@ -467,64 +468,6 @@ document.getElementById("cyconForm").addEventListener("submit", function (e) {
     getData(e.target);
 });
 
-
-function showCSV(form) {
-    //document.getElementById("StatusInfo").innerHTML = "Processing...";
-
-    // Collect all form data instances
-    var formData = new FormData(form);
-
-    var dict_data = {};
-
-    const csvFileName = document.getElementById("csvFile").files[0].name;
-    formData.append("csvFileName", csvFileName);
-
-    var checkbox = $("#cyconForm").find("input[type=checkbox]");
-    $.each(checkbox, function (key, val) {
-        formData.append($(val).attr('name') + "_checked", $(this).is(':checked'));
-    });
-
-    // iterate through entries...
-    for (var pair of formData.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-        document.getElementById("Preopt_Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
-        dict_data[pair[0]] = pair[1]
-    }
-
-    //Send information to run model experiment.
-    // will save into a json file tilted the "projectName".json
-    dict_values = { "form": dict_data };
-
-    const sent_data = JSON.stringify(dict_values)
-
-    $.ajax({
-        url: "/experiments/getCSV_PDF",
-        type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(sent_data),
-        async: false,
-        dataType: 'json',
-        success: function (Results) {
-
-            var writeData = {
-                paragraph: ''
-            }
-
-            var img = new Image();
-            img.src = 'data:image/jpeg;base64,' + Results['Dataset'];
-
-            writeData.paragraph += `${img.outerHTML} <br\>`
-
-            document.getElementById("Results").innerHTML = writeData.paragraph;
-        }
-    });
-}
-
-
-document.getElementById("Preopt_Form").addEventListener("button", function (e) {
-    e.preventDefault();
-    showCSV(e.target);
-});
 
 
 function displayResults(form) {
@@ -791,4 +734,89 @@ function popupInformation(id) {
 document.getElementById("resultForm").addEventListener("button", function (e) {
     e.preventDefault();
     generatePDF(e.target);
+});
+
+
+
+// Checks that the CSV file is able to load and displays the original csv information with additional pdf graphs
+// such as balance and distibution of data to help the user make informed desitions when preoptimizing.
+function checkCSV(form) {
+    document.getElementById("csv_Results").innerHTML = "";
+
+    var formData = new FormData(form);
+
+    var dict_data = {};
+
+    const projectName = document.getElementById("projectName").value;
+    formData.append("projectName", projectName);
+
+    const csvFileName = document.getElementById("csvFile").files[0].name;
+    formData.append("csvFileName", csvFileName);
+
+    var checkbox = $("#csvForm").find("input[type=checkbox]");
+    $.each(checkbox, function (key, val) {
+        formData.append($(val).attr('name') + "_checked", $(this).is(':checked'));
+    });
+
+    // iterate through entries...
+    for (var pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+        document.getElementById("csv_Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        dict_data[pair[0]] = pair[1]
+    }
+
+    //Send information to run model experiment.
+    // will save into a json file tilted the "projectName".json
+    dict_values = { "form": dict_data };
+
+    const sent_data = JSON.stringify(dict_values)
+
+    $.ajax({
+        url: "/experiments/getCSVResults",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(sent_data),
+        async: false,
+        dataType: 'json',
+        success: function (Results) {
+
+            var writeData = {
+                paragraph: ''
+            }
+
+            document.getElementById("csv_Results").innerHTML = Results['csv_Short'];
+            document.getElementById("csv_Null_Results").innerHTML = Results['null_Count']
+
+            if (dict_values["class_col"] != "") {
+                document.getElementById("csv_Class_Balance_Results").innerHTML = Results['Number_Classes'];
+            }
+
+            if (dict_values["kde_ind"] != "") {
+                if (dict_values["class_col"] != "") {
+                    for (i in Results["kde_plots"]) {
+                        var img = new Image();
+                        img.src = 'data:image/jpeg;base64,' + Results["kde_plots"][i];
+
+                        document.getElementById("csv_Scale_Results").innerHTML += `${img.outerHTML}`
+                    }
+                }
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            var writeData = {
+                paragraph: ''
+            }
+
+            writeData.paragraph += "ERROR: "
+
+            writeData.paragraph += textStatus
+
+            document.getElementById("csv_Results").innerHTML = writeData.paragraph;
+        }
+    });
+}
+
+document.getElementById("csvForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    checkCSV(e.target);
 });
