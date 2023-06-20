@@ -138,12 +138,14 @@ def run_experiment():
     
     # Open json file for the experiment.
     baseFolder = os.getcwd()
-    locationSavedResults = baseFolder + "\\SavedResults\\"
-    if os.path.exists(locationSavedResults + data['projectName'] + ".json"):
-        os.remove(locationSavedResults + data['projectName'] + ".json")
-        fp = open(locationSavedResults + data['projectName'] + ".json", 'a')
+    locationSavedResults = Path(baseFolder) / "SavedResults"
+    filename = secure_filename(data["projectName"] + ".json")
+    filepath = locationSavedResults / filename.lower()
+    if os.path.exists(filepath):
+        os.remove(filepath)
+        fp = open(filepath, "a")
     else:
-        fp = open(locationSavedResults + data['projectName'] + ".json", 'a')
+        fp = open(filepath, "a")
     
     # write to json file
     metrics_Dump = json.dumps(Metrics)
@@ -164,9 +166,11 @@ def getResults():
     data = formData['form']
 
     baseFolder = os.getcwd()
-    locationSavedResults = baseFolder + "\\SavedResults\\"
-    fp = open(locationSavedResults + data['projectName'] + ".json", 'r')
-
+    locationSavedResults = Path(baseFolder) / "SavedResults"
+    filename = data["projectName"] + ".json"
+    filepath = locationSavedResults / filename.lower()
+    fp = open(filepath, "r")
+    
     Metrics = json.load(fp)
 
     # close the connection

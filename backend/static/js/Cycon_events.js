@@ -793,6 +793,7 @@ function checkCSV(form) {
 
             if (dict_values["kde_ind"] != "") {
                 if (dict_values["class_col"] != "") {
+                    document.getElementById("csv_Scale_Results").innerHTML = ""
                     for (i in Results["kde_plots"]) {
                         var img = new Image();
                         img.src = 'data:image/jpeg;base64,' + Results["kde_plots"][i];
