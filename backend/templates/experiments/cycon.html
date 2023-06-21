@@ -1,9 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.1/html2pdf.bundle.min.js"></script>
 
 <head>
@@ -81,30 +79,12 @@
                 opacity: 1;
             }
         }
-        table {
-            border-collapse: collapse;
-            border-spacing: 0;
-            width: 600px;
-            height: 600px;
-            overflow: scroll;
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 16px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
     </style>
 </head>
 
 <div id="home" class="panel">
     <div class="main" style="width: 70%">
 
-        <script src="../../static/js/jquery-3.5.1.min.js"></script>
 
         <!-- Method to change the visable sections -->
         <script>
@@ -135,56 +115,59 @@
         }
     </script>
         -->
-        <h1>Welcome, fill out the following information to start an experiment.</h1>
+        <form id="cyconForm">
+            <h1>Welcome, fill out the following information to start an experiment.</h1>
 
-        <p id="demo"></p>
+            <p id="demo"></p>
 
-        <hr />
-        <h2>Phase 1. Experiment information.</h2>
-        <hr />
+            <hr />
+            <h2>Phase 1. Experiment information.</h2>
+            <hr />
 
-        <h3 id="infoHeader">
-            Name of the project:
-            <!-- information to display for the name of the project -->
-            <div class="popup" onclick="popupInformation('Experiment_Name_Info')">
-                <img src="../../static/Images/information_icon.png"
-                     width="20"
-                     height="20" />
-                <span class="popuptext" id="Experiment_Name_Info">Project name that will be used for future reference.</span>
-            </div>
-        </h3>
+            <h3 id="infoHeader">
+                Name of the project:
+                <!-- information to display for the name of the project -->
+                <div class="popup" onclick="popupInformation('Experiment_Name_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span class="popuptext" id="Experiment_Name_Info">Project name that will be used for future reference.</span>
+                </div>
+            </h3>
 
-        <tr>
-            <td><input id="projectName" type="text" name="projectName" placeholder="Name of the project" /></td>
-        </tr>
+            <table>
+                <tr>
+                    <td><input id="projectName" type="text" name="projectName" placeholder="Name of the project" /></td>
+                </tr>
 
-        <h3 id="scopeHeader">
-            Goal and scope definition:
-            <!-- information to display for the definition of the project -->
-            <div class="popup" onclick="popupInformation('Experiment_Definition_Info')">
-                <img src="../../static/Images/information_icon.png"
-                     width="20"
-                     height="20" />
-                <span class="popuptext" id="Experiment_Definition_Info">Project definition. <br><br> Will be shown for viewer`s understanding when displaying the results.</span>
-            </div>
-        </h3>
+            </table>
 
-        <li style="font-size:12pt">
-            <b>
-                Define your goal, scope, system boundary, functional unit, and case study
-                assumptions down here:
-            </b>
-        </li>
+            <h3 id="scopeHeader">
+                Goal and scope definition:
+                <!-- information to display for the definition of the project -->
+                <div class="popup" onclick="popupInformation('Experiment_Definition_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span class="popuptext" id="Experiment_Definition_Info">Project definition. <br><br> Will be shown for viewer`s understanding when displaying the results.</span>
+                </div>
+            </h3>
 
-        <textarea id="phase1Text" name="phase1Text" rows="2" cols="50">
+            <li style="font-size:12pt">
+                <b>
+                    Define your goal, scope, system boundary, functional unit, and case study
+                    assumptions down here:
+                </b>
+            </li>
+
+            <textarea id="phase1Text" name="phase1Text" rows="2" cols="50">
 
             </textarea>
-        <p>&nbsp;</p>
+            <p>&nbsp;</p>
 
-        <h3>-----------------------------------</h3>
+            <h3>-----------------------------------</h3>
 
-        <!-- Dataset section -->
-        <form id="csvForm">
+            <!-- Dataset section -->
             <hr />
             <h2>
                 Phase 2. Load Dataset.
@@ -197,46 +180,14 @@
                 </div>
             </h2><br>
             <hr />
-            <input type="file" id="csvFile" name="csvFile" accept=".csv"> <br>
+            <input type="file" id="csvFile" name="csvFile" accept=".csv">
 
-            <label>Column number to use for classifying.</label>
-            <div class="popup" onclick="popupInformation('Class_Col_Info')">
-                <img src="../../static/Images/information_icon.png"
-                     width="20"
-                     height="20" />
-                <span style="white-space: pre-wrap" class="popuptext" id="Class_col_Info">The column that contains the information to classify.</span>
-            </div>
-            <input id="class_col" type="text" name="class_col"> <br>
-
-            <label>KDE (Kernel Density Estimates)'s ind value.</label>
-            <div class="popup" onclick="popupInformation('KDE_IND_Info')">
-                <img src="../../static/Images/information_icon.png"
-                     width="20"
-                     height="20" />
-                <span style="white-space: pre-wrap" class="popuptext" id="KDE_IND_Info">A kernel density estimate (KDE) plot is a method for visualizing the distribution of observations in a dataset, analogous to a histogram. KDE represents the data using a continuous probability density curve in one or more dimensions.<br><br>Relative to a histogram, KDE can produce a plot that is less cluttered and more interpretable, especially when drawing multiple distributions. But it has the potential to introduce distortions if the underlying distribution is bounded or not smooth. Like a histogram, the quality of the representation also depends on the selection of good smoothing parameters.<br><br>Evaluation points for the estimated PDF. If None (default), 1000 equally spaced points are used. If ind is a NumPy array, the KDE is evaluated at the points passed. If ind is an integer, ind number of equally spaced points are used.</span>
-            </div>
-            <input id="kde_ind" type="text" name="kde_ind"> <br>
-
-            <button type="submit" name="submit"> Check CSV file. </button>
-
-            <p id="csv_Title">CSV values.</p>
-            <div style="overflow: auto; max-height: 300px; max-width: 900px; ">
-                <p id="csv_Results" style="background-color: white;"></p>
-            </div>
-            <p id="csv_Null_Title">Null instances.</p>
-            <p id="csv_Null_Results" style="background-color: white;"></p>
-            <p id="csv_Class_Balance_Title">Number of Class Instances.</p>
-            <p id="csv_Class_Balance_Results" style="background-color: white;"></p>
-            <p id="csv_Scale_Title">KDE plots for each class.</p>
-            <div style="overflow: auto; max-height: 600px; max-width: 600px; ">
-                <p id="csv_Scale_Results" style="background-color: white;"></p>
-            </div>
             <p>&nbsp;</p>
-        </form>
+
+            <h3>-----------------------------------</h3>
 
 
-        <!-- Preprocess section-->
-        <form id="preoptForm">
+            <!-- Preprocess section-->
             <h2>
                 Phase 2a. Preoptimization
                 <!-- information to display for the preoptimization section -->
@@ -248,32 +199,16 @@
                 </div>
             </h2><br>
 
-            <!-- Dynamically pull preoptimization options and create new identifyer when selected. -->
-            {% if g.Algorithms %}
-            Choose which preoptimization methods to apply:
-            <select id="preopt" name="preopt" onselect="selectPreopt(this.id, 'Parameters')">
-                {% for choices, infos in g.Preoptimizations%}
-                <option value={{ choices }}>{{ choices }}</option>
-                {% endfor %}
-            </select>
-            {% endif %}
-            <button type="button" id="addPreoptButton" onclick="addPreopt()"> Add </button>
+            <input type="radio" id=PreOpt_None name="preoptimization" value=PreOpt_None> <label for=PreOpt_None>None</label><br>
+            <input type="radio" id=PreOpt_PCA name="preoptimization" value=PreOpt_PCA> <label for=PreOpt_PCA>PCA: Principal Component Analysis</label><br>
 
-            <div id="Preopt_Selection"></div>
+            <p>None: No preoptimization will be performed</p>
+            <p>PCA: (Info will be added later) </p>
 
             <p>&nbsp;</p>
 
             <h3>-----------------------------------</h3>
-        </form>
 
-
-        <form id="cyconForm">
-            <!-- Copy of information from prior sections -->
-            <input id="projectName_copy" name="projectName" type="hidden" />
-            <input id="phase1Text_copy" name="phase1Text" type="hidden" />
-            <input id="csvFile_copy" name="csvFile" type="hidden" />
-
-            <!-- Preoptimization options.-->
 
             <!-- Methodology section 1 -->
             {% if g.Methodologies %}
@@ -286,7 +221,7 @@
             {% for sentence in infos%}
             {% if sentence != null and sentence != ""%}
             <!-- information to display for the selectable methodology section
-        Its a mess and will need to fix later as the onclick will not accept variables...-->
+            Its a mess and will need to fix later as the onclick will not accept variables...-->
             {% if "MLA" in choices%}
             <div class="popup" onclick="popupInformation('MLA_info')">
                 <img src="../../static/Images/information_icon.png"
@@ -422,7 +357,10 @@
                 <h3>-----------------------------------</h3>
             </div>
 
-            <button type="submit" name="submit"> Perform Experiment </button>
+            <button type="submit"
+                    name="submit">
+                Perform Experiment
+            </button>
 
         </form>
 

@@ -24,12 +24,9 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from werkzeug.utils import secure_filename
 
-#sys.path.append("backend")
-#sys.path.append("Classes")
-#sys.path.insert(1, '/Classes/')
 from backend import MLA
 from backend import Validation
-from backend import Preoptimization
+from backend.calculator import Calculator
 
 from sklearn.model_selection import KFold
 
@@ -43,13 +40,19 @@ logger = logging.getLogger()
 @bp.before_app_request
 def load_possible_experiments():
     list_Algorithms = MLA.getMLAs()
-    list_Preoptimizations = Preoptimization.getPreopts()
 
-    #----------------new Cycon--------------------------->
-    # First choice is between various categories of ML 
-    g.section_Method = ["MLA: Machine Learning Algorithm", "DLANN: Deep Learning Artifical Neural Networks"]
-    g.section_Info = [["Machine learning algorithms are mathematical model mapping methods. They are used to learn patterns embedded in the existing training dataset in order to perform pattern recognition, classification, and prediction.\n\nCurrently, the only algorithms available on cycon is under the classification objective. Other objectives that will be added later include clustering and regression."],
-                      ["DLANN info"]]
+    # ----------------new Cycon--------------------------->
+    # First choice is between various categories of ML
+    g.section_Method = [
+        "MLA: Machine Learning Algorithm",
+        "DLANN: Deep Learning Artifical Neural Networks",
+    ]
+    g.section_Info = [
+        [
+            "Machine learning algorithms are mathematical model mapping methods. They are used to learn patterns embedded in the existing training dataset in order to perform pattern recognition, classification, and prediction.\n\nCurrently, the only algorithms available on cycon is under the classification objective. Other objectives that will be added later include clustering and regression."
+        ],
+        ["DLANN info"],
+    ]
     g.Methodologies = zip(g.section_Method, g.section_Info)
 
     # Obtain the selection of Algorithm Names and Definition.
@@ -64,21 +67,6 @@ def load_possible_experiments():
     g.section_algorithm = algorithm_Names
     g.section_Info = algorithm_Definition
     g.Algorithms = zip(g.section_algorithm, g.section_Info)
-
-    # obtain the selection of preoptimization options and definitions.
-    preopt_Names = []
-    preopt_Definition = []
-    preopt_Names.append("")
-    preopt_Definition.append("")
-
-    for preopt in list_Preoptimizations:
-        preopt_Names.append(preopt.getName())
-        preopt_Definition.append(preopt.getDefinition())
-    g.section_preopt = preopt_Names
-    g.section_Info = preopt_Definition
-    g.Preoptimizations = zip(g.section_preopt, g.section_Info)
-
-
 
 
 # Old LCA for testing purposes, REMOVE BEFORE SUBMITTING.
@@ -121,21 +109,20 @@ def calculate():
 
 
 @bp.route("/run_experiment", methods=["POST"])
-def run_experiment():    
+def run_experiment():
     output = request.get_json()
     formData = json.loads(output)
 
-    data = formData['form']
+    data = formData["form"]
 
     # Split
-    if data['validation'] == "Split":
+    if data["validation"] == "Split":
         Metrics = Validation.Split(data)
 
     # K-Fold
-    elif data['validation'] == "K-Fold":
+    elif data["validation"] == "K-Fold":
         Metrics = Validation.K_Fold(data)
 
-    
     # Open json file for the experiment.
     baseFolder = os.getcwd()
     locationSavedResults = Path(baseFolder) / "SavedResults"
@@ -146,7 +133,7 @@ def run_experiment():
         fp = open(filepath, "a")
     else:
         fp = open(filepath, "a")
-    
+
     # write to json file
     metrics_Dump = json.dumps(Metrics)
 
@@ -159,23 +146,23 @@ def run_experiment():
 
 
 @bp.route("/getResults", methods=["POST"])
-def getResults(): 
+def getResults():
     output = request.get_json()
     formData = json.loads(output)
 
-    data = formData['form']
+    data = formData["form"]
 
     baseFolder = os.getcwd()
     locationSavedResults = Path(baseFolder) / "SavedResults"
     filename = data["projectName"] + ".json"
     filepath = locationSavedResults / filename.lower()
     fp = open(filepath, "r")
-    
+
     Metrics = json.load(fp)
 
     # close the connection
     fp.close()
-    
+
     return json.dumps(Metrics)
 
 
@@ -192,15 +179,3 @@ def getAlgorithmParameters():
 @bp.route("/results")
 def results():
     return render_template("experiments/results.html")
-
-
-@bp.route("/getCSVResults", methods=["POST"])
-def getCSVResults():
-    output = request.get_json()
-    formData = json.loads(output)
-
-    data = formData['form']
-
-    pdfs = Preoptimization.getCSV_PDF(data)
-
-    return json.dumps(pdfs)
