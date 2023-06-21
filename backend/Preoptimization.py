@@ -2,11 +2,13 @@ import os
 import sys
 import io
 import base64
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
 
 import matplotlib.pyplot as plt
+from werkzeug.utils import secure_filename
 
 
 class Preoptimization:
@@ -194,16 +196,18 @@ def convertToType(value, Type, additionalNumber = 0):
         return value
 
 # Method to process the proptimization options.
-
-
 def getDataset(fileName):
      # convert csv to usable dataset
     ## Manual location currently...Will be changed when implemented in Host.
     ## Should further be changed when database is setup.
 
-    ManualLoc = "/backend/tests/sampleCSV_MLA_Classification/"
+    baseFolder = os.getcwd()
 
-    dataset = pd.read_csv(ManualLoc + fileName)
+    ManualLoc = Path(baseFolder) / "backend/tests/sampleCSV_MLA_Classification/"
+
+    filename = secure_filename(fileName)
+    dataset_path = ManualLoc / filename.lower()
+    dataset = pd.read_csv(dataset_path)
 
     return dataset
 

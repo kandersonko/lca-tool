@@ -30,6 +30,7 @@ from werkzeug.utils import secure_filename
 from backend import MLA
 from backend import Validation
 from backend import Preoptimization
+from backend.calculator import Calculator
 
 from sklearn.model_selection import KFold
 
