@@ -71,7 +71,7 @@ Parameter_5 = {"Name":"shrinking", "Type": ["bool"], "Default":True, "Possible":
               "Definition":"Whether to use the shrinking heuristic."}
 Parameter_6 = {"Name":"probability", "Type": ["bool"], "Default":False, "Possible":[True,False],
               "Definition":"Whether to enable probability estimates. This must be enabled prior to calling fit, will slow down that method as it internally uses 5-fold cross-validation, and predict_proba may be inconsistent with predict."}
-Parameter_7 = {"Name":"tol", "Type": ["float"], "Default":0.003, "Possible":["float"],
+Parameter_7 = {"Name":"tol", "Type": ["float"], "Default": 0.003, "Possible":["float"],
               "Definition":"Tolerance for stopping criterion."}
 Parameter_8 = {"Name":"cache_size", "Type": ["float"], "Default":200, "Possible":["float"],
               "Definition":"Specify the size of the kernel cache (in MB)."}
@@ -345,20 +345,13 @@ def getSettings(data, Parameters):
         # get name
         settings["Parameter_" + str(i) + "_Name"] = Parameters["Parameter_" + str(i)]["Name"]
 
-        # get default
-        if data[Parameters["Parameter_" + str(i)]["Name"]+"_checked"] == "false":
-            settings["Parameter_" + str(i)] = Parameters["Parameter_" + str(i)]["Default"]
-            # convert to acceptable type
+        temp = Parameters["Parameter_" + str(i)]["Type"]
+        if Parameters["Parameter_" + str(i)]["Type"][0] == "option_float":
+            settings["Parameter_" + str(i)] = data[Parameters["Parameter_" + str(i)]["Name"] + "_Input"]
+            settings["Parameter_" + str(i)] = convertToType(settings["Parameter_" + str(i)], Parameters["Parameter_" + str(i)]["Type"], data[Parameters["Parameter_" + str(i)]["Name"] + "_Float_Input"])
+        else:
+            settings["Parameter_" + str(i)] = data[Parameters["Parameter_" + str(i)]["Name"] + "_Input"]
             settings["Parameter_" + str(i)] = convertToType(settings["Parameter_" + str(i)], Parameters["Parameter_" + str(i)]["Type"])
-
-        elif data[Parameters["Parameter_" + str(i)]["Name"]+"_checked"] == "true":
-            temp = Parameters["Parameter_" + str(i)]["Type"]
-            if Parameters["Parameter_" + str(i)]["Type"][0] == "option_float":
-                settings["Parameter_" + str(i)] = data[Parameters["Parameter_" + str(i)]["Name"] + "_Input"]
-                settings["Parameter_" + str(i)] = convertToType(settings["Parameter_" + str(i)], Parameters["Parameter_" + str(i)]["Type"], data[Parameters["Parameter_" + str(i)]["Name"] + "_Float_Input"])
-            else:
-                settings["Parameter_" + str(i)] = data[Parameters["Parameter_" + str(i)]["Name"] + "_Input"]
-                settings["Parameter_" + str(i)] = convertToType(settings["Parameter_" + str(i)], Parameters["Parameter_" + str(i)]["Type"])
 
     return settings
 

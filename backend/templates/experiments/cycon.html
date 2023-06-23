@@ -110,22 +110,44 @@
         <script>
             $(document).ready(function () {
                 $("div.methodology_desc").hide();
+
+                $("#kde_Input").hide();
+                $("#csv_Title").hide();
+                $("#csv_shape").hide();
+                $("#csv_Null_Title").hide();
+                $("#csv_Null_Results").hide();
+                $("#csv_Class_Balance_Title").hide();
+                $("#csv_Class_Balance_Results").hide();
+                $("#csv_Scale_Title").hide();
+                $("#csv_Scale_Results").hide();
+
+                $("#kde_Input_Preopt").hide();
+                $("#csv_Title_Preopt").hide();
+                $("#csv_shape_Preopt").hide();
+                $("#csv_Null_Title_Preopt").hide();
+                $("#csv_Null_Results_Preopt").hide();
+                $("#csv_Class_Balance_Title_Preopt").hide();
+                $("#csv_Class_Balance_Results_Preopt").hide();
+                $("#csv_Scale_Title_Preopt").hide();
+                $("#csv_Scale_Results_Preopt").hide();
+
                 $("input[name$='methodology' ]").click(function () {
                     var methodology = $(this).val();
                     var num = 0
                     var count = 1
 
-                    if (methodology == "MLA:") {
+                    if (methodology == "MLA") {
                         $("div.methodology_desc").hide();
                         $("#MLA_Options").show();
                     }
 
-                    if (methodology == "DLANN:") {
+                    if (methodology == "DLANN") {
                         $("div.methodology_desc").hide();
                         $("#DLANN_Options").show();
                     }
                 });
             });
+
         </script>
 
         <!--
@@ -135,135 +157,130 @@
         }
     </script>
         -->
-        <h1>Welcome, fill out the following information to start an experiment.</h1>
+        <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Goal and Scope</h1>
 
-        <p id="demo"></p>
+        Project Name:
+        <!-- information to display for the name of the project -->
+        <div class="popup" onclick="popupInformation('Experiment_Name_Info')">
+            <img src="../../static/Images/information_icon.png"
+                 width="20"
+                 height="20" />
+            <span class="popuptext" id="Experiment_Name_Info">Project name that will be used for future reference.</span>
+        </div>
+        <input id="projectName" type="text" name="projectName" placeholder="Name of the project">
+        <br>
 
-        <hr />
-        <h2>Phase 1. Experiment information.</h2>
-        <hr />
+        Goal and Scope:
+        <!-- information to display for the definition of the project -->
+        <div class="popup" onclick="popupInformation('Experiment_Definition_Info')">
+            <img src="../../static/Images/information_icon.png"
+                 width="20"
+                 height="20" />
+            <span class="popuptext" id="Experiment_Definition_Info">Project definition. <br><br> Will be shown for viewer`s understanding when displaying the results.</span>
+        </div>
 
-        <h3 id="infoHeader">
-            Name of the project:
-            <!-- information to display for the name of the project -->
-            <div class="popup" onclick="popupInformation('Experiment_Name_Info')">
-                <img src="../../static/Images/information_icon.png"
-                     width="20"
-                     height="20" />
-                <span class="popuptext" id="Experiment_Name_Info">Project name that will be used for future reference.</span>
-            </div>
-        </h3>
-
-        <tr>
-            <td><input id="projectName" type="text" name="projectName" placeholder="Name of the project" /></td>
-        </tr>
-
-        <h3 id="scopeHeader">
-            Goal and scope definition:
-            <!-- information to display for the definition of the project -->
-            <div class="popup" onclick="popupInformation('Experiment_Definition_Info')">
-                <img src="../../static/Images/information_icon.png"
-                     width="20"
-                     height="20" />
-                <span class="popuptext" id="Experiment_Definition_Info">Project definition. <br><br> Will be shown for viewer`s understanding when displaying the results.</span>
-            </div>
-        </h3>
-
-        <li style="font-size:12pt">
-            <b>
-                Define your goal, scope, system boundary, functional unit, and case study
-                assumptions down here:
-            </b>
-        </li>
-
-        <textarea id="phase1Text" name="phase1Text" rows="2" cols="50">
-
-            </textarea>
-        <p>&nbsp;</p>
-
-        <h3>-----------------------------------</h3>
+        <textarea id="phase1Text" name="phase1Text" rows="3" cols="50" style="width: 100%; max-width: 100%;"></textarea>
 
         <!-- Dataset section -->
         <form id="csvForm">
-            <hr />
-            <h2>
-                Phase 2. Load Dataset.
-                <!-- information to display for the loadable dataset -->
-                <div class="popup" onclick="popupInformation('Experiment_Dataset_Info')">
+            <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Data</h1>
+            File:
+            <!-- information to display for the loadable dataset -->
+            <div class="popup" onclick="popupInformation('Experiment_Dataset_Info')">
+                <img src="../../static/Images/information_icon.png"
+                     width="20"
+                     height="20" />
+                <span style="white-space: pre-wrap" class="popuptext" id="Experiment_Dataset_Info">File to load for cycon project. <br><br> Currently accepts CSVs (comma-separated values) only.</span>
+            </div>
+
+            <input type="file" id="csvFile" name="csvFile" accept=".csv" onchange="changeCSV()">
+
+            <div id="class_col_section"></div>
+
+            <div id="kde_Input">
+                <label>Kernel Density Estimates (KDE) ind value. (optional)</label>
+                <div class="popup" onclick="popupInformation('KDE_IND_Info')">
                     <img src="../../static/Images/information_icon.png"
                          width="20"
                          height="20" />
-                    <span style="white-space: pre-wrap" class="popuptext" id="Experiment_Dataset_Info">File to load for cycon project. <br><br> Currently accepts CSVs (comma-separated values) only.</span>
+                    <span style="white-space: pre-wrap" class="popuptext" id="KDE_IND_Info">A kernel density estimate (KDE) plot is a method for visualizing the distribution of observations in a dataset, analogous to a histogram. KDE represents the data using a continuous probability density curve in one or more dimensions.<br><br>Relative to a histogram, KDE can produce a plot that is less cluttered and more interpretable, especially when drawing multiple distributions. But it has the potential to introduce distortions if the underlying distribution is bounded or not smooth. Like a histogram, the quality of the representation also depends on the selection of good smoothing parameters.<br><br>Evaluation points for the estimated PDF. If None (default), 1000 equally spaced points are used. If ind is a NumPy array, the KDE is evaluated at the points passed. If ind is an integer, ind number of equally spaced points are used.\n\nGiving an int value will calculate the KDE for all columns when considering each class.</span>
                 </div>
-            </h2><br>
-            <hr />
-            <input type="file" id="csvFile" name="csvFile" accept=".csv"> <br>
-
-            <label>Column number to use for classifying.</label>
-            <div class="popup" onclick="popupInformation('Class_Col_Info')">
-                <img src="../../static/Images/information_icon.png"
-                     width="20"
-                     height="20" />
-                <span style="white-space: pre-wrap" class="popuptext" id="Class_col_Info">The column that contains the information to classify.</span>
+                <input id="kde_ind" type="text" name="kde_ind"> <br>
             </div>
-            <input id="class_col" type="text" name="class_col"> <br>
 
-            <label>KDE (Kernel Density Estimates)'s ind value.</label>
-            <div class="popup" onclick="popupInformation('KDE_IND_Info')">
-                <img src="../../static/Images/information_icon.png"
-                     width="20"
-                     height="20" />
-                <span style="white-space: pre-wrap" class="popuptext" id="KDE_IND_Info">A kernel density estimate (KDE) plot is a method for visualizing the distribution of observations in a dataset, analogous to a histogram. KDE represents the data using a continuous probability density curve in one or more dimensions.<br><br>Relative to a histogram, KDE can produce a plot that is less cluttered and more interpretable, especially when drawing multiple distributions. But it has the potential to introduce distortions if the underlying distribution is bounded or not smooth. Like a histogram, the quality of the representation also depends on the selection of good smoothing parameters.<br><br>Evaluation points for the estimated PDF. If None (default), 1000 equally spaced points are used. If ind is a NumPy array, the KDE is evaluated at the points passed. If ind is an integer, ind number of equally spaced points are used.</span>
-            </div>
-            <input id="kde_ind" type="text" name="kde_ind"> <br>
+            <button type="submit" name="submit"> Check </button>
 
-            <button type="submit" name="submit"> Check CSV file. </button>
-
-            <p id="csv_Title">CSV values.</p>
+            <p id="csv_Error"></p>
+            <p id="csv_Title">CSV values:</p>
             <div style="overflow: auto; max-height: 300px; max-width: 900px; ">
                 <p id="csv_Results" style="background-color: white;"></p>
             </div>
-            <p id="csv_Null_Title">Null instances.</p>
+            <p id="csv_shape">Shape of csv dataset:</p>
+            <p id="csv_Null_Title">Null instances:</p>
             <p id="csv_Null_Results" style="background-color: white;"></p>
-            <p id="csv_Class_Balance_Title">Number of Class Instances.</p>
+            <p id="csv_Class_Balance_Title">Number of Class Instances:</p>
             <p id="csv_Class_Balance_Results" style="background-color: white;"></p>
-            <p id="csv_Scale_Title">KDE plots for each class.</p>
+            <p id="csv_Scale_Title">KDE plots for each class:</p>
             <div style="overflow: auto; max-height: 600px; max-width: 600px; ">
                 <p id="csv_Scale_Results" style="background-color: white;"></p>
             </div>
-            <p>&nbsp;</p>
         </form>
 
 
         <!-- Preprocess section-->
         <form id="preoptForm">
-            <h2>
-                Phase 2a. Preoptimization
-                <!-- information to display for the preoptimization section -->
-                <div class="popup" onclick="popupInformation('Experiment_Dataset_Info')">
-                    <img src="../../static/Images/information_icon.png"
-                         width="20"
-                         height="20" />
-                    <span style="white-space: pre-wrap" class="popuptext" id="Experiment_Preoptimization_Info">Currently not implemented. <br><br> Will eventually allow such optimization as balancing dataset, removing null values, fill null values with average, set all values to numberic, etc.</span>
-                </div>
-            </h2><br>
+            <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Preprocessing (Optional)</h1>
 
             <!-- Dynamically pull preoptimization options and create new identifyer when selected. -->
-            {% if g.Algorithms %}
+            {% if g.Preoptimizations %}
             Choose which preoptimization methods to apply:
-            <select id="preopt" name="preopt" onselect="selectPreopt(this.id, 'Parameters')">
-                {% for choices, infos in g.Preoptimizations%}
-                <option value={{ choices }}>{{ choices }}</option>
+            <select id="preopt" name="preopt">
+                {% for choices, names, infos in g.Preoptimizations%}
+                <option value={{ choices }}>{{ names }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" id="AddPreopt" onclick="selectPreopt('preopt', 'Preopt_Selection')">Add</button>
+            <button type="button" id="clearPreopt" onclick="clearAllPreopt()"> Remove All </button>
+            {% endif %}
+
+            <br>
+            Category:
+            {% if g.preopt_Categories %}
+            <select id="preopt_categories" name="preopt_categories" onchange="changePreoptCategory(this.id,'preopts')">
+                {% for choices, names, infos in g.preopt_Categories%}
+                <option value={{ choices }}>{{ names }}</option>
                 {% endfor %}
             </select>
             {% endif %}
-            <button type="button" id="addPreoptButton" onclick="addPreopt()"> Add </button>
+            Optimizer:
+            {% if g.preopts %}
+            <select id="preopts" name="preopts">
+                {% for choices, names, infos in g.preopts%}
+                <option value={{ choices }}>{{ names }}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
 
             <div id="Preopt_Selection"></div>
 
-            <p>&nbsp;</p>
+            <button type="submit" name="submit"> Check </button>
 
-            <h3>-----------------------------------</h3>
+            <p id="csv_Error_Preopt"></p>
+            <p id="csv_Title_Preopt">CSV values:</p>
+            <div style="overflow: auto; max-height: 300px; max-width: 900px; ">
+                <p id="csv_Results_Preopt" style="background-color: white;"></p>
+            </div>
+            <p id="csv_shape_Preopt">Shape:</p>
+            <p id="csv_Null_Title_Preopt">Null instances:</p>
+            <p id="csv_Null_Results_Preopt" style="background-color: white;"></p>
+            <p id="csv_Class_Balance_Title_Preopt">Number of Class Instances:</p>
+            <p id="csv_Class_Balance_Results_Preopt" style="background-color: white;"></p>
+            <p id="csv_Scale_Title_Preopt">KDE plots for each class:</p>
+            <div style="overflow: auto; max-height: 600px; max-width: 600px; ">
+                <p id="csv_Scale_Results_Preopt" style="background-color: white;"></p>
+            </div>
+
+            <button type="button" id="saveCSV"> Save </button>
         </form>
 
 
@@ -273,16 +290,12 @@
             <input id="phase1Text_copy" name="phase1Text" type="hidden" />
             <input id="csvFile_copy" name="csvFile" type="hidden" />
 
-            <!-- Preoptimization options.-->
-
             <!-- Methodology section 1 -->
             {% if g.Methodologies %}
-            <hr />
-            <h2>Phase 3. Methodology.</h2><br>
-            <hr />
+            <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Method</h1>
 
-            {% for choices, infos in g.Methodologies%}
-            <input type="radio" id={{ choices }} name="methodology" value={{ choices }}> <label for={{ choices }}>{{ choices }}</label>
+            {% for choices, name, infos in g.Methodologies%}
+            <input type="radio" id={{ choices }} name="methodology" value={{ choices }}> <label for={{ choices }}>{{ name }}</label>
             {% for sentence in infos%}
             {% if sentence != null and sentence != ""%}
             <!-- information to display for the selectable methodology section
@@ -313,12 +326,10 @@
             <!-- Section for MLA -->
             <div id="MLA_Options" class="methodology_desc">
 
-                <!-- Algorithms section-->
-                <h2>Phase 3a. Method.</h2><br>
-
                 <!-- Dynamically pull algorithms names and create radio buttons for each choice-->
+                <br>
+                Algorithm: 
                 {% if g.Algorithms %}
-                Choose a Machine Learning Algorithm:
                 <select id="MLalgorithm" name="MLalgorithm" onchange="changeAlgorithm(this.id, 'Parameters')">
                     {% for choices, infos in g.Algorithms%}
                     <option value={{ choices }}>{{ choices }}</option>
@@ -329,23 +340,14 @@
                 <br><br>
                 For more information on MLA algorithms, visit  <a href="https://scikit-learn.org/stable/supervised_learning.html">scikit-learn.org</a>
 
-                <p>&nbsp;</p>
-
-                <h3>-----------------------------------</h3>
+                <br><br>
 
                 <!-- Hyperparameters section-->
 
-                <h2>Phase 3a_1. Algorithm Parameters.</h2><br>
-                <!-- Dynamically pull hyperparameter names and create radio buttons for each choice-->
-                <p>Check the parameters to change from default and provide selection.</p>
                 <div id="Parameters"></div>
 
-                <p>&nbsp;</p>
-
-                <h3>-----------------------------------</h3>
-
                 <!-- Validation section-->
-                <h2>Phase 3b. Validation.</h2><br>
+                <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Validation</h1>
 
                 <input type="radio" id=K-Fold name="validation" value=K-Fold> <label for=K-Fold>K-Fold</label>
                 <div class="popup" onclick="popupInformation('K-Fold_Info')">
@@ -367,11 +369,7 @@
                 <input type="text" id="Split_Input" name="Split_Input">
                 <br><br>
 
-                <p>k-Fold: Number for the number of folds</p>
-                <p>Split: The percentage for the training set. </p>
-                <br><br>
-
-                <p><b>Additional Options:</b></p><br>
+                <p><b>Optional Options:</b></p>
                 <label for=Random_State>Random State </label>
                 <div class="popup" onclick="popupInformation('Random_State_Info')">
                     <img src="../../static/Images/information_icon.png"
@@ -400,11 +398,8 @@
                 </div>
                 <input type="radio" id="Stratify_True" name="Stratify" value=True> <label for="Stratify_True">True</label>
                 <input type="radio" id="Stratify_False" name="Stratify" value=False checked> <label for="Stratify_False">False</label><br>
-
-                <p>&nbsp;</p>
-
-                <h3>-----------------------------------</h3>
             </div>
+
             <!-- Section for DLANN -->
             <div id="DLANN_Options" class="methodology_desc">
                 <!-- Methods section-->
@@ -426,12 +421,8 @@
 
         </form>
 
-        <hr />
-        <h2 id="resultsHeader">Phase 4. Results and Interpretation:</h2>
-        <hr />
-
         <!-- Metrics section-->
-        <h2>Phase 4a. Displayed Metrics.</h2><br>
+        <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Metrics</h1>
 
         <form id="resultForm">
 
@@ -449,43 +440,14 @@
                     name="submit">
                 Update displayed metrics
             </button>
-            <p>&nbsp;</p>
 
-            <h3>-----------------------------------</h3>
+            <!-- Results section-->
 
+            <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Results</h1>
 
-            <!-- <input type="radio" id="method4" name="method" value="method4">
-        <label for="method4"><i>Method developed by user (comming soon)</i></label><br>
-        <h3>-----------------------------------</h3> -->
-            <!-- <p>&nbsp;</p> -->
-            <!-- <li style="font-size:12pt">Results</li> -->
-
-            <p id="Status">Current Status of experiment.</p>
-            <p id="StatusInfo"></p>
-            <p>&nbsp;</p>
-            <p id="Results_Title">RESULTS.</p>
             <p id="Results" style="background-color: white;"></p>
 
-            <!-- <input id="displayResults" type="button" value="Show Results" class="displayResults"/> -->
-            <p>&nbsp;</p>
-
-            <!--
-        <li style="font-size:12pt"> Analyzing the results</li>
-
-        <canvas id="myChart" style="height: 370px; width: 100%;"></canvas>
-        <p>&nbsp;</p>
-            -->
-            <li style="font-size:12pt">
-                Generating a PDF report <button type="button"
-                                                id="generateReport" onclick="generatePDF()">
-                    Generate
-                </button>
-            </li>
-            <p>&nbsp;</p>
-
-            </ul>
-            <p>&nbsp;</p>
-
+             Generated a PDF report <button type="button" id="generateReport" onclick="generatePDF()"> Generate </button>
 
         </form>
 
@@ -498,7 +460,7 @@
 <!-- This is the old javascript method for running LCA. Will need to change to json file, run on python and run on seprate vm later.-->
 <script src="../../static/js/Cycon_events.js"></script>
 
-<!-- This is the javascript method for running MLA-->>
+<!-- This is the javascript method for running MLA-->
 
 
 <!-- The library for the charts -->
