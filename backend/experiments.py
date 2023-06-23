@@ -152,7 +152,9 @@ def calculate():
         return jsonify(results=[])
     else:
         output = results
-        if isinstance(results, pd.DataFrame):
+        if isinstance(results, np.ndarray):
+            output = results.tolist()
+        elif isinstance(results, pd.DataFrame):
             output = results.to_html(index=False)
         return jsonify(results=output, name="Process 1")
 

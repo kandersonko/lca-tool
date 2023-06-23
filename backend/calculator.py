@@ -1,5 +1,6 @@
 from sympy import symbols, sympify, simplify, lambdify
 import pandas as pd
+import numpy as np
 import re
 import logging
 
@@ -62,9 +63,17 @@ class Calculator(object):
 
         return True, error
 
-    def _evaluate_equation(self, input_data, equation, result=[]):
+    def _evaluate_equation(self, input_data, equation, result=[], has_dict=False):
         data = input_data.copy()
-        expr = sympify(equation, dict(result=result))
+        expr = None
+        if has_dict:
+            cols = dict()
+            for k, v in result.items():
+                cols[k] = np.array(list(v.values()), dtype=np.float64)
+            expr = sympify(equation, cols)
+        else:
+            expr = sympify(equation, dict(result=result))
+
         results = []
         column_names = []
         # expr = simplify(formula)
@@ -89,17 +98,6 @@ class Calculator(object):
             result = eval_func(*row_values)
             results.append(result)
 
-        # for sub in self.substitutions:
-        #     if sub[1] in data.columns:
-        #         data[sub[0]] = data[sub[1]]
-        #         data.drop(columns=[sub[1]], axis=1)
-        #         column_names.append(sub[0])
-
-        # Store and render the result
-        # column_names += ["result"]
-        # Create a list of column names that should be displayed in the result table
-        # Filter the DataFrame to include only the selected columns
-        # data = data[column_names]
         return True, results
 
     def evaluate(self):
@@ -107,7 +105,9 @@ class Calculator(object):
         if not validated:
             return False, outcome
         data = self.data
-        evaluated, result = self._evaluate_equation(data, self.equations[0], result=[])
+        evaluated, result = self._evaluate_equation(
+            data, self.equations[0], result=data.to_dict(), has_dict=True
+        )
         if not evaluated:
             return False, None
         for equation in self.equations[1:]:
