@@ -1,7 +1,6 @@
 {% extends "layout.html" %} {% block content %}
 <div id="register" class="panel">
   <div class="main" style="width: 70%">
-    <script src="{{url_for('static', filename='js/register_events.js')}}"></script>
 
     <h1>Create Your Account</h1>
     {% if isError %}
@@ -31,4 +30,8 @@
     </form>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{url_for('static', filename='js/register_events.js')}}"></script>
 {% endblock %}

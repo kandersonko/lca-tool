@@ -1,0 +1,35 @@
+<style>
+ table {
+     border-collapse: collapse;
+     width: 100%;
+ }
+
+ th,
+ td {
+     text-align: left;
+     padding: 8px;
+ }
+
+ th {
+     background-color: #4CAF50;
+     color: white;
+ }
+
+ tr:nth-child(even) {
+     background-color: #f2f2f2;
+ }
+</style>
+<div>
+    <span>Equations</span> <br /><br />
+    <div style="display: flex; align-items: center;">
+        <input type="text" name="label" value="" placeholder="Name" style="margin-right: .5rem;">
+        <textarea name="equation_1" class="input-equation" rows="1" cols="30" value="" placeholder="Enter the equation" style="margin-right: .5rem"></textarea> <br />
+        <button id="add_equation" onclick="addEquation(event)">Add Equation</button>
+    </div>
+    <br />
+    <button onclick="calculate()">Calculate</button>
+</div>
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/calculator.js')}}"></script>
+{% endblock %}

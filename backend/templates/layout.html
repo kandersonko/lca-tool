@@ -7,58 +7,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CyberTraining @ Uni. of Idaho</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/lca.css') }}">
+  {% block head %}
+  {% endblock %}
 </head>
 
 <body>
   <div class="main">
-    <div class="header">
-      <div class="logo-container">
-        <a href="https://www.uidaho.edu/idaho-falls">
-          <img src="{{ url_for('static', filename='images/UI_3.jpg') }}" alt="University of Idaho" class="logo" />
-        </a>
-      </div>
-      <a href="http://cycon.nkn.uidaho.edu/" class="title">CyberTraining</a>
-      <div class="logo-container">
-        <a href="https://webpages.uidaho.edu/rsml/lca.html">
-          <img src="{{ url_for('static', filename='images/rsml-1_3.jpg') }}" alt="Research and Innovation in Sustainable Manufacturing and Materials" class="logo" />
-        </a>
-      </div>
-    </div>
 
-    <div class="sidenav">
-      <p><a href="{{ url_for('index') }}">Home</a></p>
-      {% if not g.user %}
-        <a href="{{ url_for('auth.register') }}">Register</a>
-        <a href="{{ url_for('auth.login') }}">Log In</a>
-      {% else %}
-        {% if g.user['status'] != 'active' %}
-        <a href="{{ url_for('auth.activation') }}">Activation</a>
-        {% else %}
-        <a href="{{ url_for('auth.plans') }}">Plans</a>
-        <a href="{{ url_for('experiments.lca') }}">LCA</a>
-        <a href="{{ url_for('experiments.cycon') }}">MLA/AI</a>
-        <a href="{{ url_for('experiments.results') }}">Results</a>
-        <a href="{{ url_for('auth.logout') }}">Log Out</a>
-        {% endif %}
-      {% endif %}
-    </div>
-    
+    {% include 'header.html' %}
+
+    {% include 'sidenav.html' %}
+
     {% block content %}
     {% endblock %}
 
-    <div class="message">
-      {% with messages = get_flashed_messages() %}
-      {% if messages %}
-      <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-      {% endwith %}
-      <p>&nbsp;</p>
+    {% include 'flash.html' %}
 
-    </div>
+    {% block scripts %}
+    {% endblock %}
+
     </div>
 </body>
 </html>

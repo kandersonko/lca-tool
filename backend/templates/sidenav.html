@@ -1,0 +1,16 @@
+<div class="sidenav">
+    <p><a href="{{ url_for('index') }}">Home</a></p>
+    {% if not g.user %}
+    <a href="{{ url_for('auth.register') }}">Register</a>
+    <a href="{{ url_for('auth.login') }}">Log In</a>
+    {% else %}
+    {% if g.user['status'] != 'active' %}
+    <a href="{{ url_for('auth.activation') }}">Activation</a>
+    {% else %}
+    <a href="{{ url_for('auth.plans') }}">Plans</a>
+    <a href="{{ url_for('experiments.lca') }}">LCA</a>
+    <a href="{{ url_for('experiments.cycon') }}">ML/AI</a>
+    <a href="{{ url_for('auth.logout') }}">Log Out</a>
+    {% endif %}
+    {% endif %}
+</div>

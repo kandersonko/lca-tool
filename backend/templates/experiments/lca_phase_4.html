@@ -1,0 +1,17 @@
+<h3 id="resultsHeader">Phase 4. Results and Interpretation:</h3>
+
+<!-- Calculator results -->
+{% if error %}
+<div class="error">{{ error }}</div>
+{% endif %}
+<div id="results"></div>
+
+<p>&nbsp;</p>
+
+<li style="font-size:12pt"> Analyzing the results and comparison</li>
+
+<canvas id="myChart" style="height: 370px; width: 100%;"></canvas>
+<p>&nbsp;</p>
+<li style="font-size:12pt"> Generating a PDF report <button type="reportButton"
+                                                            id="generateReport">Generate</button></li>
+<p>&nbsp;</p>

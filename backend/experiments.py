@@ -137,10 +137,12 @@ def cycon():
 
 @bp.route("/calculate", methods=["POST"])
 def calculate():
-    variables = request.form.get("variables")
-    equation = request.form.get("equation")
+    input_equations = request.form.get("equations")
     csv_file = request.files.get("csv_file")
-    calculator = Calculator(equation=equation, variables=variables, csv_file=csv_file)
+    equations = (
+        [input_equations] if "," not in input_equations else input_equations.split(",")
+    )
+    calculator = Calculator(equations=equations, csv_file=csv_file)
 
     evaluated, results = calculator.evaluate()
     logger.debug("calculate: %s", csv_file)
@@ -149,7 +151,10 @@ def calculate():
         flash(str(results))
         return jsonify(results=[])
     else:
-        return jsonify(results=results.to_html(index=False))
+        output = results
+        if isinstance(results, pd.DataFrame):
+            output = results.to_html(index=False)
+        return jsonify(results=output, name="Process 1")
 
 
 @bp.route("/run_experiment", methods=["POST"])
