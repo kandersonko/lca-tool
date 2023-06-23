@@ -20,12 +20,16 @@ class Calculator(object):
         data, error = None, None
         try:
             data = pd.read_csv(csvfile, index_col=None)
+            data.apply(
+                lambda col: pd.to_numeric(col, downcast="float", errors="coerce")
+            )
         except FileNotFoundError:
             error = f"Error: The file '{csvfile.filename}' does not exist."
         except pd.errors.EmptyDataError:
             error = "Error: The uploaded file is empty."
         except pd.errors.ParserError:
             error = "Error: The uploaded file is not in CSV format."
+
         return data, error
 
     def _validate_equation(self, data, input_equation):
@@ -69,6 +73,8 @@ class Calculator(object):
         if has_dict:
             cols = dict()
             for k, v in result.items():
+                if any(isinstance(s, str) for s in list(v.values())):
+                    continue
                 cols[k] = np.array(list(v.values()), dtype=np.float64)
             expr = sympify(equation, cols)
         else:

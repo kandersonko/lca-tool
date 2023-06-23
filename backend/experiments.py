@@ -146,6 +146,7 @@ def calculate():
 
     evaluated, results = calculator.evaluate()
     logger.debug("calculate: %s", csv_file)
+    logger.debug("=== results: %s | dtype %s", results, type(results))
 
     if not evaluated:
         flash(str(results))
@@ -153,9 +154,7 @@ def calculate():
     else:
         output = results
         if isinstance(results, np.ndarray):
-            output = results.tolist()
-        elif isinstance(results, pd.DataFrame):
-            output = results.to_html(index=False)
+            output = results.astype(np.float64).tolist()
         return jsonify(results=output, name="Process 1")
 
 
