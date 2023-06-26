@@ -33,3 +33,4 @@ password.txt
 *.webm
 /proxy/certs/
 .DS_Store
+/backend/node_modules/
