@@ -293,7 +293,7 @@ $(document).ready(function () {
     // Add the footer with the link to our tool
     doc.setFontSize(9);
     doc.text("Created using the IDeaL LCA Tool:", 10, 295);
-    doc.textWithLink("https://webpages.uidaho.edu/ideal/lca.html", 62, 295, {url: "https://webpages.uidaho.edu/ideal/lca.html"});
+    doc.textWithLink("https://cycon.nkn.uidaho.edu", 62, 295, {url: "https://cycon.nkn.uidaho.edu"});
     doc.setFontSize(11);
 
     // doc.addImage(LifeExpectancyTableImg, 'JPEG', 20, 100, 100, 80);
