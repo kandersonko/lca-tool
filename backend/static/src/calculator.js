@@ -32,14 +32,16 @@ function calculate(e) {
         output += `<div class="calculator-result">${name}: ${equation}</div/>`;
         results.push({name: name, value: equation})
       }
-      $("#results").html(output);
-      if(chartInitialized) {
-        updateChart(chart, results);
-      } else {
-        chart = initializeChart(
-          document.getElementById("myChart"),
-          results
-        )
+      if(results.length > 0) {
+        $("#results").html(output);
+        if(chartInitialized) {
+          updateChart(chart, results);
+        } else {
+          chart = initializeChart(
+            document.getElementById("myChart"),
+            results
+          )
+        }
       }
 
     },
@@ -54,7 +56,7 @@ function calculate(e) {
 function addEquation() {
   const equationPlaceholder = document.getElementById("lca_equation");
   const equation = `
-            <div class="input-equation flex items-center justify-center mb-2">
+            <div class="input-equation flex items-center mb-2">
                 <input type="text" name="label" class="py-1 px-2 border border-gray-400 rounded-lg" value="Process ${processCount}" placeholder="Rename Process 1" style="margin-right: .5rem;">
                 <textarea class="py-1 px-2 border border-gray-400 rounded-lg" rows="1" cols="30" value="" placeholder="Enter the equation" style="margin-right: .5rem"></textarea> <br />
             </div>
@@ -93,16 +95,35 @@ const convertToChartData = (results) => {
 
 let chartInitialized = false;
 
+const chartOptions = {
+  scales: {
+    yAxes: [{
+      ticks: {
+        beginAtZero: true,
+        min: 0
+      }
+    }]
+  },
+  legend: {
+    display: false //This will do the task
+  }
+};
+
 function initializeChart(ctx, results) {
 
   chartInitialized = true;
-  return new Chart(
+  let newChart = new Chart(
     ctx,
     {
       type: 'bar',
-      data: convertToChartData(results)
+      data: convertToChartData(results),
+      options: chartOptions,
+      // options: chartOptions,
     }
   );
+  // newChart.options = chartOptions;
+  // newChart.update();
+  return newChart;
 }
 
 function updateChart(chart, results) {

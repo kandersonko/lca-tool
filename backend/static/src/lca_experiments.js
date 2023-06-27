@@ -62,8 +62,8 @@ function initializeChart(ctx) {
   customTables.push(customTable_1);
 
 
-  var ctx = document.getElementById('myChart').getContext('2d');
-  var chart = initializeChart(ctx);
+  // var ctx = document.getElementById('myChart').getContext('2d');
+  // var chart = initializeChart(ctx);
 
   //Initialize an array with same objects but differnt id
   var results = new Array(10).fill().map((_, i) => ({ id: i, indicator:"",
@@ -213,7 +213,7 @@ function initializeChart(ctx) {
       let indicators = results.map(result => result.indicator);
 
       // updateChart(chart, label, results.result1, results.result2);
-      updateChart(chart, results);
+      // updateChart(chart, results);
     }
   );
 
