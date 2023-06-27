@@ -1,33 +1,38 @@
-{% extends "layout.html" %} {% block content %}
-<div id="login" class="panel">
-  <div class="main mb-2 mt-4" style="width: 70%">
+{% extends "layout.html" %}
 
-    <h1 class="mb-2">Account Login</h1>
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+
+{% block content %}
+<div id="login" class="flex justify-center p-4">
+  <div class="flex flex-col justify-center mb-2 mt-4">
+
+    <h1 class="font-medium text-3xl mb-2">Account Login</h1>
     {% if isError %}
     <h2 style="color: red">{{ error[0] }}</h2>
     {% endif %}
 
-    <form method="post" onsubmit="return validateForm();">
-      <label for="email">Email:</label><br />
+    <form method="post" onsubmit="return validateForm();" class="flex flex-col space-y-2">
+      <label for="email">Email:</label>
       <input type="text" id="email" name="email" class="px-2 py-1 rounded-lg border bg-white"/>
-      <span style="color: red" id="emailErrorMSG"></span><br /><br />
-      <label for="password">Password:</label><br />
-      <input type="password" id="password" name="password" autocomplete="off" class="px-2 py-1 rounded-lg border bg-white"/>
-      <a href="{{ url_for('auth.forgot_password') }}" class="py-1 px-2 rounded-md border border-gray-400 bg-white"> Forgot Password?</a>
-      <span style="color: red" id="passwordErrorMSG"></span><br /><br />
-      <input type="submit" value="Login" class="px-2 py-1 rounded-lg border border-gray-400 bg-white mr-2" />
-      <button
-        type="button"
-        class="py-1 px-2 rounded-lg border border-gray-400 bg-white"
-        onclick="window.location.href='{{ url_for('auth.register') }}';"
-      >
-        Create New Account
-      </button>
+      <span style="color: red" id="emailErrorMSG"></span>
+      <label for="password">Password:</label>
+      <div class="flex flex-row space-x-2">
+        <input type="password" id="password" name="password" autocomplete="off" class="px-2 py-1 rounded-lg border bg-white"/>
+        <a href="{{ url_for('auth.forgot_password') }}" class="py-1 px-2 rounded-md border border-gray-400 bg-white"> Forgot Password?</a>
+      </div>
+      <span style="color: red" id="passwordErrorMSG"></span>
+      <div class="flex flex-row space-x-2">
+      <button type="submit" class="grow bg-blue-400 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-md hover:shadow-lg mr-2">Login</button>
+        <a href="{{ url_for('auth.register') }}" class="py-2 px-4 rounded-md border border-gray-400 bg-white">Create Account</a>
+      </div>
     </form>
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='src/login_events.js')}}"></script>
+<script src="{{ url_for('static', filename='src/login_events.js')}}"></script>
 {% endblock %}
