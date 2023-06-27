@@ -1,7 +1,6 @@
 let processCount = 0;
 
-// var ctx = document.getElementById('myChart').getContext('2d');
-// var chart = initializeChart(ctx);
+let chart;
 
 function calculate(e) {
 
@@ -34,27 +33,15 @@ function calculate(e) {
         results.push({name: name, value: equation})
       }
       $("#results").html(output);
+      if(chartInitialized) {
+        updateChart(chart, results);
+      } else {
+        chart = initializeChart(
+          document.getElementById("myChart"),
+          results
+        )
+      }
 
-      // updateChart(chart, results);
-      const colors = ['rgb(0,128,255)', 'rgb(0,255,0)', 'rgb(255,0,0)', 'rgb(255,255,0)', 'rgb(255,51,153)',
-                'rgb(0,0,153)', 'rgb(0,102,51)', 'rgb(51,0,25)', 'rgb(225,128,0)', 'rgb(0,0,0)'];
-      new Chart(
-        document.getElementById('myChart'),
-        {
-          type: 'bar',
-          data: {
-            labels: results.map(row => row.name),
-            datasets: [
-              {
-                label: 'Process value',
-                data: results.map(row => row.value),
-                backgroundColor: colors,
-                borderColor: colors,
-              }
-            ]
-          }
-        }
-      );
     },
     error: function(error){
       console.log("error", error);
@@ -87,81 +74,48 @@ function  addNewProcessCSV() {
   }
 }
 
+const colors = ['rgb(0,128,255)', 'rgb(0,255,0)', 'rgb(255,0,0)', 'rgb(255,255,0)', 'rgb(255,51,153)',
+                'rgb(0,0,153)', 'rgb(0,102,51)', 'rgb(51,0,25)', 'rgb(225,128,0)', 'rgb(0,0,0)'];
 
-function initializeChart(ctx) {
-  var chart = new Chart(ctx, {
-    // The type of chart we want to create
-    type: 'bar',
-
-    // The data for our dataset
-    data: {
-      labels: [],
-      datasets: []
-    },
-
-    // Configuration options go here
-    options: {
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true,
-            //max: 3000,
-            stepSize: 500000
-          }
-        }]
-      },
-      "animation": {
-        "duration": 1,
-        "onComplete": function() {
-          var chartInstance = this.chart,
-              ctx = chartInstance.ctx;
-
-          ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'bottom';
-
-          this.data.datasets.forEach(function(dataset, i) {
-            var meta = chartInstance.controller.getDatasetMeta(i);
-            meta.data.forEach(function(bar, index) {
-              var data = dataset.data[index];
-              ctx.fillText(data, bar._model.x, bar._model.y - 5);
-            });
-          });
-        }
+// convert results to datasets for chartjs
+const convertToChartData = (results) => {
+  return ({
+    labels: results.map(row => row.name),
+    datasets: [
+      {
+        data: results.map(row => row.value),
+        backgroundColor: colors,
+        borderColor: colors,
       }
-    }
+    ]
   });
-  return chart;
+}
+
+let chartInitialized = false;
+
+function initializeChart(ctx, results) {
+
+  chartInitialized = true;
+  return new Chart(
+    ctx,
+    {
+      type: 'bar',
+      data: convertToChartData(results)
+    }
+  );
 }
 
 function updateChart(chart, results) {
 
+  const data = convertToChartData(results);
 
-  var dataset = [];
-
-  var colors = ['rgb(0,128,255)', 'rgb(0,255,0)', 'rgb(255,0,0)', 'rgb(255,255,0)', 'rgb(255,51,153)',
-                'rgb(0,0,153)', 'rgb(0,102,51)', 'rgb(51,0,25)', 'rgb(225,128,0)', 'rgb(0,0,0)'];
-  console.log("update charts:", results);
-  results.forEach(function (result, index){
-    var obj = {
-      label: result.name,
-      backgroundColor: colors[index],
-      borderColor: colors[index],
-      data: [result.value]
-    };
-    dataset.push(obj);
-  });
-
-  chart.data.datasets = dataset;
-  chart.data.labels = results.map(x => x.name)
+  chart.data = data;
   chart.update();
 }
 
 $(document).ready(function () {
 
-  let customTables = [];
   let customTable_1 = $('#customTable_1').dataTable();
-  customTables.push(customTable_1);
 
   $("#generateReport").click(async function () {
 
@@ -207,7 +161,7 @@ $(document).ready(function () {
     // list.push($("#Result1").text());
     // list.push($("#Result2").text());
     $(".calculator-result").each((_, el) => {
-      list.push(el.innerText)
+      list.push(el.innerText);
     })
 
     list.push($("#phase4Header").text());
