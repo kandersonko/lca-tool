@@ -837,55 +837,55 @@ function initializeChart(ctx) {
     }
   }
 
-  $("#generateReport").click(async function () {
+  // $("#generateReport").click(async function () {
 
-    // This fucntionality should be implemented using a Unit Testing framework
-    //updateChart(chart, "Life Exprectancy", 1000000, 3000000);
+  //   // This fucntionality should be implemented using a Unit Testing framework
+  //   //updateChart(chart, "Life Exprectancy", 1000000, 3000000);
 
-    //Get the rest of the HTML elemensts here (name, scope, GWP etc.)
+  //   //Get the rest of the HTML elemensts here (name, scope, GWP etc.)
 
-    // Get the canvas from the HTML
-    var canvas = document.querySelector('#myChart');
-    //creates image
-    var canvasImg = canvas.toDataURL("image/png", 1.0);
+  //   // Get the canvas from the HTML
+  //   var canvas = document.querySelector('#myChart');
+  //   //creates image
+  //   var canvasImg = canvas.toDataURL("image/png", 1.0);
 
-    // We add all the info into one list in order to put them into the pdf
-    var list = [];
-    // Add the info
-    list.push($("#infoHeader").text());
-    list.push($("#projectName").val());
-
-
-    // Add the description
-    list.push($("#scopeHeader").text());
-
-    list.push($("textarea#phase1Text").val());
+  //   // We add all the info into one list in order to put them into the pdf
+  //   var list = [];
+  //   // Add the info
+  //   list.push($("#infoHeader").text());
+  //   list.push($("#projectName").val());
 
 
+  //   // Add the description
+  //   list.push($("#scopeHeader").text());
 
-    // Add the selected equation
-    list.push($("#methodHeader").text());
-    //list.push($('input:radio[name="methodCalculation"]:checked').text());
-
-    $('input:radio[name="methodCalculation"]:checked').each(function() {
-      var idVal = $(this).attr("id");
-      list.push($("label[for='"+idVal+"']").text());
-    });
-
-    var equation_image = null;
+  //   list.push($("textarea#phase1Text").val());
 
 
-    // Add the result
-    list.push("Results:");
 
-    list.push($("#Result1").text());
-    list.push($("#Result2").text());
+  //   // Add the selected equation
+  //   list.push($("#methodHeader").text());
+  //   //list.push($('input:radio[name="methodCalculation"]:checked').text());
 
-    list.push($("#phase4Header").text());
+  //   $('input:radio[name="methodCalculation"]:checked').each(function() {
+  //     var idVal = $(this).attr("id");
+  //     list.push($("label[for='"+idVal+"']").text());
+  //   });
+
+  //   var equation_image = null;
 
 
-    createPDF(canvasImg, null, equation_image, list);
-  });
+  //   // Add the result
+  //   list.push("Results:");
+
+  //   list.push($("#Result1").text());
+  //   list.push($("#Result2").text());
+
+  //   list.push($("#phase4Header").text());
+
+
+  //   createPDF(canvasImg, null, equation_image, list);
+  // });
 });
 
 

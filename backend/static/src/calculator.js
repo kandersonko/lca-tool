@@ -30,7 +30,7 @@ function calculate(e) {
       let output = "";
       let results = [];
       for (const [name, equation] of Object.entries(response.results)) {
-        output += `<div>${name}: ${equation}</div/>`;
+        output += `<div class="calculator-result">${name}: ${equation}</div/>`;
         results.push({name: name, value: equation})
       }
       $("#results").html(output);
@@ -204,8 +204,11 @@ $(document).ready(function () {
     // Add the result
     list.push("Results:");
 
-    list.push($("#Result1").text());
-    list.push($("#Result2").text());
+    // list.push($("#Result1").text());
+    // list.push($("#Result2").text());
+    $(".calculator-result").each((_, el) => {
+      list.push(el.innerText)
+    })
 
     list.push($("#phase4Header").text());
 
