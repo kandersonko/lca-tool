@@ -68,6 +68,8 @@ function checkCSVHeaderEnvironmental(data,type){
   return true;
   
 }
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = initializeChart(ctx);
 
 function initializeChart(ctx) {
   var chart = new Chart(ctx, {

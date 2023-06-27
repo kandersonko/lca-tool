@@ -1,43 +1,18 @@
+<script>
+</script>
+
 <h3 id="phase2Header">Phase 2. Life cycle inventory (LCI):</h3>
 
 <div id="customTables" style="display: none;">
     <div id="customTableDiv_1">
-        <table id="customTable_1" style="table-layout:fixed; width: 100%;">
-            <thead>
-                <tr>
-                    <th>Indicator</th>
-                    <th>Metric</th>
-                    <th>Location</th>
-                    <th>Score</th>
-                    <th>Total Score</th>
-                </tr>
-                <thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <input id="indicator" type="text" name="indicator" placeholder="Indicator" class="indicator"/>
-                            </td>
-                            <td><input id="metric" type="text" name="metric" placeholder="Metric" class="metric"/></td>
-                            <td><input id="location" type="text" name="location" placeholder="Location" class="location" /></td>
-                            <td><input id="score" type="text" name="score" placeholder="score" class="score" /></td>
-                            <td><input id="totalScore" type="text" name="totalScore" placeholder="Total Score" class="totalScore" /></td>
-                        </tr>
-                    </tbody>
-        </table>
-        <input id="addButton_1" type="button" value="Add new record" class="addButton"/>
-        <input id="addNewProcessButton1_1" type="button" value="Add new process" class="addNewProcessButton1"/>
-        <label id="processCount_1"> Processes: 0/2 </label>
-        <label id="customTableErrorMessage_1" value="" style="color:red"></label>
-        <br>
-        <input id="exportDatabase_1" value="Export as CSV" type="button" style="display: none;">
     </div>
     <p>&nbsp;</p>
 </div>
 
-<input type="radio" id="importDatabase" name="databaseMethod" value="importDatabase">
-<label for="importDatabase"><i>Importing a database</i></label>
+<!-- <input type="radio" id="importDatabase" name="databaseMethod" value="importDatabase">
+     <label for="importDatabase"><i>Importing a database</i></label> -->
 
-<div id="readyTables" style="display: none;">
+<div id="readyTables">
     <div id="readyTableDiv_1" class="container mt-4 a">
         <!-- <canvas id="canvasLifeExpectancy"> -->
         <div id="dvImportSegments_1" class="fileupload ">
@@ -48,16 +23,15 @@
             <div id="csv-display_1">
                 <table id="CSVtable_1" class="display"></table>
             </div>
-            <input id="addNewProcessButton2_1" type="button" value="Add new process" class="addNewProcessButton2" />
-            <label id="processCount2_1"> Processes: 0/2 </label>
+            <input id="addNewProcessButton2_1" type="button" onclick="addNewProcessCSV()" class="px-3 py-1.5 rounded-lg border border-gray-400 bg-white my-2" value="Add new process" class="addNewProcessButton2" />
+            <label id="processCount2_1"> Processes: 0/4 </label>
             <label id="csvTableErrorMessage_1" value="" style="color:red"></label>
         </div>
     </div>
 </div>
 
-<p>&nbsp;</p>
-<input id="addCSVUpload" type="button" value="Add new CSV Upload" class="addCSVUpload" />
+<script>
 
-<p>&nbsp;</p>
+</script>
 
 <h3>-----------------------------------</h3>

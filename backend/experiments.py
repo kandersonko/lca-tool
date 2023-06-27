@@ -139,9 +139,8 @@ def cycon():
 def calculate():
     input_equations = request.form.get("equations")
     csv_file = request.files.get("csv_file")
-    equations = (
-        [input_equations] if "," not in input_equations else input_equations.split(",")
-    )
+    equations = json.loads(input_equations)
+    logger.debug("=== Equations: %s %s", input_equations, equations)
     calculator = Calculator(equations=equations, csv_file=csv_file)
 
     evaluated, results = calculator.evaluate()
@@ -152,10 +151,7 @@ def calculate():
         flash(str(results))
         return jsonify(results=[])
     else:
-        output = results
-        if isinstance(results, np.ndarray):
-            output = results.astype(np.float64).tolist()
-        return jsonify(results=output, name="Process 1")
+        return jsonify(results=results)
 
 
 @bp.route("/run_experiment", methods=["POST"])
