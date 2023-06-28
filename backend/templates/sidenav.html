@@ -1,24 +1,23 @@
 
 
 <div class="sidenav">
-    <a href="{{ url_for('index') }}">
-        {% if g.user %} User {% else %} Home {% endif %}
-    </a>
     {% if not g.user %}
-    <a href="{{ url_for('auth.register') }}">Register</a>
-    <a href="{{ url_for('auth.login') }}">Log In</a>
-    <a href="{{ url_for('modules.index') }}">Modules</a>
-    <a href="{{ url_for('about.index') }}">About</a>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('auth.register') }}">Register</a>
+        <a href="{{ url_for('auth.login') }}">Log In</a>
+        <a href="{{ url_for('modules.index') }}">Modules</a>
+        <a href="{{ url_for('about.index') }}">About</a>
     {% else %}
-    {% if g.user['status'] != 'active' %}
-    <a href="{{ url_for('auth.activation') }}">Activation</a>
-    {% else %}
-    <a href="{{ url_for('auth.plans') }}">Plans</a>
-    <a href="{{ url_for('experiments.lca') }}">LCA</a>
-    <a href="{{ url_for('experiments.cycon') }}">ML/AI</a>
-    <a href="{{ url_for('modules.index') }}">Modules</a>
-    <a href="{{ url_for('about.index') }}">About</a>
-    <a href="{{ url_for('auth.logout') }}">Log Out</a>
-    {% endif %}
+        {% if g.user['status'] != 'active' %}
+            <a href="{{ url_for('auth.activation') }}">Activation</a>
+        {% else %}
+            <a href="{{ url_for('modules.index') }}">Modules</a>
+            <a href="{{ url_for('auth.plans') }}">Plans</a>
+            <a href="{{ url_for('experiments.cycon') }}">ML/AI</a>
+            <a href="{{ url_for('experiments.lca') }}">LCA</a>
+            <a href="{{ url_for('index') }}">User</a>
+            <a href="{{ url_for('about.index') }}">About</a>
+            <a href="{{ url_for('auth.logout') }}">Log Out</a>
+        {% endif %}
     {% endif %}
 </div>
