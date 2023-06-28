@@ -1,34 +1,35 @@
 {% extends "layout.html" %} {% block content %}
 
-<div id="home" class="panel">
-  <div class="main mt-4 mb-2">
-    {% if g.user %}
+<div id="home" class="container mx-auto px-2 py-4 mt-2">
+    <div class="main mt-4 mb-2">
+        {% if g.user %}
 
-    <h1>Welcome {{ g.user['last_name'] }}</h1>
+        <h1>Welcome {{ g.user['last_name'] }}</h1>
 
-    <p>Account status: {{g.user['status']}}</p>
+        <p>Account status: {{g.user['status']}}</p>
 
-    <p>Account plan id: {{g.user['plan_id']}}</p>
+        <p>Account plan id: {{g.user['plan_id']}}</p>
 
-    <p>Email: {{g.user['email']}}</p>
+        <p>Email: {{g.user['email']}}</p>
 
-    <p>First name: {{g.user['first_name']}}</p>
+        <p>First name: {{g.user['first_name']}}</p>
 
-    <p>Last name: {{g.user['last_name']}}</p>
+        <p>Last name: {{g.user['last_name']}}</p>
 
-    <p>Affiliation: {{g.user['affiliation']}}</p>
+        <p>Affiliation: {{g.user['affiliation']}}</p>
 
-    <p>Status (Activation via email): {{g.user['status']}}</p>
+        <p>Status (Activation via email): {{g.user['status']}}</p>
 
-    <p>Account Creation Timestamp: {{g.user['created_at']}}</p>
+        <p>Account Creation Timestamp: {{g.user['created_at']}}</p>
 
-    <p>Last Login: {{g.user['last_login']}}</p>
+        <p>Last Login: {{g.user['last_login']}}</p>
 
-    <p>Last Updated: {{g.user['updated_at']}}</p>{% else %}
+        <p>Last Updated: {{g.user['updated_at']}}</p>
 
-    <h1>This will be the home page eventually.</h1>
-
-    <p>Will add information about the concept, work, and
-    contributors later.</p>{% endif %}
-  </div>
+        {% else %}
+        <div class="flex justify-center items-center">
+            <img src="{{ url_for('static', filename='Images/welcome.png') }}" alt="" class="w-128 h-128" />
+        </div>
+        {% endif %}
+    </div>
 </div>{% endblock %}
