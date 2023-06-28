@@ -631,6 +631,10 @@ video {
   display: none;
 }
 
+.h-64 {
+  height: 16rem;
+}
+
 .w-48 {
   width: 12rem;
 }

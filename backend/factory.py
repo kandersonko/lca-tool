@@ -1,7 +1,7 @@
 from flask import Flask, g
 from logging.config import dictConfig
 
-from backend import auth, home, about, config, experiments
+from backend import auth, home, about, modules, config, experiments
 from backend.db import DBManager
 
 dictConfig(
@@ -35,6 +35,7 @@ def create_app(password_file="/run/secrets/db-password"):
     app.register_blueprint(auth.bp)
     app.register_blueprint(home.bp)
     app.register_blueprint(about.bp)
+    app.register_blueprint(modules.bp)
     app.register_blueprint(experiments.bp)
 
     app.add_url_rule("/", endpoint="index")

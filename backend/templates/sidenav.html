@@ -1,18 +1,13 @@
 
 
-
 <div class="sidenav">
-    <p><a href="{{ url_for('index') }}">
-        {% if g.user %}
-        User
-        {% else %}
-        Home
-        {% endif %}
-
-    </a></p>
+    <a href="{{ url_for('index') }}">
+        {% if g.user %} User {% else %} Home {% endif %}
+    </a>
     {% if not g.user %}
     <a href="{{ url_for('auth.register') }}">Register</a>
     <a href="{{ url_for('auth.login') }}">Log In</a>
+    <a href="{{ url_for('modules.index') }}">Modules</a>
     <a href="{{ url_for('about.index') }}">About</a>
     {% else %}
     {% if g.user['status'] != 'active' %}
