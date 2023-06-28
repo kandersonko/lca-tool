@@ -1001,6 +1001,11 @@ video {
   background-color: rgb(245 243 255 / var(--tw-bg-opacity));
 }
 
+.file\:bg-violet-500::file-selector-button {
+  --tw-bg-opacity: 1;
+  background-color: rgb(139 92 246 / var(--tw-bg-opacity));
+}
+
 .file\:px-2::file-selector-button {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
