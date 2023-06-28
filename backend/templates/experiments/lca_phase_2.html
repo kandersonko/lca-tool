@@ -1,37 +1,30 @@
-<script>
-</script>
+<div class="px-2 py-4 flex flex-col space-y-2 border-b border-gray-200">
+    <h3 id="phase2Header" class="mb-2 text-xl font-bold">Life cycle inventory (LCI)</h3>
 
-<h3 id="phase2Header">Phase 2. Life cycle inventory (LCI):</h3>
 
-<div id="customTables" style="display: none;">
-    <div id="customTableDiv_1">
+    <div id="customTables" style="display: none;">
+        <div id="customTableDiv_1">
+        </div>
+        <p>&nbsp;</p>
     </div>
-    <p>&nbsp;</p>
-</div>
 
-<!-- <input type="radio" id="importDatabase" name="databaseMethod" value="importDatabase">
-     <label for="importDatabase"><i>Importing a database</i></label> -->
 
-<div id="readyTables">
-    <div id="readyTableDiv_1" class="container mt-4 a">
-        <!-- <canvas id="canvasLifeExpectancy"> -->
-        <div id="dvImportSegments_1" class="fileupload ">
-            <fieldset>
-                <legend id="legend_1">Upload your CSV File for indicator 1</legend>
-                <input type="file" name="File Upload" id="txtFileUpload_1" accept=".csv" />
-            </fieldset>
-            <div id="csv-display_1">
-                <table id="CSVtable_1" class="display"></table>
+    <div id="readyTables">
+        <div id="readyTableDiv_1" class="container mt-4 mx-auto">
+            <!-- <canvas id="canvasLifeExpectancy"> -->
+            <div id="dvImportSegments_1" class="fileupload ">
+                <fieldset>
+                    <legend id="legend_1">Upload your CSV File</legend>
+                    <input type="file" class="file:px-2 file:py-1 file:my-1 file:bg-violet-50 file:text-white file:font-medium file:text-sm file:rounded-full file:border-none" name="File Upload" id="txtFileUpload_1" accept=".csv" />
+                </fieldset>
+                <div id="csv-display_1">
+                    <table id="CSVtable_1" class="display"></table>
+                </div>
+                <input id="addNewProcessButton2_1" type="button" onclick="addNewProcessCSV()" class="px-2 py-1 bg-white rounded-md border border-slate-50 my-2" value="Add new process" class="addNewProcessButton2" />
+                <label id="processCount2_1"> Processes: 0/4 </label>
+                <label id="csvTableErrorMessage_1" value="" style="color:red"></label>
             </div>
-            <input id="addNewProcessButton2_1" type="button" onclick="addNewProcessCSV()" class="px-3 py-1.5 rounded-lg border border-gray-400 bg-white my-2" value="Add new process" class="addNewProcessButton2" />
-            <label id="processCount2_1"> Processes: 0/4 </label>
-            <label id="csvTableErrorMessage_1" value="" style="color:red"></label>
         </div>
     </div>
+
 </div>
-
-<script>
-
-</script>
-
-<h3>-----------------------------------</h3>

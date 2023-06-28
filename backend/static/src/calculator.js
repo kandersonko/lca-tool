@@ -29,7 +29,7 @@ function calculate(e) {
       let output = "";
       let results = [];
       for (const [name, equation] of Object.entries(response.results)) {
-        output += `<div class="calculator-result">${name}: ${equation}</div/>`;
+        output += `<div class="calculator-result" class="flex flex-row mb-2"><h4 class="mr-2 font-medium"><h4>${name}: <span class="font-bold">${equation}</span></h4> </div/>`;
         results.push({name: name, value: equation})
       }
       if(results.length > 0) {
