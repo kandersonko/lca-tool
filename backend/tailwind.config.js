@@ -5,9 +5,6 @@ module.exports = {
     "./static/src/**/*.js"
   ],
   theme: {
-    colors: {
-      'brand': '#F6B700'
-    },
     fontFamily: {
       'body': [
         'Inter',
@@ -44,7 +41,11 @@ module.exports = {
         'Noto Color Emoji'
       ],
     },
-    extend: {},
+    extend: {
+      colors: {
+        'brand': '#F6B700'
+      },
+    },
   },
   plugins: [],
 }

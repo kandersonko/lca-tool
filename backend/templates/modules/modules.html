@@ -1,0 +1,76 @@
+{% extends "layout.html" %} {% block content %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+
+<div id="home" class="container mx-auto flex justify-center items-center pt-4">
+
+    <div class="flex justify-center items-center max-w-xl">
+        <div class="p-4 mt-4 self-center grid gap-8 grid-cols-1 grid-rows-4 md:grid-cols-2 md:grid-rows-2">
+
+            <a href="{{url_for('modules.ci_user')}}" class="flex flex-col outline outline-offset-2 outline-4 outline-blue-500 hover:shadow-lg rounded-lg p-2 cursor-pointer">
+                <div class="flex items-center">
+                    <img src="{{ url_for('static', filename='Images/ci_user.png') }}" alt="" width="48px" height="48px" class="block mt-2" />
+                    <h3 class="ml-2 pt-1 text-xl font-medium">CI User Resource​</h3>
+                </div>
+                <div class="ml-12 pl-4 px-4 py-2">
+                    <ul class="list-disc">
+                        <li>E-classroom building blocks​</li>
+                        <li>Modular learning coursework​</li>
+                        <li>Course project libraries</li>
+                    </ul>
+                </div>
+            </a>
+
+            <a href="{{url_for('modules.ci_educator')}}" class="flex flex-col outline outline-offset-2 outline-4 outline-green-500 hover:shadow-lg rounded-lg p-2">
+                <div class="flex items-center">
+                    <img src="{{ url_for('static', filename='Images/ci_educator.png') }}" alt="" width="48px" height="48px" class="block mt-2" />
+                    <h3 class="ml-2 pt-1 text-xl font-medium">CI Educator Resource</h3>
+                </div>
+                <div class="ml-12 pl-4 px-4 py-2">
+                    <ul class="list-disc">
+                        2-day hybrid kick-off workshops
+                        1-hour online webinars
+                        2-hour online closing sessions
+                        20+ hours of online materials
+                    </ul>
+                </div>
+            </a>
+
+            <a href="{{url_for('modules.ci_competition')}}" class="flex flex-col outline outline-offset-2 outline-4 outline-cyan-500 hover:shadow-lg rounded-lg p-2">
+                <div class="flex items-center">
+                    <img src="{{ url_for('static', filename='Images/ci_competition.png') }}" alt="" width="48px" height="48px" class="block mt-2" />
+                    <h3 class="ml-2 pt-1 text-xl font-medium"> Competition Module</h3>
+                </div>
+                <div class="ml-12 pl-4 px-4 py-2">
+                    <ul class="list-disc">
+                        5-6 CyCon Challenges
+                        Two-stage ML competition
+                        Awards are considered
+
+                    </ul>
+                </div>
+            </a>
+
+            <a href="{{url_for('modules.ci_crowdsourcing')}}" class="flex flex-col outline outline-offset-2 outline-4 outline-red-500 hover:shadow-lg rounded-lg p-2">
+                <div class="flex items-center">
+                    <img src="{{ url_for('static', filename='Images/ci_crowdsourcing.png') }}" alt="" width="48px" height="48px" class="block mt-2" />
+                    <h3 class="ml-2 pt-1 text-xl font-medium">Crowdsourcing Module</h3>
+                </div>
+                <div class="ml-12 pl-4 px-4 py-2">
+                    <ul class="list-disc">
+                        Crowdsourced data collection
+                        Crowdsourced data annotation
+                        Semi-automated cloud-based annotation tool
+                    </ul>
+                </div>
+            </a>
+
+
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
