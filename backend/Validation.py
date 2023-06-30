@@ -22,6 +22,8 @@ from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import KFold
 from sklearn.model_selection import StratifiedKFold
 
+from backend.Classes.PreoptimizationFiles import Preoptimization
+
 
 def getDataset(fileName):
      # convert csv to usable dataset
@@ -35,12 +37,21 @@ def getDataset(fileName):
     dataset_path = ManualLoc / filename.lower()
     dataset = pd.read_csv(dataset_path)
 
-    return dataset.to_numpy()
+    return dataset
 
 def Split(data):
     try:
         # convert csv to usable dataset
-        df = getDataset(data['csvFileName'])
+        df_act = getDataset(data['csvFileName'])
+        
+        # Cycle through the choices of preotimization
+        for i in range(int(data["preoptCounter"])):
+            # Get the choice of preoptimization.
+            preopt_method = data["Preopt_" + str(i)]
+            # Perform the preoptimization on the dataset.
+            df_act = Preoptimization.perform_Preopt(data, i, df_act)
+
+        df = df_act.to_numpy()
 
         # Split dataset to training and testing set
         random_state = None
@@ -51,7 +62,7 @@ def Split(data):
             shuffle = True
         stratify = None
         if data["Stratify"] == "True":
-            stratify = df[:,length]
+            stratify = df_act[data["class_col"]]
     
         train_set, test_set = train_test_split(df, test_size=float(data[data['validation'] + "_Input"]), shuffle=shuffle, random_state = random_state, stratify = stratify)
 
@@ -151,7 +162,16 @@ def Split(data):
 def K_Fold(data):
     try:
         # convert csv to usable dataset
-        df = getDataset(data['csvFileName'])
+        df_act = getDataset(data['csvFileName'])
+        
+        # Cycle through the choices of preotimization
+        for i in range(int(data["preoptCounter"])):
+            # Get the choice of preoptimization.
+            preopt_method = data["Preopt_" + str(i)]
+            # Perform the preoptimization on the dataset.
+            df_act = Preoptimization.perform_Preopt(data, i, df_act)
+
+        df = df_act.to_numpy()
 
         length = df.shape[1] -1
 
