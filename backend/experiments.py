@@ -155,21 +155,27 @@ def cycon():
 
 @bp.route("/calculate", methods=["POST"])
 def calculate():
-    input_equations = request.form.get("equations")
-    csv_file = request.files.get("csv_file")
-    equations = json.loads(input_equations)
-    logger.debug("=== Equations: %s %s", input_equations, equations)
-    calculator = Calculator(equations=equations, csv_file=csv_file)
+    processes_input = request.form.get("processes")
+    processes = json.loads(processes_input)
+    logger.debug("=== Equations: %s %s", processes, processes_input)
+    calculator = Calculator()
 
-    evaluated, results = calculator.evaluate()
-    logger.debug("calculate: %s", csv_file)
+    results = []
+    for process in processes:
+        filename = process.get("filename")
+        csv_file = request.files.get(filename)
+        equation = process.get("equation")
+        name = process.get("name")
+        logger.debug("=== Process (file): %s %s %s", filename, csv_file, request.form)
+        evaluated, result = calculator.evaluate(equation=equation, csv_file=csv_file)
+        output = dict(result=result, name=name)
+        results.append(output)
+
+        if not evaluated:
+            flash(str(result))
+
     logger.debug("=== results: %s | dtype %s", results, type(results))
-
-    if not evaluated:
-        flash(str(results))
-        return jsonify(results=[])
-    else:
-        return jsonify(results=results)
+    return jsonify(processes=results)
 
 
 @bp.route("/run_experiment", methods=["POST"])

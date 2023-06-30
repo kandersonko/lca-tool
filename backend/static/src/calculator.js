@@ -1,19 +1,34 @@
-let processCount = 0;
-
 let chart;
+
+const getFilename = (inputFile) => {
+  return inputFile.value.split('\\').slice(-1)[0]
+}
+
+const getCSVFiles = (className) => {
+  const csvFiles = Array.from(document.getElementsByClassName(className))
+                        .map(el => ({filename: getFilename(el), file: el.files[0]}));
+  return csvFiles;
+}
 
 function calculate(e) {
 
-  const inputEquations = document.getElementsByClassName("input-equation");
-  const equations = Array.from(inputEquations)
-                         .filter(x => x.children[1].value !== '')
-                         .map(x => ({"equation": x.children[1].value, "name": x.children[0].value}));
-  console.log("equations: ", equations, inputEquations);
-  const csvFile = $("#txtFileUpload_1")[0].files[0];
-  console.log("csv: ", csvFile)
+  const csvFiles = getCSVFiles("input-csv")
+  console.log("csv files: ", csvFiles);
+  const processes = Array.from(document.getElementsByClassName("input-equation"))
+                         .map(el => {
+                           return ({
+                             name: el.children[0].value,
+                             filename: el.children[1].value,
+                             equation: el.children[2].value
+                           });
+                         });
+  console.log("processes", processes);
+
   const data = new FormData();
-  data.append("csv_file", csvFile);
-  data.append("equations", JSON.stringify(equations));
+  data.append("processes", JSON.stringify(processes));
+  csvFiles.forEach(csv => {
+    data.append(csv.filename, csv.file);
+  })
   console.log("data", data)
 
   $.ajax({
@@ -25,13 +40,12 @@ function calculate(e) {
     contentType: false, // important
     success: function(response){
       console.log("response", response);
-      const name = response.name;
       let output = "";
       let results = [];
-      for (const [name, equation] of Object.entries(response.results)) {
-        output += `<div class="calculator-result" class="flex flex-row mb-2"><h4 class="mr-2 font-medium"><h4>${name}: <span class="font-bold">${equation}</span></h4> </div/>`;
-        results.push({name: name, value: equation})
-      }
+      response.processes.forEach(process => {
+        output += `<div class="calculator-result" class="flex flex-row mb-2"><h4 class="mr-2 font-medium"><h4>${process.name}: <span class="font-bold">${process.result}</span></h4> </div/>`;
+        results.push({name: process.name, value: process.result});
+      });
       if(results.length > 0) {
         $("#results").html(output);
         if(chartInitialized) {
@@ -52,29 +66,6 @@ function calculate(e) {
   });
 }
 
-
-function addEquation() {
-  const equationPlaceholder = document.getElementById("lca_equation");
-  const equation = `
-            <div class="input-equation flex items-center mb-2">
-                <input type="text" name="label" class="py-1 px-2 border border-gray-400 rounded-lg" value="Process ${processCount}" placeholder="Rename Process 1" style="margin-right: .5rem;">
-                <textarea class="py-1 px-2 border border-gray-400 rounded-lg" rows="1" cols="30" value="" placeholder="Enter the equation" style="margin-right: .5rem"></textarea> <br />
-            </div>
-    `
-  $(equation).insertBefore(equationPlaceholder);
-}
-
-function  addNewProcessCSV() {
-  if(processCount < 4){
-    processCount = processCount + 1;
-    const output = `
-            <label id="processCount2_1"> Processes: ${processCount}/4 </label>
-        `
-    $("#processCount2_1").replaceWith(output)
-
-    addEquation()
-  }
-}
 
 const colors = ['rgb(0,128,255)', 'rgb(0,255,0)', 'rgb(255,0,0)', 'rgb(255,255,0)', 'rgb(255,51,153)',
                 'rgb(0,0,153)', 'rgb(0,102,51)', 'rgb(51,0,25)', 'rgb(225,128,0)', 'rgb(0,0,0)'];
@@ -192,44 +183,6 @@ $(document).ready(function () {
   });
 
 
-
-  function populateTable(dataSet, tableElement) {
-    if (typeof (dataSet[0]) === 'undefined') {
-      return null;
-    }
-    else {
-      var columns = [];
-      var data = [];
-      $.each(dataSet, function (index, row) {
-
-        // The first row of the csv data is going to be represent each column in our HTML table
-        if (index == 0) {
-          $.each(row, function (index, colData) {
-            columns.push({ title: colData });
-          });
-        } // Then we just have the rest of the data
-        else {
-          data.push(row);
-        }
-
-      });
-
-
-      // We assign the above data and columns and some attributes to display on the table.
-      return tableElement.DataTable({
-        data: data,
-        columns: columns,
-        select: {
-          style: 'single',
-          items: 'row'
-        },
-      });
-    }
-
-
-  }
-
-
   function createPDF(canvasImg, LifeExpectancyTableImg, equation, list) {
 
     // console.log(LifeExpectancyTableImg);
@@ -301,3 +254,79 @@ $(document).ready(function () {
     doc.save('report.pdf');
   }
 })
+
+
+
+function populateTable(dataSet, tableElement) {
+  if (typeof (dataSet[0]) === 'undefined') {
+    return null;
+  }
+  else {
+    var columns = [];
+    var data = [];
+    $.each(dataSet, function (index, row) {
+
+      // The first row of the csv data is going to be represent each column in our HTML table
+      if (index == 0) {
+        $.each(row, function (index, colData) {
+          columns.push({ title: colData });
+        });
+      } // Then we just have the rest of the data
+      else {
+        data.push(row);
+      }
+
+    });
+
+
+    // We assign the above data and columns and some attributes to display on the table.
+    return tableElement.DataTable({
+      data: data,
+      columns: columns,
+      select: {
+        style: 'single',
+        items: 'row'
+      },
+    });
+  }
+}
+
+
+
+// Method that reads and processes the selected file
+function upload(evt, index) {
+  if (!browserSupportFileUpload()) {
+    alert('The File APIs are not fully supported in this browser!');
+  }
+  else {
+    var data = null;
+    var file = evt.target.files[0];
+    var reader = new FileReader();
+    reader.readAsText(file);
+
+    var uploadId = index;
+
+    reader.onload = function (event) {
+      var csvData = event.target.result;
+      data = $.csv.toArrays(csvData);
+
+      populateTable(data, $('#CSVtable_'+index));
+
+    };
+    reader.onerror = function () {
+      alert('Unable to read ' + file.fileName);
+    };
+  }
+}
+
+// TODO: Add the rest of the events here, pass the ID of the csv somehow (see this.id) and then convert the addNewProcessButton2
+// to have the appropriate button ID and to call the same fucntion based on the if statements
+
+// Method that checks that the browser supports the HTML5 File API
+function browserSupportFileUpload() {
+  var isCompatible = false;
+  if (window.File && window.FileReader && window.FileList && window.Blob) {
+    isCompatible = true;
+  }
+  return isCompatible;
+}
