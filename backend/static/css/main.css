@@ -44,7 +44,7 @@ html {
   -o-tab-size: 4;
      tab-size: 4;
   /* 3 */
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, system-ui, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  font-family: Inter, system-ui, sans-serif;
   /* 4 */
   font-feature-settings: normal;
   /* 5 */
@@ -619,8 +619,16 @@ video {
   margin-top: 1rem;
 }
 
+.mt-6 {
+  margin-top: 1.5rem;
+}
+
 .block {
   display: block;
+}
+
+.inline-block {
+  display: inline-block;
 }
 
 .flex {
@@ -639,20 +647,20 @@ video {
   display: none;
 }
 
-.h-1\/2 {
-  height: 50%;
-}
-
-.w-1\/2 {
-  width: 50%;
+.h-full {
+  height: 100%;
 }
 
 .w-64 {
   width: 16rem;
 }
 
-.w-72 {
-  width: 18rem;
+.w-full {
+  width: 100%;
+}
+
+.max-w-3xl {
+  max-width: 48rem;
 }
 
 .max-w-xs {
@@ -663,24 +671,12 @@ video {
   max-width: 24rem;
 }
 
-.max-w-md {
-  max-width: 28rem;
+.flex-1 {
+  flex: 1 1 0%;
 }
 
-.max-w-lg {
-  max-width: 32rem;
-}
-
-.max-w-xl {
-  max-width: 36rem;
-}
-
-.max-w-2xl {
-  max-width: 42rem;
-}
-
-.max-w-3xl {
-  max-width: 48rem;
+.flex-none {
+  flex: none;
 }
 
 .grow {
@@ -699,20 +695,16 @@ video {
   cursor: pointer;
 }
 
+.resize {
+  resize: both;
+}
+
 .list-disc {
   list-style-type: disc;
 }
 
-.grid-cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
-}
-
-.grid-rows-2 {
-  grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 
 .grid-rows-4 {
@@ -737,10 +729,6 @@ video {
 
 .justify-center {
   justify-content: center;
-}
-
-.gap-4 {
-  gap: 1rem;
 }
 
 .gap-8 {
@@ -798,11 +786,6 @@ video {
 .border-gray-400 {
   --tw-border-opacity: 1;
   border-color: rgb(156 163 175 / var(--tw-border-opacity));
-}
-
-.border-slate-50 {
-  --tw-border-opacity: 1;
-  border-color: rgb(248 250 252 / var(--tw-border-opacity));
 }
 
 .border-slate-400 {
@@ -891,7 +874,7 @@ video {
 }
 
 .font-sans {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, system-ui, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  font-family: Inter, system-ui, sans-serif;
 }
 
 .text-3xl {
@@ -956,16 +939,8 @@ video {
   outline-width: 4px;
 }
 
-.outline-2 {
-  outline-width: 2px;
-}
-
 .outline-offset-2 {
   outline-offset: 2px;
-}
-
-.outline-offset-4 {
-  outline-offset: 4px;
 }
 
 .outline-blue-500 {
@@ -999,11 +974,6 @@ video {
 
 .file\:border-none::file-selector-button {
   border-style: none;
-}
-
-.file\:bg-violet-50::file-selector-button {
-  --tw-bg-opacity: 1;
-  background-color: rgb(245 243 255 / var(--tw-bg-opacity));
 }
 
 .file\:bg-violet-500::file-selector-button {
@@ -1054,10 +1024,6 @@ video {
   --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-.hover\:outline-blue-500\/75:hover {
-  outline-color: rgb(59 130 246 / 0.75);
 }
 
 @media (min-width: 768px) {
