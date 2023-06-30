@@ -258,9 +258,10 @@ $(document).ready(function () {
   }
 })
 
+let datatables = [];
 
 
-function populateTable(dataSet, tableElement) {
+function populateTable(dataSet, tableElement, tableId) {
   if (typeof (dataSet[0]) === 'undefined') {
     return null;
   }
@@ -281,17 +282,24 @@ function populateTable(dataSet, tableElement) {
 
     });
 
+    if(datatables[tableId]) {
+      datatables[tableId].clear().draw();
+      datatables[tableId].rows.add(data); // Add new data
+      datatables[tableId].columns.adjust().draw(); // Redraw the DataTable
+    } else {
 
-    // We assign the above data and columns and some attributes to display on the table.
-    return tableElement.DataTable({
-      retrieve: true,
-      data: data,
-      columns: columns,
-      select: {
-        style: 'single',
-        items: 'row'
-      },
-    });
+      // We assign the above data and columns and some attributes to display on the table.
+      datatables[tableId] =  tableElement.DataTable({
+        retrieve: true,
+        data: data,
+        columns: columns,
+        select: {
+          style: 'single',
+          items: 'row'
+        },
+      });
+    }
+    return datatables[tableId];
   }
 }
 
@@ -314,7 +322,7 @@ function upload(evt, index) {
       var csvData = event.target.result;
       data = $.csv.toArrays(csvData);
 
-      populateTable(data, $('#CSVtable_'+index));
+      populateTable(data, $('#CSVtable_'+index), index);
 
     };
     reader.onerror = function () {

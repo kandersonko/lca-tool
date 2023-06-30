@@ -105,14 +105,15 @@
       {% if error %}
       <div class="error">{{ error }}</div>
       {% endif %}
-      <div id="results"></div>
+      <div id="results" class="mb-4"></div>
 
-      <p>&nbsp;</p>
 
       <div class="mb-2"> Analyzing the results and comparison</div>
 
-      <canvas id="myChart" style="height: 370px; width: 100%;"></canvas>
-      <p>&nbsp;</p>
+      <div class="flex w-full">
+        <canvas id="myChart" class="w-full max-w-md"></canvas>
+      </div>
+
       <div>
         <span>Generating a PDF report</span>
         <button type="reportButton" id="generateReport" class="px-2 px-1.5 rounded-lg bg-white border border-gray-400">Generate</button>
