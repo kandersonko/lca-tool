@@ -42,30 +42,20 @@ bp = Blueprint("experiments", __name__, url_prefix="/experiments")
 logger = logging.getLogger()
 
 # should be modified to work with a db or class if necessary.
-# Otherwise, the choces being pre-available on page load will slightly speed the process.
+# Otherwise, the choices being pre-available on page load will slightly speed the process.
 @bp.before_app_request
 def load_possible_experiments():
     list_Algorithms = MLA.getMLAs()
-    list_Preoptimizations = Preoptimization.getPreopts()
     list_Preopt_Categories = Preoptimization.getPreopt_Categories()
     list_Standardization = Standardization.getStandardization()
 
-    # ----------------new Cycon--------------------------->
-    # First choice is between various categories of ML
+    #----------------new Cycon--------------------------->
+    # First choice is between various categories of ML 
     g.section_Method = ["MLA", "DLANN"]
-    g.section_Method_Display_Name = [
-        "Machine Learning Algorithm (MLA)",
-        "Deep Learning Artifical Neural Networks (DLANN)",
-    ]
-    g.section_Info = [
-        [
-            "Machine learning algorithms are mathematical model mapping methods. They are used to learn patterns embedded in the existing training dataset in order to perform pattern recognition, classification, and prediction.\n\nCurrently, the only algorithms available on cycon is under the classification objective. Other objectives that will be added later include clustering and regression."
-        ],
-        ["DLANN info"],
-    ]
-    g.Methodologies = zip(
-        g.section_Method, g.section_Method_Display_Name, g.section_Info
-    )
+    g.section_Method_Display_Name = ["Machine Learning Algorithm (MLA)", "Deep Learning Artifical Neural Networks (DLANN)"]
+    g.section_Info = [["Machine learning algorithms are mathematical model mapping methods. They are used to learn patterns embedded in the existing training dataset in order to perform pattern recognition, classification, and prediction.\n\nCurrently, the only algorithms available on cycon is under the classification objective. Other objectives that will be added later include clustering and regression."],
+                      ["DLANN info"]]
+    g.Methodologies = zip(g.section_Method, g.section_Method_Display_Name, g.section_Info)
 
     # Obtain the selection of Algorithm Names and Definition.
     algorithm_Names = []
@@ -79,24 +69,6 @@ def load_possible_experiments():
     g.section_algorithm = algorithm_Names
     g.section_Info = algorithm_Definition
     g.Algorithms = zip(g.section_algorithm, g.section_Info)
-
-    # obtain the selection of preoptimization options and definitions.
-    preopt_Names = []
-    preopt_Display_Names = []
-    preopt_Definition = []
-
-    preopt_Names.append("")
-    preopt_Display_Names.append("")
-    preopt_Definition.append("")
-
-    for preopt in list_Preoptimizations:
-        preopt_Names.append(preopt.getName())
-        preopt_Display_Names.append(preopt.getDisplayName())
-        preopt_Definition.append(preopt.getDefinition())
-    g.section_preopt = preopt_Names
-    g.section_preopt_names = preopt_Display_Names
-    g.section_Info = preopt_Definition
-    g.Preoptimizations = zip(g.section_preopt, g.section_preopt_names, g.section_Info)
 
     # create list of options to choose a category of preoptimization options.
     preopt_Category_Names = []
@@ -113,12 +85,8 @@ def load_possible_experiments():
         preopt_Category_Definition.append(preopt_Category.getDefinition())
     g.section_preopt_Category_Names = preopt_Category_Names
     g.section_preopt_Category_Display_Names = preopt_Category_Display_Names
-    g.section_preopt_Category_Info = preopt_Category_Definition
-    g.preopt_Categories = zip(
-        g.section_preopt_Category_Names,
-        g.section_preopt_Category_Display_Names,
-        g.section_preopt_Category_Info,
-    )
+    g.section_preopt_Category_Info =  preopt_Category_Definition
+    g.preopt_Categories = zip(g.section_preopt_Category_Names, g.section_preopt_Category_Display_Names, g.section_preopt_Category_Info)
 
     # create list of options for the first category of preoprtimization (I.E. Standardization)
     preopt_Names = []
@@ -131,10 +99,9 @@ def load_possible_experiments():
         preopt_Definition.append(preopt.getDefinition())
     g.section_preopt_Names = preopt_Names
     g.section_preopt_Display_Names = preopt_Display_Names
-    g.section_preopt_Info = preopt_Definition
-    g.preopts = zip(
-        g.section_preopt_Names, g.section_preopt_Display_Names, g.section_preopt_Info
-    )
+    g.section_preopt_Info =  preopt_Definition
+    g.preopts = zip(g.section_preopt_Names, g.section_preopt_Display_Names, g.section_preopt_Info)
+
 
 
 # Old LCA for testing purposes, REMOVE BEFORE SUBMITTING.
@@ -142,11 +109,14 @@ def load_possible_experiments():
 def LCA_Old():
     return render_template("experiments/LCA_Old.html")
 
+# REMOVE ASAP
+@bp.route("/new_experiment")
+def new_experiment():
+    return render_template("experiments/new_experiment.html")
 
 @bp.route("/lca")
 def lca():
     return render_template("experiments/lca.html")
-
 
 @bp.route("/cycon")
 def cycon():
@@ -155,11 +125,10 @@ def cycon():
 
 @bp.route("/calculate", methods=["POST"])
 def calculate():
-    input_equations = request.form.get("equations")
+    variables = request.form.get("variables")
+    equation = request.form.get("equation")
     csv_file = request.files.get("csv_file")
-    equations = json.loads(input_equations)
-    logger.debug("=== Equations: %s %s", input_equations, equations)
-    calculator = Calculator(equations=equations, csv_file=csv_file)
+    calculator = Calculator(equation=equation, variables=variables, csv_file=csv_file)
 
     evaluated, results = calculator.evaluate()
     logger.debug("calculate: %s", csv_file)
@@ -169,22 +138,22 @@ def calculate():
         flash(str(results))
         return jsonify(results=[])
     else:
-        return jsonify(results=results)
+        return jsonify(results=results.to_html(index=False))
 
 
 @bp.route("/run_experiment", methods=["POST"])
-def run_experiment():
+def run_experiment():    
     output = request.get_json()
     formData = json.loads(output)
 
-    data = formData["form"]
+    data = formData['form']
 
     # Split
-    if data["validation"] == "Split":
+    if data['validation'] == "Split":
         status, msg, Metrics = Validation.Split(data)
 
     # K-Fold
-    elif data["validation"] == "K-Fold":
+    elif data['validation'] == "K-Fold":
         status, msg, Metrics = Validation.K_Fold(data)
 
     if status == "worked":
@@ -198,7 +167,7 @@ def run_experiment():
             fp = open(filepath, "a")
         else:
             fp = open(filepath, "a")
-
+    
         # write to json file
         metrics_Dump = json.dumps(Metrics)
 
@@ -211,13 +180,12 @@ def run_experiment():
 
     return json.dumps(Results)
 
-
 @bp.route("/getResults", methods=["POST"])
-def getResults():
+def getResults(): 
     output = request.get_json()
     formData = json.loads(output)
 
-    data = formData["form"]
+    data = formData['form']
 
     baseFolder = os.getcwd()
     locationSavedResults = Path(baseFolder) / "SavedResults"
@@ -229,7 +197,7 @@ def getResults():
 
     # close the connection
     fp.close()
-
+    
     return json.dumps(Metrics)
 
 
@@ -241,7 +209,6 @@ def getAlgorithmParameters():
     Parameters = MLA.getParameters(data["Algorithm"])
 
     return json.dumps(Parameters)
-
 
 @bp.route("/getCategoryPreopts", methods=["POST"])
 def getCategoryPreopts():
@@ -263,14 +230,13 @@ def getCSVResults():
     output = request.get_json()
     formData = json.loads(output)
 
-    data = formData["form"]
+    data = formData['form']
 
     status, msg, info = Preoptimization.getCSV_PDF(data)
 
     Results = [status, msg, info]
 
     return json.dumps(Results)
-
 
 @bp.route("/getPreoptParameters", methods=["POST"])
 def getPreoptParameters():
@@ -280,7 +246,6 @@ def getPreoptParameters():
     Parameters = Preoptimization.getParameters(data["Preopt"])
 
     return json.dumps(Parameters)
-
 
 # Gets the colummn names inside the csv.
 @bp.route("/getCSVColumnTitles", methods=["POST"])

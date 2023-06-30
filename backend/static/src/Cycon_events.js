@@ -149,7 +149,7 @@ function changeAlgorithm(algorithms, ID_Parameters) {
 
                 if (data.hasOwnProperty(Parameter)) {
                     // Create a label, which will be the parameter Name followed by the default value.
-                    var name_label = Parameter_Name + " (Default: " + data[Parameter]["Default"] + ") ";
+                    var name_label = Parameter_Name + " (Default: " + data[Parameter]["Default_value"] + ") ";
                     var label = document.createElement('label');
                     label.htmlFor = name_label;
                     label.appendChild(document.createTextNode(name_label));
@@ -216,6 +216,11 @@ function getData(form) {
     const csvFileName = document.getElementById("csvFile").files[0].name;
     formData.append("csvFileName", csvFileName);
 
+    const class_column = document.getElementById("class_col").value;
+    formData.append("class_col", class_column);
+
+    formData.append("preoptCounter", preoptCounter)
+
     var checkbox = $("#cyconForm").find("input[type=checkbox]");
     $.each(checkbox, function (key, val) {
         formData.append($(val).attr('name') + "_checked", $(this).is(':checked'));
@@ -223,6 +228,17 @@ function getData(form) {
 
     // iterate through entries...
     for (var pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+        document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        dict_data[pair[0]] = pair[1]
+    }
+
+    const preoptform = document.getElementById("preoptForm");
+
+    var preoptForm = new FormData(preoptform);
+
+    // iterate through entries...
+    for (var pair of preoptForm.entries()) {
         console.log(pair[0] + ": " + pair[1]);
         document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
         dict_data[pair[0]] = pair[1]
@@ -262,7 +278,11 @@ function getData(form) {
                 writeData.paragraph += "Dataset Information".bold().italics().big() + "<br\>"
                 writeData.paragraph += "Dataset File: ".bold().italics() + "<br\>" + dict_data["csvFileName"] + "<br\><br\>"
                 // Preoptimization
-                writeData.paragraph += "Preoptimization: ".bold().italics() + "<br\>" + dict_data["preoptimization"] + "<br\><br\>"
+                writeData.paragraph += "Preoptimization: ".bold().italics() + "<br\>"
+                for (let i = 0; i < preoptCounter; i++) {
+                    writeData.paragraph += dict_data["Preopt_" + i].bold() + "<br\>"
+                }
+                writeData.paragraph += "<br\>"
                 // Phase 3
                 // Name of Methology
                 writeData.paragraph += "Methodology Information".bold().italics().big() + "<br\>"
@@ -779,6 +799,9 @@ function checkCSV_Preopt(form) {
     const csvFileName = document.getElementById("csvFile").files[0].name;
     formData.append("csvFileName", csvFileName);
 
+    const class_column = document.getElementById("class_col").value;
+    formData.append("class_col", class_column);
+
     formData.append("Perform_Preopt", "Yes")
 
     formData.append("preoptCounter", preoptCounter)
@@ -941,7 +964,7 @@ function selectPreopt(Preopt, ID_Preopt) {
 
                     if (data.hasOwnProperty(Parameter)) {
                         // Create a label, which will be the parameter Name followed by the default value.
-                        var name_label = Parameter_Name + " (Default: " + data[Parameter]["Default"] + ") ";
+                        var name_label = Parameter_Name + " (Default: " + data[Parameter]["Default_value"] + ") ";
                         var label = document.createElement('label');
                         label.htmlFor = name_label;
                         label.appendChild(document.createTextNode(name_label));
@@ -988,11 +1011,9 @@ function selectPreopt(Preopt, ID_Preopt) {
     }
 }
 
-// Removes all preoptimization options.
-function clearAllPreopt() {
-    document.getElementById("Preopt_Selection").innerHTML = "";
+// Removes all csv check information
+function clearAllCSV() {
     document.getElementById("csv_Error_Preopt").innerHTML = "";
-    preoptCounter = 0;
 
     document.getElementById("csv_Results").innerHTML = "";
     document.getElementById("csv_shape").innerHTML = "";
@@ -1008,6 +1029,12 @@ function clearAllPreopt() {
     $("#csv_Class_Balance_Results").hide();
     $("#csv_Scale_Title").hide();
     $("#csv_Scale_Results").hide();
+}
+
+// Removes all preoptimization options.
+function clearAllPreopt() {
+    document.getElementById("Preopt_Selection").innerHTML = "";
+    preoptCounter = 0;
 
     document.getElementById("csv_Results_Preopt").innerHTML = "";
     document.getElementById("csv_shape_Preopt").innerHTML = "";
@@ -1029,7 +1056,8 @@ function clearAllPreopt() {
 // Method to fill an html paragraph or section via the parameters
 function fillSection(section, data, Parameter, Location, counter) {
 
-    var default_p = data[Parameter]["Default"];
+    var default_opt = data[Parameter]["Default_option"];
+    var default_value = data[Parameter]["Default_value"];
     
     var Parameter_Name = data[Parameter]["Name"];
 
@@ -1041,7 +1069,7 @@ function fillSection(section, data, Parameter, Location, counter) {
     // Create choices and options to alter the parameter
     for (var Type_Int in data[Parameter]["Type"]) {
         // Selectable options.
-        if (data[Parameter]["Type"][Type_Int] == "option") {
+        if (data[Parameter]["Type"][Type_Int] == "option" || data[Parameter]["Type"][Type_Int] == "option_integer" || data[Parameter]["Type"][Type_Int] == "option_dtype") {
             for (var Option_Int in data[Parameter]["Possible"]) {
                 // create radio button
                 var radio_name = Parameter_Name + "_Input";
@@ -1052,7 +1080,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                 radio.id = option;
                 radio.value = option;
                 section.appendChild(radio);
-                if (option == default_p) {
+                if (option == default_opt) {
                     radio.checked = true;
                 }
 
@@ -1063,6 +1091,85 @@ function fillSection(section, data, Parameter, Location, counter) {
                 label.appendChild(document.createTextNode(name_label));
 
                 section.appendChild(label);
+            }
+        }
+
+        // Selectable options with input types.
+        if (data[Parameter]["Type"][Type_Int] == "option_input" || data[Parameter]["Type"][Type_Int] == "option_input_dtype") {
+            for (var Option_Int in data[Parameter]["Possible"]) {
+                // create radio button
+                var radio_name = Parameter_Name + "_Input";
+                var option = data[Parameter]["Possible"][Option_Int];
+                var radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = radio_name;
+                radio.id = option;
+                radio.value = option;
+                section.appendChild(radio);
+                if (option == default_opt) {
+                    radio.checked = true;
+                }
+
+                // create label for radio button
+                var name_label = option;
+                var label = document.createElement('label')
+                label.htmlFor = name_label;
+                label.appendChild(document.createTextNode(name_label));
+
+                section.appendChild(label);
+
+                // set default.
+                if (typeof default_value != 'number') {
+                    if (option == default_opt) {
+                        radio.checked = true;
+                    }
+                }
+
+                if (typeof default_value == 'number' && !isNaN(default_value)) {
+                    if (option == default_opt) {
+                        radio.check = true;
+                    }
+                }
+
+                if (option == "str") {
+                    var selection = Parameter_Name + "_String_Input";
+                    var textbox = document.createElement("input");
+                    textbox.type = "text";
+                    textbox.name = selection;
+                    section.appendChild(textbox);
+
+                    if (default_opt == 'str') {
+                        textbox.value = default_value;
+                    }
+                }
+
+                if (option == "int") {
+                    var selection = Parameter_Name + "_Int_Input";
+                    var textbox = document.createElement("input");
+                    textbox.type = "text";
+                    textbox.name = selection;
+                    section.appendChild(textbox);
+
+                    if (default_opt == "int") {
+                        if (typeof default_value == 'number' && !isNaN(default_value)) {
+                            textbox.value = default_value;
+                        }
+                    }
+                }
+
+                if (option == "float") {
+                    var selection = Parameter_Name + "_Float_Input";
+                    var textbox = document.createElement("input");
+                    textbox.type = "text";
+                    textbox.name = selection;
+                    section.appendChild(textbox);
+
+                    if (default_opt == "float") {
+                        if (typeof default_value == 'number' && !isNaN(default_value)) {
+                            textbox.value = default_value;
+                        }
+                    }
+                }
             }
         }
 
@@ -1104,13 +1211,13 @@ function fillSection(section, data, Parameter, Location, counter) {
                 radio.value = option;
                 section.appendChild(radio);
 
-                if (typeof default_p != 'number') {
-                    if (option == default_p) {
+                if (typeof default_opt != 'number') {
+                    if (option == default_opt) {
                         radio.checked = true;
                     }
                 }
 
-                if (typeof default_p == 'number' && !isNaN(default_p)) {
+                if (typeof default_opt == 'number' && !isNaN(default_opt)) {
                     if (option == "float") {
                         radio.check = true;
                     }
@@ -1131,8 +1238,8 @@ function fillSection(section, data, Parameter, Location, counter) {
                     textbox.name = selection;
                     section.appendChild(textbox);
 
-                    if (typeof default_p == 'number' && !isNaN(default_p)) {
-                        texbox.value = default_p;
+                    if (typeof default_opt == 'number' && !isNaN(default_opt)) {
+                        texbox.value = default_opt;
                     }
                 }
             }
@@ -1151,13 +1258,13 @@ function fillSection(section, data, Parameter, Location, counter) {
                 radio.value = option;
                 section.appendChild(radio);
 
-                if (typeof default_p != 'number') {
-                    if (option == default_p) {
+                if (typeof default_opt != 'number') {
+                    if (option == default_opt) {
                         radio.checked = true;
                     }
                 }
 
-                if (typeof default_p == 'number' && !isNaN(default_p)) {
+                if (typeof default_opt == 'number' && !isNaN(default_opt)) {
                     if (option == "int") {
                         radio.check = true;
                     }
@@ -1178,8 +1285,8 @@ function fillSection(section, data, Parameter, Location, counter) {
                     textbox.name = selection;
                     section.appendChild(textbox);
 
-                    if (typeof default_p == 'number' && !isNaN(default_p)) {
-                        texbox.value = default_p;
+                    if (typeof default_opt == 'number' && !isNaN(default_opt)) {
+                        texbox.value = default_opt;
                     }
                 }
             }
@@ -1193,7 +1300,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             textbox.type = "text";
             textbox.name = selection;
 
-            textbox.value = default_p;
+            textbox.value = default_opt;
 
             section.appendChild(textbox);
         }
@@ -1206,8 +1313,8 @@ function fillSection(section, data, Parameter, Location, counter) {
             textbox.type = "text";
             textbox.name = selection;
 
-            if (typeof default_p == 'number' && !isNaN(default_p)) {
-                textbox.value = default_p;
+            if (typeof default_opt == 'number' && !isNaN(default_opt)) {
+                textbox.value = default_opt;
             }
 
             section.appendChild(textbox);
@@ -1221,8 +1328,8 @@ function fillSection(section, data, Parameter, Location, counter) {
             textbox.type = "text";
             textbox.name = selection;
 
-            if (typeof default_p == 'number' && !isNaN(default_p)) {
-                textbox.value = default_p;
+            if (typeof default_opt == 'number' && !isNaN(default_opt)) {
+                textbox.value = default_opt;
             }
 
             section.appendChild(textbox);
@@ -1236,7 +1343,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             textbox.type = "text";
             textbox.name = selection;
 
-            textbox.value = default_p;
+            textbox.value = default_opt;
 
             section.appendChild(textbox);
         }
@@ -1254,7 +1361,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                 radio.value = option;
                 section.appendChild(radio);
 
-                if (option == default_p) {
+                if (option == default_opt) {
                     radio.checked = true;
                 }
 
@@ -1275,7 +1382,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             var textbox = document.createElement("input");
             textbox.type = "text";
             textbox.name = selection;
-            textbox.value = data[Parameter]["Default"];
+            textbox.value = data[Parameter]["Default_value"];
             section.appendChild(textbox);
         }
 
@@ -1298,6 +1405,7 @@ function fillSection(section, data, Parameter, Location, counter) {
 
 // Updates the csv dataset information. Changing selectable column names and resetting the preoptimization.
 function changeCSV() {
+    clearAllCSV()
     clearAllPreopt()
 
     // create option to select classification column
@@ -1379,8 +1487,4 @@ function changeCSV() {
             document.getElementById("kde_ind").value = "";
         }
     });
-}
-
-function clearAllCSV() {
-
 }
