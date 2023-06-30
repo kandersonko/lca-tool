@@ -133,8 +133,6 @@ function updateChart(chart, results) {
 
 $(document).ready(function () {
 
-  let customTable_1 = $('#customTable_1').dataTable();
-
   $("#generateReport").click(async function () {
 
     // This fucntionality should be implemented using a Unit Testing framework
@@ -286,6 +284,7 @@ function populateTable(dataSet, tableElement) {
 
     // We assign the above data and columns and some attributes to display on the table.
     return tableElement.DataTable({
+      retrieve: true,
       data: data,
       columns: columns,
       select: {
