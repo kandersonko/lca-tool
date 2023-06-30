@@ -168,7 +168,7 @@ def calculate():
         name = process.get("name")
         logger.debug("=== Process (file): %s %s %s", filename, csv_file, request.form)
         evaluated, result = calculator.evaluate(equation=equation, csv_file=csv_file)
-        output = dict(result=result, name=name)
+        output = dict(result=result, name=name, equation=equation)
         results.append(output)
 
         if not evaluated:

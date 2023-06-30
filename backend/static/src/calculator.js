@@ -43,7 +43,13 @@ function calculate(e) {
       let output = "";
       let results = [];
       response.processes.forEach(process => {
-        output += `<div class="calculator-result" class="flex flex-row mb-2"><h4 class="mr-2 font-medium"><h4>${process.name}: <span class="font-bold">${process.result}</span></h4> </div/>`;
+        output += `
+          <div class="calculator-result" class="flex flex-row mb-3">
+            <h4 class="mr-2 font-medium">
+              ${process.name}: <span class="font-bold">${process.result}</span>
+              <span>| Formula: ${process.equation}</span>
+            </h4>
+          </div/>`;
         results.push({name: process.name, value: process.result});
       });
       if(results.length > 0) {
@@ -220,9 +226,8 @@ $(document).ready(function () {
     var y_margin = 20;
 
     lines.forEach(line => {
-      if(line === "Name of the project, Name and Email:" || line === "Phase 1. Goal and scope definition:"
-         || line === "Phase 2. Life cycle inventory (LCI):" || line === "Phase 3. Life cycle impact assessment (LCIA):"
-         || line === "Results:" || line ==="Phase 4: Interpretation:"){
+      if(line === "Name of the project" || line === "Goal and scope"
+         || line === "Life cycle impact assessment (LCIA)" || line === "Results:"){
         var textWidth = doc.getTextWidth(line);
         doc.line(lMargin, y_margin+1, lMargin + textWidth, y_margin+1);
       }
