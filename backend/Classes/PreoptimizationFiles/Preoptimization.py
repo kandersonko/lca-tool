@@ -13,8 +13,6 @@ from sklearn import preprocessing
 from sklearn.preprocessing import OrdinalEncoder
 from werkzeug.utils import secure_filename
 
-from backend.Classes.PreoptimizationFiles import Preoptimizer
-
 from backend.Classes.PreoptimizationFiles import Discretization
 from backend.Classes.PreoptimizationFiles import EncodingCategoricalFeatures
 from backend.Classes.PreoptimizationFiles import GeneratingPolynomialFeatures
@@ -117,123 +115,10 @@ list_Discretization = Discretization.getDiscretization()
 list_ECF = EncodingCategoricalFeatures.getECF()
 list_GPF = GeneratingPolynomialFeatures.getGPF()
 list_IoMV = ImputationOfMissingValues.getIoMV()
-list_NonLV = NonLinearTransformation.getNonLT()
+list_NonLT = NonLinearTransformation.getNonLT()
 list_Normalization = Normalization.getNormalization()
 list_RemoveData = RemoveData.getRemoveData()
 list_Standardization = Standardization.getStandardization()
-
-# Create a list of possible Preoptimizations. (Old method, to be removed later)
-list_Preopts = []
-
-def getPreopts():
-    return list_Preopts
-
-# Information of the Preoptimization options.
-## Category Encoders:
-### OrdinalEncoder
-Name = "OrdinalEncoder"
-Display_Name = "Ordinal Encoder"
-Definition = ["Encode categorical features as an integer array.\n\nThe input to this transformer should be an array-like of integers or strings, denoting the values taken on by categorical (discrete) features. The features are converted to ordinal integers. This results in a single column of integers (0 to n_categories - 1) per feature."]
-## This should only be added if 2-d array is given, however since we are allowing user to perform operation on one column only. We give it the possible values later.
-#Parameter_0 =  {"Name":"categories", "Type": ["option"], "Default":"auto", "Possible":["auto", "columns"], 
-#               "Definition":"Categories (unique values) per feature:\n\n‘auto’ : Determine categories automatically from the training data.\n\nlist : categories[i] holds the categories expected in the ith column. The passed categories should not mix strings and numeric values, and should be sorted in case of numeric values."}
-### Removed due to json issues and no other types are listed as acceptable on sklearn. Will be implemented at a later date if necessary
-#Parameter_1 =  {"Name":"dtype", "Type": ["dtype_number"], "Default":np.float64, "Possible":["np.int32", "np.float64"], 
-#               "Definition":"Desired dtype of output."}
-Parameter_0 =  {"Name":"handle_unknown", "Type": ["option"], "Default":"error", "Possible":["error", "use_encoded_value"], 
-               "Definition":"When set to ‘error’ an error will be raised in case an unknown categorical feature is present during transform. When set to ‘use_encoded_value’, the encoded value of unknown categories will be set to the value given for the parameter unknown_value. In inverse_transform, an unknown category will be denoted as None."}
-Parameter_1 =  {"Name":"unknown_value", "Type": ["option"], "Default":"None", "Possible":["int", "np.nan", "None"], 
-               "Definition":"When the parameter handle_unknown is set to ‘use_encoded_value’, this parameter is required and will set the encoded value of unknown categories. It has to be distinct from the values used to encode any of the categories in fit. If set to np.nan, the dtype parameter must be a float dtype."}
-Parameter_2 =  {"Name":"encoded_missing_value", "Type": ["option_int"], "Default":"np.nan", "Possible":["int", "np.nan"], 
-               "Definition":"Encoded value of missing categories. If set to np.nan, then the dtype parameter must be a float dtype."}
-Parameter_3 = {"Name":"column", "Type": ["select"], "Default":"", "Possible":["col_names"],
-               "Definition":"Column to perform the preoptimization on."}
-
-Parameters = {"Parameter_0":Parameter_0, "Parameter_1":Parameter_1,"Parameter_2":Parameter_2,"Parameter_3":Parameter_3}
-
-list_Preopts.append(Preoptimizer.Preoptimizer(Name, Display_Name, Definition, Parameters))
-
-## Standard Scaling:
-Name = "StandardScaler"
-Display_Name = "Standard Scaler"
-Definition = ["Standardize features by removing the mean and scaling to unit variance.\n\nThe standard score of a sample x is calculated as:\n\nz = (x - u) / s\n\nwhere u is the mean of the training samples or zero if with_mean=False, and s is the standard deviation of the training samples or one if with_std=False.\n\nCentering and scaling happen independently on each feature by computing the relevant statistics on the samples in the training set. Mean and standard deviation are then stored to be used on later data using transform.\n\nStandardization of a dataset is a common requirement for many machine learning estimators: they might behave badly if the individual features do not more or less look like standard normally distributed data (e.g. Gaussian with 0 mean and unit variance).\n\nFor instance many elements used in the objective function of a learning algorithm (such as the RBF kernel of Support Vector Machines or the L1 and L2 regularizers of linear models) assume that all features are centered around 0 and have variance in the same order. If a feature has a variance that is orders of magnitude larger than others, it might dominate the objective function and make the estimator unable to learn from other features correctly as expected.\n\nThis scaler can also be applied to sparse CSR or CSC matrices by passing with_mean=False to avoid breaking the sparsity structure of the data."]
-Parameter_0 =  {"Name":"copy", "Type": ["bool"], "Default":True, "Possible":[True, False], 
-               "Definition":"If False, try to avoid a copy and do inplace scaling instead. This is not guaranteed to always work inplace; e.g. if the data is not a NumPy array or scipy.sparse CSR matrix, a copy may still be returned."}
-Parameter_1 =  {"Name":"with_mean", "Type": ["bool"], "Default":True, "Possible":[True, False], 
-               "Definition":"If True, center the data before scaling. This does not work (and will raise an exception) when attempted on sparse matrices, because centering them entails building a dense matrix which in common use cases is likely to be too large to fit in memory."}
-Parameter_2 =  {"Name":"with_std", "Type": ["bool"], "Default":True, "Possible":[True, False], 
-               "Definition":"If True, scale the data to unit variance (or equivalently, unit standard deviation)."}
-Parameter_3 = {"Name":"column", "Type": ["select"], "Default":"", "Possible":["col_names"],
-               "Definition":"Column to perform the preoptimization on."}
-
-Parameters = {"Parameter_0":Parameter_0, "Parameter_1":Parameter_1,"Parameter_2":Parameter_2, "Parameter_3":Parameter_3}
-
-list_Preopts.append(Preoptimizer.Preoptimizer(Name, Display_Name, Definition, Parameters))
-
-## Label Encoding:
-Name = "LabelEncoder"
-Display_Name = "Label Encoder"
-Definition = ["Encode target labels with value between 0 and n_classes-1.\n\nThis transformer should be used to encode target values, i.e. y, and not the input X."]
-
-Parameters = {}
-
-list_Preopts.append(Preoptimizer.Preoptimizer(Name, Display_Name, Definition, Parameters))
-
-## Dummy Variables:
-Name = "DummyVariables"
-Display_Name = "Dummy Variables"
-Definition = ["converts string entires for numeric representation for each columns."]
-Parameter_0 =  {"Name":"prefix", "Type": ["str"], "Default":None, "Possible":["str"], 
-               "Definition":"String to append DataFrame column names. Pass a list with length equal to the number of columns when calling get_dummies on a DataFrame. Alternatively, prefix can be a dictionary mapping column names to prefixes."}
-Parameter_1 =  {"Name":"prefix_sep", "Type": ["str"], "Default":"_", "Possible":["str"], 
-               "Definition":"If appending prefix, separator/delimiter to use. Or pass a list or dictionary as with prefix."}
-Parameter_2 =  {"Name":"dummy_na", "Type": ["bool"], "Default":False, "Possible":[True,False], 
-               "Definition":"Add a column to indicate NaNs, if False NaNs are ignored."}
-Parameter_3 =  {"Name":"dtype", "Type": ["option"], "Default":"bool", "Possible":["bool","float","int"], 
-               "Definition":"Data type for new columns. Only a single dtype is allowed."}
-Parameter_4 = {"Name":"column", "Type": ["select"], "Default":"", "Possible":["col_names"],
-               "Definition":"Column to perform the preoptimization on."}
-
-Parameters = {"Parameter_0":Parameter_0, "Parameter_1":Parameter_1,"Parameter_2":Parameter_2,"Parameter_3":Parameter_3,"Parameter_4":Parameter_4}
-
-list_Preopts.append(Preoptimizer.Preoptimizer(Name, Display_Name, Definition, Parameters))
-
-## Drop Columns:
-Name = "RemoveColumn"
-Display_Name = "Remove Column"
-Definition = ["Remove column from the dataset."]
-Parameter_0 = {"Name":"column", "Type": ["select"], "Default":"", "Possible":["col_names"],
-             "Definition":"The column name to remove from the dataset."}
-
-Parameters = {"Parameter_0":Parameter_0}
-
-list_Preopts.append(Preoptimizer.Preoptimizer(Name, Display_Name, Definition, Parameters))
-
-## Drop Rows:
-Name = "RemoveRow"
-Display_Name = "Remove Row"
-Definition = ["Remove row from the dataset."]
-Parameter_0 = {"Name":"row", "Type": ["int"], "Default":"", "Possible":["int"],
-             "Definition":"The index number of the row to remove."}
-
-Parameters = {"Parameter_0":Parameter_0}
-
-list_Preopts.append(Preoptimizer.Preoptimizer(Name, Display_Name, Definition, Parameters))
-
-## Drop null values Removal:
-Name = "DropRowsContainingNullValues"
-Display_Name = "Drop Rows Containing Null Values"
-Definition = ["Removes the rows that contain null value entires in any of the columns."]
-
-Parameters = {}
-
-list_Preopts.append(Preoptimizer.Preoptimizer(Name, Display_Name, Definition, Parameters))
-
-## Outlier Removal:
-
-## PCA: Principal Component Analysis
-
-# Other Methods
 
 # get settings to fill the model parameters.
 def getSettings(data, Parameters):
@@ -249,7 +134,7 @@ def getSettings(data, Parameters):
 
         # get default
         if data[Parameters["Parameter_" + str(i)]["Name"]+"_checked"] == "false":
-            settings["Parameter_" + str(i)] = Parameters["Parameter_" + str(i)]["Default"]
+            settings["Parameter_" + str(i)] = Parameters["Parameter_" + str(i)]["Default_option"]
             # convert to acceptable type
             settings["Parameter_" + str(i)] = convertToType(settings["Parameter_" + str(i)], Parameters["Parameter_" + str(i)]["Type"])
 
@@ -345,7 +230,7 @@ def getCategoryPreopts(Category_Name):
     if Category_Name == "ImputationofMissingValues":
         preopts = list_IoMV
     if Category_Name == "NonlinearTransformation":
-        preopts = list_NonLV
+        preopts = list_NonLT
     if Category_Name == "Normalization":
         preopts = list_Normalization
     if Category_Name == "RemoveData":
@@ -439,11 +324,6 @@ def getParameters(Preopt_Name):
     #list_Normalization = Normalization.getNormalization()
     #list_RemoveData = RemoveData.getRemoveData()
     #list_Standardization = Standardization.getStandardization()
-
-    for preopt in list_Preopts:
-        if preopt.getName() == Preopt_Name:
-            Parameters = preopt.getParameters()
-            return Parameters
     
     for preopt in list_Discretization:
         if preopt.getName() == Preopt_Name:
@@ -495,108 +375,70 @@ def perform_Preopt(data, i, df):
 
     new_df = df
 
-    # Perform the preoptimization method based on the chosen selection.
-    ## Categorical Encoding.
-    ### Ordinal Encoder
-    if method == "OrdinalEncoder":
-        enc_miss_value = "";
-        if data["Preopt_" + str(i) + "_encoded_missing_value_Input"] == "np.nan":
-            enc_miss_value = np.nan
-        else:
-            enc_miss_value = int(data["Preopt_" + str(i) + "_encoded_missing_value_Input"])
-
-        unknown_Value = "";
-        if data["Preopt_" + str(i) + "_unknown_value_Input"] == "np.nan":
-            unknown_Value = np.nan
-        elif data["Preopt_" + str(i) + "_unknown_value_Input"] == "None":
-            unknown_Value = None
-        else:
-            unknown_Value = int(data["Preopt_" + str(i) + "_unknown_value_Input"])
-
-        enc = OrdinalEncoder(categories=[df[data["Preopt_" + str(i) + "_column_Input"]].unique().tolist()],
-                             handle_unknown=data["Preopt_" + str(i) + "_handle_unknown_Input"],
-                             unknown_value=unknown_Value,
-                             encoded_missing_value=enc_miss_value
-        )
-
-        new_df[data["Preopt_" + str(i) + "_column_Input"]] = enc.fit_transform(df[[data["Preopt_" + str(i) + "_column_Input"]]])
-
-    ### Standard Scaler
-    if method == "StandardScaler":
-        copy = True
-        if data["Preopt_" + str(i) + "_copy_Input"] == "False":
-            copy = False
-
-        with_mean = True
-        if data["Preopt_" + str(i) + "_with_mean_Input"] == "False":
-            with_mean = False
-
-        with_std = True
-        if data["Preopt_" + str(i) + "_with_std_Input"] == "False":
-            with_std = False
-
-        sc = preprocessing.StandardScaler(copy=copy,
-                            with_mean=with_mean,
-                            with_std=with_std)
-        
-        index_of_column = df.columns.get_loc(data["Preopt_" + str(i) + "_column_Input"])
-
-        temp = sc.fit_transform(df[[data["Preopt_" + str(i) + "_column_Input"]]]).flatten()
-
-        new_df.iloc[:,index_of_column] = sc.fit_transform(df[[data["Preopt_" + str(i) + "_column_Input"]]]).flatten()
-
-
-    ### Label Encoder
-    if method == "LabelEncoder":
-        le = preprocessing.LabelEncoder()
-
-        index_of_class_col = df.columns.get_loc(data["class_col"])
-
-        temp = df[data["class_col"]].unique().tolist()
-        le.fit(df[data["class_col"]].unique().tolist())
-        new_df.iloc[:,index_of_class_col] = le.transform(df.iloc[:,index_of_class_col]) 
-
-    # Dummy Variables
-    if method == "DummyVariables":
-        prefix = None
-        if data["Preopt_" + str(i) + "_prefix_Input"] != "" and data["Preopt_" + str(i) + "_prefix_Input"] != None:
-            prefix = data["Preopt_" + str(i) + "_prefix_Input"]
-
-        dummy_na = False;
-        if data["Preopt_" + str(i) + "_dummy_na_Input"] == "True":
-            dummy_na = True;
-
-        dtype_value = bool
-        if data["Preopt_" + str(i) + "_dtype_Input"] == "float":
-            dtype_value = float
-        if data["Preopt_" + str(i) + "_dtype_Input"] == "int":
-            dtype_value = int
-
-
-        new_df = pd.get_dummies(data=df,
-                                prefix=prefix,
-                                prefix_sep=data["Preopt_" + str(i) + "_prefix_sep_Input"],
-                                dummy_na=dummy_na,
-                                columns=[data["Preopt_" + str(i) + "_column_Input"]],
-                                dtype=dtype_value)
-
-    ## Removal
-    if method == "RemoveColumn":
-        new_df = df.drop(columns=[data["Preopt_" + str(i) + "_column_Input"]])
-
-    if method == "RemoveRow":
-        new_df = df.drop([int(data["Preopt_" + str(i) + "_row_Input"])])
-
-    ## Null instances
-    ### Remove all
-    if method == "DropRowsContainingNullValues":
-        new_df = df.dropna(axis=0)
+    found = 0
 
     ## Standardization options
-    if method == "StandardScaler" or method == "MinMaxScaler" or method == "MaxAbsScaler" or method == "RobustScaler":
-        new_df = Standardization.perform_Preopt(data, i, df)
+    if found == 0:
+        for preopts in list_Standardization:
+            if method == preopts.getName():
+                new_df = Standardization.perform_Preopt(data, i, df)
+                found = 1
+                break
 
-    if method == "RemoveColumn" or method == "RemoveRow" or method == "DropRowsContainingNullValues":
-        new_df = RemoveData.perform_Preopt(data, i, df)
+    ## NonLinear Transformation options
+    if found == 0:
+        for preopts in list_NonLT:
+            if method == preopts.getName():
+                new_df = NonLinearTransformation.perform_Preopt(data, i, df)
+                found = 1
+                break
+
+    ## Normalization
+    if found == 0:
+        for preopts in list_Normalization:
+            if method == preopts.getName():
+                new_df = Normalization.perform_Preopt(data, i, df)
+                found = 1
+                break
+
+    ## Encoding Categorical Features
+    if found == 0:
+        for preopts in list_ECF:
+            if method == preopts.getName():
+                new_df = EncodingCategoricalFeatures.perform_Preopt(data, i, df)
+                found = 1
+                break
+
+    ## Discretization
+    if found == 0:
+        for preopts in list_Discretization:
+            if method == preopts.getName():
+                new_df = Discretization.perform_Preopt(data, i, df)
+                found = 1
+                break
+
+    ## Imputation of Missing Values
+    if found == 0:
+        for preopts in list_IoMV:
+            if method == preopts.getName():
+                new_df = ImputationOfMissingValues.perform_Preopt(data, i, df)
+                found = 1
+                break
+
+    ## Generating Polynomial Features
+    if found == 0:
+        for preopts in list_GPF:
+            if method == preopts.getName():
+                new_df = GeneratingPolynomialFeatures.perform_Preopt(data, i, df)
+                found = 1
+                break
+
+    ## RemoveData
+    if found == 0:
+        for preopts in list_RemoveData:
+            if method == preopts.getName():
+                new_df = RemoveData.perform_Preopt(data, i, df)
+                found = 1
+                break
 
     return new_df

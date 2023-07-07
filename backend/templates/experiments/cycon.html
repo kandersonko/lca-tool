@@ -1,6 +1,4 @@
 {% extends "layout.html" %}
-
-
 {% block content %}
 
 <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
@@ -234,18 +232,6 @@
             <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Preprocessing (Optional)</h1>
 
             <!-- Dynamically pull preoptimization options and create new identifyer when selected. -->
-            {% if g.Preoptimizations %}
-            Choose which preoptimization methods to apply:
-            <select id="preopt" name="preopt">
-                {% for choices, names, infos in g.Preoptimizations%}
-                <option value={{ choices }}>{{ names }}</option>
-                {% endfor %}
-            </select>
-            <button type="button" id="AddPreopt" onclick="selectPreopt('preopt', 'Preopt_Selection')">Add</button>
-            <button type="button" id="clearPreopt" onclick="clearAllPreopt()"> Remove All </button>
-            {% endif %}
-
-            <br>
             Category:
             {% if g.preopt_Categories %}
             <select id="preopt_categories" name="preopt_categories" onchange="changePreoptCategory(this.id,'preopts')">
@@ -261,6 +247,8 @@
                 <option value={{ choices }}>{{ names }}</option>
                 {% endfor %}
             </select>
+            <button type="button" id="AddPreopts" onclick="selectPreopt('preopts', 'Preopt_Selection')">Add</button>
+            <button type="button" id="clearPreopts" onclick="clearAllPreopt()"> Remove All </button>
             {% endif %}
 
             <div id="Preopt_Selection"></div>
@@ -455,7 +443,6 @@
 
     </div>
 </div>
-
 
 
 
