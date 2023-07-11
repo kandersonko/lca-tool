@@ -24,7 +24,7 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from werkzeug.utils import secure_filename
 
-from backend.calculator import Calculator
+from backend.calculator import Calculator, read_data
 
 # sys.path.append("backend")
 # sys.path.append("Classes")
@@ -126,23 +126,44 @@ def cycon():
 @bp.route("/calculate", methods=["POST"])
 def calculate():
     processes_input = request.form.get("processes")
+    if not processes_input:
+        return flash("Invalid arguments!")
     processes = json.loads(processes_input)
-    logger.debug("=== Equations: %s %s", processes, processes_input)
-    calculator = Calculator()
+    data = dict()
+    for key, value in request.files.items():
+        logger.debug("=== file data: %s %s", key, value)
+        data[key], error = read_data(value)
+        if error:
+            return jsonify(error=error)
+    logger.debug("=== Equations: %s %s", processes, data)
 
     results = []
+    num_process = 0
     for process in processes:
+        num_process += 1
         filename = process.get("filename")
-        csv_file = request.files.get(filename)
+        if not filename:
+            error = f"Missing filename for process {num_process}"
+            return jsonify(error=error)
+        process_data = data.get(filename)
+        if process_data is None:
+            error = f"Missing csv file '{filename}' for process {num_process}"
+            return jsonify(error=error)
         equation = process.get("equation")
+        if not equation or equation == "":
+            error = f"Missing equation for process for process {num_process}"
+            return jsonify(error=error)
         name = process.get("name")
-        logger.debug("=== Process (file): %s %s %s", filename, csv_file, request.form)
-        evaluated, result = calculator.evaluate(equation=equation, csv_file=csv_file)
+        logger.debug("=== Process %s: %s %s", num_process, filename, process_data)
+        calculator = Calculator()
+        evaluated, result = calculator.evaluate(equation=equation, data=process_data)
+        logger.debug("=== Process %s Results: %s, %s", num_process, evaluated, result)
+        if not evaluated:
+            error = f"Error in the formula for process {num_process}\n{result}"
+            return jsonify(error=error)
+
         output = dict(result=result, name=name, equation=equation)
         results.append(output)
-
-        if not evaluated:
-            flash(str(result))
 
     logger.debug("=== results: %s | dtype %s", results, type(results))
     return jsonify(processes=results)

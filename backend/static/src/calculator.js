@@ -6,7 +6,8 @@ const getFilename = (inputFile) => {
 
 const getCSVFiles = (className) => {
   const csvFiles = Array.from(document.getElementsByClassName(className))
-                        .map(el => ({filename: getFilename(el), file: el.files[0]}));
+                        .map((el, index) => ({file_id: index, filename: getFilename(el), file: el.files[0]}))
+                        .filter(el => el.filename !== '');
   return csvFiles;
 }
 
@@ -15,10 +16,11 @@ function calculate(e) {
   const csvFiles = getCSVFiles("input-csv")
   console.log("csv files: ", csvFiles);
   const processes = Array.from(document.getElementsByClassName("input-equation"))
-                         .map(el => {
+                         .map((el, index) => {
                            return ({
                              name: el.children[0].value,
                              filename: el.children[1].value,
+                             file_id: index,
                              equation: el.children[2].value
                            });
                          });
@@ -26,10 +28,11 @@ function calculate(e) {
 
   const data = new FormData();
   data.append("processes", JSON.stringify(processes));
+  data.append("files", JSON.stringify(csvFiles));
   csvFiles.forEach(csv => {
     data.append(csv.filename, csv.file);
-  })
-  console.log("data", data)
+  });
+  console.log("data", data);
 
   $.ajax({
     url: "/experiments/calculate",
@@ -42,32 +45,37 @@ function calculate(e) {
       console.log("response", response);
       let output = "";
       let results = [];
-      response.processes.forEach(process => {
-        output += `
+      if(response.error) {
+        $("#results").html(response.error);
+      }
+      if(response.processes) {
+        response.processes.forEach(process => {
+          output += `
           <div class="calculator-result" class="flex flex-row mb-3">
             <h4 class="mr-2 font-medium">
               ${process.name}: <span class="font-bold">${process.result}</span>
               <span>| Formula: ${process.equation}</span>
             </h4>
           </div/>`;
-        results.push({name: process.name, value: process.result});
-      });
-      if(results.length > 0) {
-        $("#results").html(output);
-        if(chartInitialized) {
-          updateChart(chart, results);
-        } else {
-          chart = initializeChart(
-            document.getElementById("myChart"),
-            results
-          )
+          results.push({name: process.name, value: process.result});
+        });
+        if(results.length > 0) {
+          $("#results").html(output);
+          if(chartInitialized) {
+            updateChart(chart, results);
+          } else {
+            chart = initializeChart(
+              document.getElementById("myChart"),
+              results
+            )
+          }
         }
       }
 
     },
     error: function(error){
       console.log("error", error);
-      $("#results").html("There is an error in your entries!");
+      $("#results").html(error);
     }
   });
 }
