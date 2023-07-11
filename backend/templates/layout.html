@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CyberTraining @ Uni. of Idaho</title>
+  <title>Cyber Training</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/lca.css') }}">
   <script src="{{url_for('static', filename='js/alpinejs.min.js')}}" defer></script>
   {% block head %}
@@ -24,9 +24,11 @@
 
     {% include 'flash.html' %}
 
+
+    <footer class="bg-gray-900 tex-white p-6 mt-4" style="position: absolute; bottom: 0; width: 100%; height: 2.5rem;">
+      Copyright <span>&copy; Cycon</span> 2023 <span>version 1.0</span></footer>
+    </div>
     {% block scripts %}
     {% endblock %}
-
-    </div>
 </body>
 </html>

@@ -256,7 +256,7 @@ $(document).ready(function () {
 
     // Add the footer with the link to our tool
     doc.setFontSize(9);
-    doc.text("Created using the IDeaL LCA Tool:", 10, 295);
+    doc.text("Created using the LCA Tool:", 10, 295);
     doc.textWithLink("https://cycon.nkn.uidaho.edu", 62, 295, {url: "https://cycon.nkn.uidaho.edu"});
     doc.setFontSize(11);
 
