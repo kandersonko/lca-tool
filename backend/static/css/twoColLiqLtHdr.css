@@ -145,59 +145,59 @@ ul.nav {
     margin-left: auto;
 }
 
-.text {
-    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-    font-size: medium;
-    font-weight: 200;
-    text-align: justify;
-    text-decoration: none;
-}
+/* .text { */
+/*     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; */
+/*     font-size: medium; */
+/*     font-weight: 200; */
+/*     text-align: justify; */
+/*     text-decoration: none; */
+/* } */
 
-.text1 {
-    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-    font-size: medium;
-    font-weight: 200;
-    text-align: justify;
-    text-decoration: none;
-    margin-bottom: 4px;
-}
+/* .text1 { */
+/*     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; */
+/*     font-size: medium; */
+/*     font-weight: 200; */
+/*     text-align: justify; */
+/*     text-decoration: none; */
+/*     margin-bottom: 4px; */
+/* } */
 
-.text2 {
-    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-    font-size: medium;
-    font-weight: 200;
-    text-align: justify;
-    text-decoration: none;
-    margin-bottom: 4px;
-    width: 80%;
-    position: inherit;
-    text-indent: 10%;
-}
+/* .text2 { */
+/*     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; */
+/*     font-size: medium; */
+/*     font-weight: 200; */
+/*     text-align: justify; */
+/*     text-decoration: none; */
+/*     margin-bottom: 4px; */
+/*     width: 80%; */
+/*     position: inherit; */
+/*     text-indent: 10%; */
+/* } */
 
-.text3 {
-    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-    font-size: medium;
-    font-weight: 200;
-    text-align: justify;
-    text-decoration: line-through;
-}
+/* .text3 { */
+/*     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; */
+/*     font-size: medium; */
+/*     font-weight: 200; */
+/*     text-align: justify; */
+/*     text-decoration: line-through; */
+/* } */
 
 
-.address {
-    font-family: "Courier New", Courier, monospace;
-    font-size: medium;
-    text-align: center;
-}
+/* .address { */
+/*     font-family: "Courier New", Courier, monospace; */
+/*     font-size: medium; */
+/*     text-align: center; */
+/* } */
 
-.address_1 {
-    font-family: Verdana, Geneva, sans-serif;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-}
+/* .address_1 { */
+/*     font-family: Verdana, Geneva, sans-serif; */
+/*     font-size: 14px; */
+/*     font-style: normal; */
+/*     font-weight: 400; */
+/* } */
 
-.Titles {
-    font-family: Narkisim;
-    font-size: x-large;
-    text-indent: 20%;
-}
+/* .Titles { */
+/*     font-family: Narkisim; */
+/*     font-size: x-large; */
+/*     text-indent: 20%; */
+/* } */
