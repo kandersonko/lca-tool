@@ -24,7 +24,7 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from werkzeug.utils import secure_filename
 
-from backend.calculator import Calculator, read_data
+from backend.calculator import Calculator
 
 # sys.path.append("backend")
 # sys.path.append("Classes")
@@ -33,6 +33,8 @@ from backend import MLA
 from backend import Validation
 from backend.Classes.PreoptimizationFiles import Preoptimization
 from backend.Classes.PreoptimizationFiles import Standardization
+from backend.Classes.NeuralNetworkFiles import NeuralNetwork
+from backend.Classes.NeuralNetworkFiles import Core
 
 from sklearn.model_selection import KFold
 
@@ -46,8 +48,21 @@ logger = logging.getLogger()
 @bp.before_app_request
 def load_possible_experiments():
     list_Algorithms = MLA.getMLAs()
+    # list for preoptimization options
     list_Preopt_Categories = Preoptimization.getPreopt_Categories()
     list_Standardization = Standardization.getStandardization()
+    # list for Neural Network options
+    list_Layer_Categories = NeuralNetwork.getLayer_Categories()
+    list_Core = Core.getCore()
+
+    #----------------Data Types-------------------------->
+    g.data_types = ["Tabular", "Image", "Text", "Signal"]
+    g.data_types_Name = ["Tabular", "Image", "Text", "Signal"]
+    g.data_types_Info = [["Tabular is data that is displayed in columns or tables and does not pertain to the other data types."],
+                      ["Image is data that is usually 3-dimentional corresponding to the three color spectrom, RGB"],
+                      ["Text is data containing textual words or sentences."],
+                      ["Signal is data containing time-series data corresponding to a signal format."]]
+    g.Data_Types = zip(g.data_types, g.data_types_Name, g.data_types_Info)
 
     #----------------new Cycon--------------------------->
     # First choice is between various categories of ML 
@@ -70,14 +85,11 @@ def load_possible_experiments():
     g.section_Info = algorithm_Definition
     g.Algorithms = zip(g.section_algorithm, g.section_Info)
 
+    #----------------Preoptimiztion-------------------------->
     # create list of options to choose a category of preoptimization options.
     preopt_Category_Names = []
     preopt_Category_Display_Names = []
     preopt_Category_Definition = []
-
-    # preopt_Category_Names.append("")
-    # preopt_Category_Display_Names.append("")
-    # preopt_Category_Definition.append("")
 
     for preopt_Category in list_Preopt_Categories:
         preopt_Category_Names.append(preopt_Category.getName())
@@ -101,6 +113,35 @@ def load_possible_experiments():
     g.section_preopt_Display_Names = preopt_Display_Names
     g.section_preopt_Info =  preopt_Definition
     g.preopts = zip(g.section_preopt_Names, g.section_preopt_Display_Names, g.section_preopt_Info)
+
+    #-------------------Neural Network Layers----------------------->
+    # create list of options to choose a category of layer options.
+    layer_Category_Names = []
+    layer_Category_Display_Names = []
+    layer_Category_Definition = []
+
+    for layer_Category in list_Layer_Categories:
+        layer_Category_Names.append(layer_Category.getName())
+        layer_Category_Display_Names.append(layer_Category.getDisplayName())
+        layer_Category_Definition.append(layer_Category.getDefinition())
+    g.layer_Category_Names = layer_Category_Names
+    g.layer_Category_Display_Names = layer_Category_Display_Names
+    g.layer_Category_Info =  layer_Category_Definition
+    g.NN_layer_Categories = zip(g.layer_Category_Names, g.layer_Category_Display_Names, g.layer_Category_Info)
+
+    # create list of options for the first category of preoprtimization (I.E. Core)
+    layer_Names = []
+    layer_Display_Names = []
+    layer_Definition = []
+
+    for layer in list_Core:
+        layer_Names.append(layer.getName())
+        layer_Display_Names.append(layer.getDisplayName())
+        layer_Definition.append(layer.getDefinition())
+    g.layer_Names = layer_Names
+    g.layer_Display_Names = layer_Display_Names
+    g.layer_Info =  layer_Definition
+    g.layers = zip(g.layer_Names, g.layer_Display_Names, g.layer_Info)
 
 
 
@@ -171,10 +212,14 @@ def calculate():
 
 @bp.route("/run_experiment", methods=["POST"])
 def run_experiment():    
-    output = request.get_json()
-    formData = json.loads(output)
+    processes_input = request.form.get("processes")
+    data = json.loads(processes_input)
 
-    data = formData['form']
+    filename = request.form.get("csvFileName")
+    csv_file = request.files.get("csvFile")
+
+    data["csvFileName"] = filename
+    data["csvFile"] = csv_file
 
     # Split
     if data['validation'] == "Split":
@@ -255,12 +300,33 @@ def results():
 
 @bp.route("/getCSVResults", methods=["POST"])
 def getCSVResults():
-    output = request.get_json()
-    formData = json.loads(output)
+    processes_input = request.form.get("processes")
+    data = json.loads(processes_input)
 
-    data = formData['form']
+    filename = request.form.get("csvFileName")
+    csv_file = request.files.get("csvFile")
+
+    data["csvFileName"] = filename
+    data["csvFile"] = csv_file
 
     status, msg, info = Preoptimization.getCSV_PDF(data)
+
+    Results = [status, msg, info]
+
+    return json.dumps(Results)
+
+@bp.route("/downloadCSV", methods=["POST"])
+def downloadCSV():
+    processes_input = request.form.get("processes")
+    data = json.loads(processes_input)
+
+    filename = request.form.get("csvFileName")
+    csv_file = request.files.get("csvFile")
+
+    data["csvFileName"] = filename
+    data["csvFile"] = csv_file
+
+    status, msg, info = Preoptimization.downloadCSV(data)
 
     Results = [status, msg, info]
 
@@ -275,12 +341,23 @@ def getPreoptParameters():
 
     return json.dumps(Parameters)
 
-# Gets the colummn names inside the csv.
-@bp.route("/getCSVColumnTitles", methods=["POST"])
-def getCSVColumnTitles():
+@bp.route("/getLayerParameters", methods=["POST"])
+def getLayerParameters():
     output = request.get_json()
     data = json.loads(output)
 
-    columnTitles = Preoptimization.getCSVColumnTitles(data["csvFileName"])
+    Parameters = NeuralNetwork.getParameters(data["Layer"])
+
+    return json.dumps(Parameters)
+
+# Gets the colummn names inside the csv.
+@bp.route("/getCSVColumnTitles", methods=["POST"])
+def getCSVColumnTitles():
+    filename = request.form.get("csvFileName")
+    csv_file = request.files.get("csvFile")
+
+    data = {"csvFileName": filename, "csvFile": csv_file}
+
+    columnTitles = Preoptimization.getCSVColumnTitles(data)
 
     return json.dumps(columnTitles)
