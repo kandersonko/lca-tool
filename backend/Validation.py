@@ -42,7 +42,8 @@ def getDataset(fileName):
 def Split(data):
     try:
         # convert csv to usable dataset
-        df_act = getDataset(data['csvFileName'])
+        ##df_act = getDataset(data['csvFileName'])
+        df_act = pd.read_csv(data['csvFile'], index_col=None)
         
         # Cycle through the choices of preotimization
         for i in range(int(data["preoptCounter"])):
@@ -162,7 +163,8 @@ def Split(data):
 def K_Fold(data):
     try:
         # convert csv to usable dataset
-        df_act = getDataset(data['csvFileName'])
+        ##df_act = getDataset(data['csvFileName'])
+        df_act = pd.read_csv(data['csvFile'], index_col=None)
         
         # Cycle through the choices of preotimization
         for i in range(int(data["preoptCounter"])):

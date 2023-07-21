@@ -81,6 +81,7 @@
                 opacity: 1;
             }
         }
+
         table {
             border-collapse: collapse;
             border-spacing: 0;
@@ -113,7 +114,6 @@
 
                 $("#kde_Input").hide();
                 $("#csv_Title").hide();
-                $("#csv_shape").hide();
                 $("#csv_Null_Title").hide();
                 $("#csv_Null_Results").hide();
                 $("#csv_Class_Balance_Title").hide();
@@ -123,7 +123,6 @@
 
                 $("#kde_Input_Preopt").hide();
                 $("#csv_Title_Preopt").hide();
-                $("#csv_shape_Preopt").hide();
                 $("#csv_Null_Title_Preopt").hide();
                 $("#csv_Null_Results_Preopt").hide();
                 $("#csv_Class_Balance_Title_Preopt").hide();
@@ -151,12 +150,12 @@
         </script>
 
         <!--
-    <script type="text/javascript">
-        function changeMethod(methods, Parameters) {
-            document.getElementById("Results").innerHTML = "Hello?"
-        }
-    </script>
-        -->
+        <script type="text/javascript">
+            function changeMethod(methods, Parameters) {
+                document.getElementById("Results").innerHTML = "Hello?"
+            }
+        </script>
+            -->
         <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Goal and Scope</h1>
 
         Project Name:
@@ -184,6 +183,16 @@
         <!-- Dataset section -->
         <form id="csvForm">
             <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Data</h1>
+            <div>
+            Data Type:
+            {% if g.Data_Types %}
+            <select id="types" name="Types" onchange="changeDataType(this.id)">
+                {% for choices, names, infos in g.Data_Types%}
+                <option value={{ choices }}>{{ names }}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+            </div>
             File:
             <!-- information to display for the loadable dataset -->
             <div class="popup" onclick="popupInformation('Experiment_Dataset_Info')">
@@ -212,10 +221,9 @@
 
             <p id="csv_Error"></p>
             <p id="csv_Title">CSV values:</p>
-            <div style="overflow: auto; max-height: 300px; max-width: 900px; ">
+            <div style="overflow: auto; max-height: 1000px; max-width: 1100px; ">
                 <p id="csv_Results" style="background-color: white;"></p>
             </div>
-            <p id="csv_shape">Shape of csv dataset:</p>
             <p id="csv_Null_Title">Null instances:</p>
             <p id="csv_Null_Results" style="background-color: white;"></p>
             <p id="csv_Class_Balance_Title">Number of Class Instances:</p>
@@ -253,14 +261,13 @@
 
             <div id="Preopt_Selection"></div>
 
-            <button type="submit" name="submit"> Check </button>
+            <button type="submit" value="Check" onclick="changePreoptSubmit('Check')"> Check </button>
 
             <p id="csv_Error_Preopt"></p>
             <p id="csv_Title_Preopt">CSV values:</p>
-            <div style="overflow: auto; max-height: 300px; max-width: 900px; ">
+            <div style="overflow: auto; max-height: 1000px; max-width: 1100px; ">
                 <p id="csv_Results_Preopt" style="background-color: white;"></p>
             </div>
-            <p id="csv_shape_Preopt">Shape:</p>
             <p id="csv_Null_Title_Preopt">Null instances:</p>
             <p id="csv_Null_Results_Preopt" style="background-color: white;"></p>
             <p id="csv_Class_Balance_Title_Preopt">Number of Class Instances:</p>
@@ -270,7 +277,7 @@
                 <p id="csv_Scale_Results_Preopt" style="background-color: white;"></p>
             </div>
 
-            <button type="button" id="saveCSV"> Save </button>
+            <button type="submit" value="Download" onclick="changePreoptSubmit('Download')"> Download </button>
         </form>
 
 
@@ -289,7 +296,7 @@
             {% for sentence in infos%}
             {% if sentence != null and sentence != ""%}
             <!-- information to display for the selectable methodology section
-        Its a mess and will need to fix later as the onclick will not accept variables...-->
+            Its a mess and will need to fix later as the onclick will not accept variables...-->
             {% if "MLA" in choices%}
             <div class="popup" onclick="popupInformation('MLA_info')">
                 <img src="../../static/Images/information_icon.png"
@@ -318,7 +325,7 @@
 
                 <!-- Dynamically pull algorithms names and create radio buttons for each choice-->
                 <br>
-                Algorithm: 
+                Algorithm:
                 {% if g.Algorithms %}
                 <select id="MLalgorithm" name="MLalgorithm" onchange="changeAlgorithm(this.id, 'Parameters')">
                     {% for choices, infos in g.Algorithms%}
@@ -392,19 +399,41 @@
 
             <!-- Section for DLANN -->
             <div id="DLANN_Options" class="methodology_desc">
-                <!-- Methods section-->
-                <h2>Phase 3a. Network.</h2><br>
-
-                <!-- Dynamically pull methods names and create radio buttons for each choice-->
+                <!-- Dynamically pull methods names and create radio buttons for each choice
                 <input type="radio" id=Method_BNN name="networks" value=network_BNN onclick=> <label for=Network_BNN>Basic Neural Network</label><br>
                 <input type="radio" id=Method_CNN name="networks" value=network_CNN onclick=> <label for=Network_CNN>Convolutional Neural Network</label><br>
 
                 <p>Basic Neural Network: (Info will be added later) </p>
-                <p>Convolutional Neural Network: (Info will be added later) </p>
+                <p>Convolutional Neural Network: (Info will be added later) </p>-->
 
-                <p>&nbsp;</p>
+                <!-- Methods section-->
+                <h2>Model Creation</h2><br>
 
-                <h3>-----------------------------------</h3>
+                Category:
+                {% if g.NN_layer_Categories %}
+                <select id="layer_categories" name="layer_categories" onchange="changeLayerCategory(this.id,'layers')">
+                    {% for choices, names, infos in g.NN_layer_Categories%}
+                    <option value={{ choices }}>{{ names }}</option>
+                    {% endfor %}
+                </select>
+                {% endif %}
+                Layer:
+                {% if g.layers %}
+                <select id="layers" name="layers">
+                    {% for choices, names, infos in g.layers%}
+                    <option value={{ choices }}>{{ names }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" id="AddLayer" onclick="selectLayers('layers', 'Layers_Selection')">Add</button>
+                <button type="button" id="clearNN" onclick="clearAllNN()"> Remove All </button>
+                {% endif %}
+
+                <div id="Layers_Selection"></div>
+
+                <button type="submit" value="Check" onclick="changePreoptSubmit('Check')"> Check </button>
+
+                <p id="csv_Error_Preopt"></p>
+
             </div>
 
             <button type="submit" name="submit"> Perform Experiment </button>
@@ -437,7 +466,7 @@
 
             <p id="Results" style="background-color: white;"></p>
 
-             Generated a PDF report <button type="button" id="generateReport" onclick="generatePDF()"> Generate </button>
+            Generated a PDF report <button type="button" id="generateReport" onclick="generatePDF()"> Generate </button>
 
         </form>
 
@@ -447,12 +476,11 @@
 
 
 
-<!-- This is the old javascript method for running LCA. Will need to change to json file, run on python and run on seprate vm later.-->
+<!-- This is the old javascript method for running LCA. Will need to change to json file, run on pytho
+    n and run on seprate vm later.-->
 <script src="../../static/src/Cycon_events.js"></script>
 
 <!-- This is the javascript method for running MLA-->
-
-
 <!-- The library for the charts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 {% endblock %}

@@ -1,4 +1,5 @@
 var preoptCounter = 0;
+var layerCounter = 0;
 var columnTitles = [];
 
 $(document).ready(function () {
@@ -67,7 +68,7 @@ $(document).ready(function () {
             };
         }
     }
- });
+});
 
 function changePreoptCategory(category, ID_Preopts) {
     var category_selection = document.getElementById(category)
@@ -181,7 +182,7 @@ function changeAlgorithm(algorithms, ID_Parameters) {
 
                     // Create choices and options to edit the parameter
 
-                    fillSection(field, data, Parameter, ID_Parameters, 0, )
+                    fillSection(field, data, Parameter, ID_Parameters, 0,)
                 }
             }
 
@@ -213,9 +214,6 @@ function getData(form) {
 
     var dict_data = {};
 
-    const csvFileName = document.getElementById("csvFile").files[0].name;
-    formData.append("csvFileName", csvFileName);
-
     const class_column = document.getElementById("class_col").value;
     formData.append("class_col", class_column);
 
@@ -246,17 +244,24 @@ function getData(form) {
 
     //Send information to run model experiment.
     // will save into a json file tilted the "projectName".json
-    dict_values = { "form": dict_data };
 
-    const sent_data = JSON.stringify(dict_values)
+    const csvFileName = document.getElementById("csvFile").files[0].name;
+    const csvFile = document.getElementById("csvFile").files[0];
+
+    const data = new FormData();
+    data.append("processes", JSON.stringify(dict_data))
+    data.append("csvFileName", csvFileName)
+    data.append("csvFile", csvFile)
+
+    document.getElementById("Results").innerHTML += data;
 
     $.ajax({
         url: "/experiments/run_experiment",
+        data: data,
         type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(sent_data),
-        async: false,
         dataType: 'json',
+        processData: false, // important
+        contentType: false, // important,
         success: function (Results) {
             if (Results[0] == "worked") {
 
@@ -386,7 +391,7 @@ function getData(form) {
                 writeData.paragraph += Results[1];
                 writeData.paragraph += '</FONT >';
 
-                document.getElementById("Results").innerHTML =  writeData.paragraph;
+                document.getElementById("Results").innerHTML = writeData.paragraph;
             }
         }
     });
@@ -491,7 +496,7 @@ function displayResults(form) {
 
 
                 if (dict_data['Met_Precision_checked'] == "true") {
-                    writeData.paragraph += Results["Precision_Intro"] .bold() + Results["Precision"] + "<br\>"
+                    writeData.paragraph += Results["Precision_Intro"].bold() + Results["Precision"] + "<br\>"
                 }
 
                 if (dict_data['Met_Precision_Micro_checked'] == "true") {
@@ -630,7 +635,7 @@ function generatePDF(form) {
 
     let element = document.getElementById('Results')
 
-    
+
     html2pdf(element, {
         margin: 10,
         filename: "Results.pdf",
@@ -639,16 +644,16 @@ function generatePDF(form) {
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     }).get('pdf').then(function (pdf) {
-            var totalPages = pdf.internal.getNumberOfPages();
+        var totalPages = pdf.internal.getNumberOfPages();
 
-            for (let i = 1; i <= totalPages; i++) {
-                pdf.setPage(i);
-                pdf.setFontSize(10);
-                pdf.setTextColor(150);
-                // Add you content in place of example here
-                pdf.text("Created using the IDeaL Cycon Tool: https://cycon.nkn.uidaho.edu/cycon", pdf.internal.pageSize.getWidth() - 120, pdf.internal.pageSize.getHeight() - 10);
-            }
-        }).save();
+        for (let i = 1; i <= totalPages; i++) {
+            pdf.setPage(i);
+            pdf.setFontSize(10);
+            pdf.setTextColor(150);
+            // Add you content in place of example here
+            pdf.text("Created using the IDeaL Cycon Tool: https://cycon.nkn.uidaho.edu/cycon", pdf.internal.pageSize.getWidth() - 120, pdf.internal.pageSize.getHeight() - 10);
+        }
+    }).save();
 
 }
 
@@ -678,9 +683,6 @@ function checkCSV(form) {
     const projectName = document.getElementById("projectName").value;
     formData.append("projectName", projectName);
 
-    const csvFileName = document.getElementById("csvFile").files[0].name;
-    formData.append("csvFileName", csvFileName);
-
     formData.append("Perform_Preopt", "No")
 
     // iterate through entries...
@@ -692,12 +694,8 @@ function checkCSV(form) {
 
     //Send information to run model experiment.
     // will save into a json file tilted the "projectName".json
-    dict_values = { "form": dict_data };
-
-    const sent_data = JSON.stringify(dict_values)
 
     $("#csv_Title").hide();
-    $("#csv_shape").hide();
     $("#csv_Null_Title").hide();
     $("#csv_Null_Results").hide();
     $("#csv_Class_Balance_Title").hide();
@@ -705,13 +703,23 @@ function checkCSV(form) {
     $("#csv_Scale_Title").hide();
     $("#csv_Scale_Results").hide();
 
+    const csvFileName = document.getElementById("csvFile").files[0].name;
+    const csvFile = document.getElementById("csvFile").files[0];
+
+    const data = new FormData();
+    data.append("processes", JSON.stringify(dict_data))
+    data.append("csvFileName", csvFileName)
+    data.append("csvFile", csvFile)
+
+    document.getElementById("Results").innerHTML += data;
+
     $.ajax({
         url: "/experiments/getCSVResults",
+        data: data,
         type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(sent_data),
-        async: false,
         dataType: 'json',
+        processData: false, // important
+        contentType: false, // important,
         success: function (Results) {
             if (Results[0] == "worked") {
 
@@ -722,11 +730,9 @@ function checkCSV(form) {
                 }
 
                 document.getElementById("csv_Results").innerHTML = Results['csv_Short'];
-                document.getElementById("csv_shape").innerHTML = "Shape: " + Results['shape']
                 document.getElementById("csv_Null_Results").innerHTML = Results['null_Count']
 
                 $("#csv_Title").show();
-                $("#csv_shape").show();
                 $("#csv_Null_Title").show();
                 $("#csv_Null_Results").show();
 
@@ -796,9 +802,6 @@ function checkCSV_Preopt(form) {
     const projectName = document.getElementById("projectName").value;
     formData.append("projectName", projectName);
 
-    const csvFileName = document.getElementById("csvFile").files[0].name;
-    formData.append("csvFileName", csvFileName);
-
     const class_column = document.getElementById("class_col").value;
     formData.append("class_col", class_column);
 
@@ -819,12 +822,8 @@ function checkCSV_Preopt(form) {
 
     //Send information to run model experiment.
     // will save into a json file tilted the "projectName".json
-    dict_values = { "form": dict_data };
-
-    const sent_data = JSON.stringify(dict_values)
 
     $("#csv_Title_Preopt").hide();
-    $("#csv_shape_Preopt").hide();
     $("#csv_Null_Title_Preopt").hide();
     $("#csv_Null_Results_Preopt").hide();
     $("#csv_Class_Balance_Title_Preopt").hide();
@@ -832,13 +831,23 @@ function checkCSV_Preopt(form) {
     $("#csv_Scale_Title_Preopt").hide();
     $("#csv_Scale_Results_Preopt").hide();
 
+    const csvFileName = document.getElementById("csvFile").files[0].name;
+    const csvFile = document.getElementById("csvFile").files[0];
+
+    const data = new FormData();
+    data.append("processes", JSON.stringify(dict_data))
+    data.append("csvFileName", csvFileName)
+    data.append("csvFile", csvFile)
+
+    document.getElementById("Results").innerHTML += data;
+
     $.ajax({
         url: "/experiments/getCSVResults",
+        data: data,
         type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(sent_data),
-        async: false,
         dataType: 'json',
+        processData: false, // important
+        contentType: false, // important,
         success: function (Results) {
             if (Results[0] == "worked") {
 
@@ -849,11 +858,9 @@ function checkCSV_Preopt(form) {
                 }
 
                 document.getElementById("csv_Results_Preopt").innerHTML = Results['csv_Short'];
-                document.getElementById("csv_shape_Preopt").innerHTML = "Shape: " + Results['shape']
                 document.getElementById("csv_Null_Results_Preopt").innerHTML = Results['null_Count']
 
                 $("#csv_Title_Preopt").show();
-                $("#csv_shape_Preopt").show();
                 $("#csv_Null_Title_Preopt").show();
                 $("#csv_Null_Results_Preopt").show();
 
@@ -906,8 +913,113 @@ function checkCSV_Preopt(form) {
 
 document.getElementById("preoptForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    checkCSV_Preopt(e.target);
+    if (preoptSubmit == 'Check') {
+        checkCSV_Preopt(e.target);
+    } else if (preoptSubmit == 'Download') {
+        downloadCSV(e.target);
+    } else {
+        //invalid action!
+    }
 });
+
+var preoptSubmit = ""
+
+function changePreoptSubmit(value) {
+    preoptSubmit = value
+}
+
+function downloadCSV(form) {
+    var fileName = "CyberTraining.csv";
+
+    document.getElementById("csv_Error_Preopt").innerHTML = "";
+    document.getElementById("csv_Results_Preopt").innerHTML = "";
+
+    var formData = new FormData(form);
+    var csvFormData = new FormData(document.getElementById("csvForm"));
+
+    var dict_data = {};
+
+    const projectName = document.getElementById("projectName").value;
+    formData.append("projectName", projectName);
+
+    const class_column = document.getElementById("class_col").value;
+    formData.append("class_col", class_column);
+
+    formData.append("Perform_Preopt", "Yes")
+
+    formData.append("preoptCounter", preoptCounter)
+
+    // iterate through entries...
+    for (var pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+        //document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        dict_data[pair[0]] = pair[1]
+    }
+
+    for (var pair of csvFormData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+        //document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        dict_data[pair[0]] = pair[1]
+    }
+
+    //Send information to run model experiment.
+    // will save into a json file tilted the "projectName".json
+
+    const csvFileName = document.getElementById("csvFile").files[0].name;
+    const csvFile = document.getElementById("csvFile").files[0];
+
+    const data = new FormData();
+    data.append("processes", JSON.stringify(dict_data))
+    data.append("csvFileName", csvFileName)
+    data.append("csvFile", csvFile)
+
+    $.ajax({
+        url: "/experiments/downloadCSV",
+        data: data,
+        type: "POST",
+        dataType: 'json',
+        processData: false, // important
+        contentType: false, // important,
+        success: function (Results) {
+            if (Results[0] == "worked") {
+                Results = Results[2]
+
+                var element = document.createElement('a');
+                element.setAttribute('href', Results["csv_data"]);
+                element.setAttribute('download', fileName);
+
+                document.body.appendChild(element);
+
+                element.click();
+
+                document.body.removeChild(element);
+
+            }
+            else {
+                var writeData = {
+                    paragraph: ''
+                }
+
+                writeData.paragraph += '<FONT COLOR="#ff0000">ERROR: <br>';
+                writeData.paragraph += Results[1];
+                writeData.paragraph += '</FONT >';
+
+                document.getElementById("csv_Error_Preopt").innerHTML = writeData.paragraph;
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            var writeData = {
+                paragraph: ''
+            }
+
+            writeData.paragraph += '<FONT COLOR="#ff0000">ERROR: <br>';
+            writeData.paragraph += "Error with connection to server!";
+            writeData.paragraph += '</FONT >';
+
+            document.getElementById("csv_Error_Preopt").innerHTML = writeData.paragraph;
+        }
+    });
+}
 
 
 
@@ -1011,18 +1123,112 @@ function selectPreopt(Preopt, ID_Preopt) {
     }
 }
 
+// Addes the selected layer to the form. 
+function selectLayers(Layer, ID_Layer) {
+    if (layerCounter != 20) {
+
+        var Layer_selection = document.getElementById(Layer)
+        var Layer_name = Layer_selection.options[Layer_selection.selectedIndex].text
+        var Layer_value = Layer_selection.value
+        //document.getElementById("Results").innerHTML = method_name
+
+        dict_values = { Layer: Layer_value };
+
+        const sent_data = JSON.stringify(dict_values)
+
+        // Get the parameters for the selected layer option.
+        $.ajax({
+            url: "/experiments/getLayerParameters",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(sent_data),
+            async: false,
+            dataType: 'json',
+            success: function (data) {
+                // Create the html section to place in the cycon page.
+                var html_section = document.getElementById(ID_Layer);
+
+                // create the field box for the new layer option.
+                var field = document.createElement('fieldset');
+                // create title for the field.
+                var legend = document.createElement('legend');
+                legend_text = document.createTextNode(Layer_name);
+                legend.appendChild(legend_text);
+                field.appendChild(legend);
+
+                // Create a hidden value that will contain the selected parameter name.
+                var textbox = document.createElement("input");
+                textbox.type = "text";
+                textbox.name = "Layer_" + layerCounter;
+                textbox.value = Layer_value;
+                textbox.style.display = "none";
+
+                field.appendChild(textbox);
+
+                // Create option to edit the parameter for the NN layer option.
+                for (var Parameter in data) {
+
+                    var Parameter_Name = data[Parameter]["Name"];
+
+                    if (data.hasOwnProperty(Parameter)) {
+                        // Create a label, which will be the parameter Name followed by the default value.
+                        var name_label = Parameter_Name + " (Default: " + data[Parameter]["Default_value"] + ") ";
+                        var label = document.createElement('label');
+                        label.htmlFor = name_label;
+                        label.appendChild(document.createTextNode(name_label));
+                        let id_info = data[Parameter]["Name"] + "_Info";
+
+                        field.appendChild(label);
+
+                        // Create popup information.
+                        let newDiv = document.createElement("div");
+                        newDiv.className = "popup";
+                        newDiv.onclick = function () { popupInformation(id_info); };
+
+                        let newImage = document.createElement("img");
+                        newImage.src = "../../static/Images/information_icon.png";
+                        newImage.width = "20";
+                        newImage.height = "20";
+
+                        newDiv.appendChild(newImage);
+
+                        let newSpan = document.createElement("span");
+                        newSpan.style = "white-space: pre-wrap";
+                        newSpan.className = "popuptext";
+                        newSpan.id = id_info;
+                        newSpan.textContent = data[Parameter]["Definition"];
+
+                        newDiv.appendChild(newSpan);
+
+                        field.appendChild(newDiv);
+
+                        // Create choices and options to edit the parameter
+
+                        fillSection(field, data, Parameter, "Layer", layerCounter)
+                    }
+                }
+                // TO DO LATER: Add button to remove the individual NN layer.
+
+                // add field to div section
+                html_section.appendChild(field)
+
+            }
+        });
+
+        layerCounter = layerCounter + 1;
+    }
+}
+
 // Removes all csv check information
 function clearAllCSV() {
     document.getElementById("csv_Error_Preopt").innerHTML = "";
 
     document.getElementById("csv_Results").innerHTML = "";
-    document.getElementById("csv_shape").innerHTML = "";
     document.getElementById("csv_Null_Results").innerHTML = "";
     document.getElementById("csv_Class_Balance_Results").innerHTML = "";
     document.getElementById("csv_Scale_Results").innerHTML = "";
 
     $("#csv_Title").hide();
-    $("#csv_shape").hide();
     $("#csv_Null_Title").hide();
     $("#csv_Null_Results").hide();
     $("#csv_Class_Balance_Title").hide();
@@ -1037,13 +1243,11 @@ function clearAllPreopt() {
     preoptCounter = 0;
 
     document.getElementById("csv_Results_Preopt").innerHTML = "";
-    document.getElementById("csv_shape_Preopt").innerHTML = "";
     document.getElementById("csv_Null_Results_Preopt").innerHTML = "";
     document.getElementById("csv_Class_Balance_Results_Preopt").innerHTML = "";
     document.getElementById("csv_Scale_Results_Preopt").innerHTML = "";
 
     $("#csv_Title_Preopt").hide();
-    $("#csv_shape_Preopt").hide();
     $("#csv_Null_Title_Preopt").hide();
     $("#csv_Null_Results_Preopt").hide();
     $("#csv_Class_Balance_Title_Preopt").hide();
@@ -1052,13 +1256,19 @@ function clearAllPreopt() {
     $("#csv_Scale_Results_Preopt").hide();
 }
 
+// Removes all layer options.
+function clearAllNN() {
+    document.getElementById("Layers_Selection").innerHTML = "";
+    layerCounter = 0;
+}
+
 
 // Method to fill an html paragraph or section via the parameters
 function fillSection(section, data, Parameter, Location, counter) {
 
     var default_opt = data[Parameter]["Default_option"];
     var default_value = data[Parameter]["Default_value"];
-    
+
     var Parameter_Name = data[Parameter]["Name"];
 
     if (Location == "Preopt") {
@@ -1197,7 +1407,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             }
         }
 
-        
+
         //  Selectable option with a float entry option
         if (data[Parameter]["Type"][Type_Int] == "option_float") {
             for (var Option_Int in data[Parameter]["Possible"]) {
@@ -1397,7 +1607,7 @@ function fillSection(section, data, Parameter, Location, counter) {
         }
         section.appendChild(document.createElement("br"));
     }
-    
+
 
     // section.appendChild(document.createElement("br"));
 }
@@ -1410,18 +1620,24 @@ function changeCSV() {
 
     // create option to select classification column
     const csvFileName = document.getElementById("csvFile").files[0].name;
+    const csvFile = document.getElementById("csvFile").files[0];
 
-    dict_values = { "csvFileName": csvFileName };
+    dict_values = { "csvFileName": csvFileName, "csvFile": csvFile };
 
     const sent_data = JSON.stringify(dict_values)
 
+    const data = new FormData();
+    data.append("processes", JSON.stringify(dict_values))
+    data.append("csvFileName", csvFileName)
+    data.append("csvFile", csvFile)
+
     $.ajax({
         url: "/experiments/getCSVColumnTitles",
+        data: data,
         type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(sent_data),
-        async: false,
         dataType: 'json',
+        processData: false, // important
+        contentType: false, // important,
         success: function (Results) {
 
             columnTitles = [];

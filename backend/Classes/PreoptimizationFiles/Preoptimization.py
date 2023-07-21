@@ -22,6 +22,8 @@ from backend.Classes.PreoptimizationFiles import Normalization
 from backend.Classes.PreoptimizationFiles import RemoveData
 from backend.Classes.PreoptimizationFiles import Standardization
 
+from urllib.parse import quote
+
 class Preopt_Category:
     def __init__(self, name, display_name, definition):
         self.name = name
@@ -200,7 +202,7 @@ def getDataset(fileName):
 
     baseFolder = os.getcwd()
 
-    ManualLoc = Path(baseFolder) / "tests/sampleCSV_MLA_Classification/"
+    ManualLoc = Path(baseFolder) / "backend/tests/sampleCSV_MLA_Classification/"
 
     filename = secure_filename(fileName)
     dataset_path = ManualLoc / filename.lower()
@@ -210,7 +212,8 @@ def getDataset(fileName):
 
 # Return the column titles in an array.
 def getCSVColumnTitles(data):
-    df = getDataset(data)
+    ##df = getDataset(data['csvFileName'])
+    df = pd.read_csv(data['csvFile'], index_col=None)
 
     titles_list = list(df.columns.values)
 
@@ -247,7 +250,8 @@ def getCategoryPreopts(Category_Name):
 def getCSV_PDF(data):
     try: 
         # convert csv to usable dataset
-        df = getDataset(data['csvFileName'])
+        ##df = getDataset(data['csvFileName'])
+        df = pd.read_csv(data['csvFile'], index_col=None)
 
         # perform preoptimization
         if data["Perform_Preopt"] == "Yes":
@@ -258,7 +262,7 @@ def getCSV_PDF(data):
                 # Perform the preoptimization on the dataset.
                 df = perform_Preopt(data, i, df)
 
-        dataframe = df.to_html()
+        dataframe = df.to_html(max_rows=10, show_dimensions=True)
 
         null_count = df.isnull().sum().rename_axis('Column').reset_index(name='Number of Null Instances')
         null_count = null_count.to_html()
@@ -312,6 +316,42 @@ def getCSV_PDF(data):
         status = "error"
 
         return status, msg, PDF
+
+def downloadCSV(data):
+    try: 
+        # convert csv to usable dataset
+        ##df = getDataset(data['csvFileName'])
+        df = pd.read_csv(data['csvFile'], index_col=None)
+
+        # perform preoptimization
+        if data["Perform_Preopt"] == "Yes":
+            # Cycle through the choices
+            for i in range(int(data["preoptCounter"])):
+                # Get the choice of preoptimization.
+                preopt_method = data["Preopt_" + str(i)]
+                # Perform the preoptimization on the dataset.
+                df = perform_Preopt(data, i, df)
+
+        csv_data = build_csv_data(df)
+
+        PDF = { "csv_data": csv_data }
+    
+        status = "worked"
+        msg = ""
+
+        return status, msg, PDF
+
+    except Exception as e:
+        PDF = ""
+        msg = str(e)
+        status = "error"
+
+        return status, msg, PDF
+
+def build_csv_data(dataframe):
+    csv_data = dataframe.to_csv(index=False, encoding='utf-8')
+    csv_data = "data:text/csv;charset=utf-8," + quote(csv_data)
+    return csv_data
 
 # Method to pull all parameters from a given preoptimization option
 def getParameters(Preopt_Name):
