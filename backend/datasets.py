@@ -91,7 +91,8 @@ def upload_file():
                 # TODO check file size
                 filename = secure_filename(file.filename)
                 user_storage = plan.get("storage_url")
-                upload_path = Path('data/') / user_storage
+                base_folder = os.getcwd()
+                upload_path = Path(base_folder + '/data/') / user_storage
                 file.save(os.path.join(upload_path, filename))
                 flash("File uploaded successfully")
     return redirect(url_for("datasets.index"))
@@ -126,7 +127,8 @@ def delete_file():
             # TODO check file size
             filename = secure_filename(filename)
             user_storage = plan.get("storage_url")
-            upload_path = Path('data/') / user_storage
+            base_folder = os.getcwd()
+            upload_path = Path(base_folder+'/data/') / user_storage
             file_path = upload_path / filename
             if os.path.exists(file_path):
                 os.remove(file_path)
