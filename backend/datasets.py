@@ -95,3 +95,42 @@ def upload_file():
                 file.save(os.path.join(upload_path, filename))
                 flash("File uploaded successfully")
     return redirect(url_for("datasets.index"))
+
+
+@bp.route('/datasets/delete', methods=['GET', 'POST'])
+def delete_file():
+    user_id = session.get("user_id")
+    logging.debug("=== Deleting files: %s", user_id)
+    filename = request.form.get("filename")
+
+    if user_id is None:
+        g.user = None
+        flash("You need to login to upload your datasets!")
+        return redirect(url_for("auth.login"))
+    else:
+        # check if the post request has the file part
+        try:
+            manager = DBManager.instance(
+                password_file=current_app.config["DB_PASSWORD"]
+            )
+            plan = manager.get_plan_by_user_id(user_id)
+        except Error as e:
+            logging.debug(f"=== Failed to get user plan: {e} ===")
+
+        logging.debug("=== Upload plan: %s", plan)
+        if plan is None:
+            flash("You have not subscribed to a plan!")
+            return redirect(url_for("auth.plans"))
+        else:
+            # if plan.get('tier') == 'free':
+            # TODO check file size
+            filename = secure_filename(filename)
+            user_storage = plan.get("storage_url")
+            upload_path = Path('data/') / user_storage
+            file_path = upload_path / filename
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                flash("File deleted successfully")
+            else:
+                flash("File does not exist on the server")
+    return redirect(url_for("datasets.index"))
