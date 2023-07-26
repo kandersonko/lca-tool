@@ -130,6 +130,7 @@ def delete_file():
             base_folder = os.getcwd()
             upload_path = Path(base_folder+'/data/') / user_storage
             file_path = upload_path / filename
+            Path(upload_path).mkdir(parents=True, exist_ok=True)
             if os.path.exists(file_path):
                 os.remove(file_path)
                 flash("File deleted successfully")

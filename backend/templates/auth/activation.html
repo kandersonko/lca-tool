@@ -11,7 +11,7 @@
                 <div> An activation link was sent to your email</div>
             {% else %}
                 <form  method="POST">
-                    <input type="submit" value="Request Activation Link">
+                    <input class="px-2 py-1 rounded-md font-medium text-brand" type="submit" value="Request Activation Link">
                 </form> <br>
                 <div> An activation link will be sent to your email {{ g.user.get('email') }} </div> <br>
             {% endif %}
