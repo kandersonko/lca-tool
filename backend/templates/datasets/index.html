@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container mx-auto flex justify-center items-center pt-4">
+    <div class="flex flex-col">
+        <h1 class="text-xl font-medium text-slate-900 mb-4">Datasets</h1>
+        <h5 class="font-medium text-md mb-2">Upload new File</h5>
+        <form method="POST" action="/datasets/upload" enctype="multipart/form-data"
+        class="flex flex-col">
+            <input type="file"
+                   name="file"
+                   class="file:px-2 file:py-1 file:my-1 file:bg-violet-500 file:text-white file:font-medium file:text-sm file:rounded-full file:border-none">
+            <input type="submit"
+                   value="upload"
+                   class="px-2 py-1 rounded-md bg-brand text-slate-200 font-medium">
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}
