@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <!-- The library for the charts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
@@ -78,6 +77,8 @@
       <!-- Calculator -->
       <div class="flex flex-col ">
         <h4 class="text-lg font-bold mb-2">Enter formula for LCA methods</h4>
+        <h5 class="mb-2">Documentation for writing the equation can be found <a class="font-bold text-indigo-500 mb-2" href="https://docs.sympy.org/latest">here</a>.
+        </h5>
         <div class="flex flex-col">
           <template x-for="(count, index) in processCount">
             <div class="input-equation flex items-center mb-2">

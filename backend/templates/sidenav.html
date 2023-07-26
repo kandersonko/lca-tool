@@ -1,4 +1,5 @@
-<div x-data="{ selected: window.location.pathname}" class="flex flex-col h-full w-64 p-4 bg-gray-900 text-brand">
+<div x-data="{ selected: window.location.pathname}"
+     class="flex flex-col h-full w-64 p-4 bg-gray-900 font-semibold text-xl text-brand">
     <div class="flex flex-col">
         {% if not g.user %}
         <a class="hover:text-slate-200"
@@ -35,8 +36,8 @@
            :class="{'text-slate-100': selected === '/experiments/lca'}"
            href="{{ url_for('experiments.lca') }}">LCA</a>
         <a class="hover:text-slate-200"
-           :class="{'text-slate-100': selected === '/'}"
-           href="{{ url_for('index') }}">User</a>
+           :class="{'text-slate-100': selected === '/datasets'}"
+           href="{{ url_for('datasets.index') }}">Datasets</a>
         <a class="hover:text-slate-200"
            :class="{'text-slate-100': selected === '/about'}"
            href="{{ url_for('about.index') }}">About</a>
