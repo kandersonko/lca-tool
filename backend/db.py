@@ -165,7 +165,8 @@ class DBManager(object):
                 WHERE users.id=%s
                 """, (user_id,))
                 result = cursor.fetchone()
-                plan = result
+                (id, tier, storage_url) = result
+                plan = dict(id=id, tier=tier, storage_url=storage_url)
                 logging.debug(f"=== get_plan_by_user_id result: {result}")
         return plan
 
