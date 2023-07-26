@@ -31,6 +31,8 @@ apk update
 apk add git
 EOF
 
+RUN mkdir -p data
+
 RUN <<EOF
 addgroup -S docker
 adduser -S --shell /bin/bash --ingroup docker vscode

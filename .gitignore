@@ -34,3 +34,4 @@ password.txt
 /proxy/certs/
 .DS_Store
 /backend/node_modules/
+/backend/data/
