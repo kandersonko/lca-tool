@@ -19,12 +19,12 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 
-## Models
+# Models
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from werkzeug.utils import secure_filename
 
-from backend.calculator import Calculator
+from backend.calculator import Calculator, read_data
 
 # sys.path.append("backend")
 # sys.path.append("Classes")
@@ -45,6 +45,8 @@ logger = logging.getLogger()
 
 # should be modified to work with a db or class if necessary.
 # Otherwise, the choices being pre-available on page load will slightly speed the process.
+
+
 @bp.before_app_request
 def load_possible_experiments():
     list_Algorithms = MLA.getMLAs()
@@ -55,22 +57,24 @@ def load_possible_experiments():
     list_Layer_Categories = NeuralNetwork.getLayer_Categories()
     list_Core = Core.getCore()
 
-    #----------------Data Types-------------------------->
+    # ----------------Data Types-------------------------->
     g.data_types = ["Tabular", "Image", "Text", "Signal"]
     g.data_types_Name = ["Tabular", "Image", "Text", "Signal"]
     g.data_types_Info = [["Tabular is data that is displayed in columns or tables and does not pertain to the other data types."],
-                      ["Image is data that is usually 3-dimentional corresponding to the three color spectrom, RGB"],
-                      ["Text is data containing textual words or sentences."],
-                      ["Signal is data containing time-series data corresponding to a signal format."]]
+                         ["Image is data that is usually 3-dimentional corresponding to the three color spectrom, RGB"],
+                         ["Text is data containing textual words or sentences."],
+                         ["Signal is data containing time-series data corresponding to a signal format."]]
     g.Data_Types = zip(g.data_types, g.data_types_Name, g.data_types_Info)
 
-    #----------------new Cycon--------------------------->
-    # First choice is between various categories of ML 
+    # ----------------new Cycon--------------------------->
+    # First choice is between various categories of ML
     g.section_Method = ["MLA", "DLANN"]
-    g.section_Method_Display_Name = ["Machine Learning Algorithm (MLA)", "Deep Learning Artifical Neural Networks (DLANN)"]
+    g.section_Method_Display_Name = [
+        "Machine Learning Algorithm (MLA)", "Deep Learning Artifical Neural Networks (DLANN)"]
     g.section_Info = [["Machine learning algorithms are mathematical model mapping methods. They are used to learn patterns embedded in the existing training dataset in order to perform pattern recognition, classification, and prediction.\n\nCurrently, the only algorithms available on cycon is under the classification objective. Other objectives that will be added later include clustering and regression."],
                       ["DLANN info"]]
-    g.Methodologies = zip(g.section_Method, g.section_Method_Display_Name, g.section_Info)
+    g.Methodologies = zip(
+        g.section_Method, g.section_Method_Display_Name, g.section_Info)
 
     # Obtain the selection of Algorithm Names and Definition.
     algorithm_Names = []
@@ -85,7 +89,7 @@ def load_possible_experiments():
     g.section_Info = algorithm_Definition
     g.Algorithms = zip(g.section_algorithm, g.section_Info)
 
-    #----------------Preoptimiztion-------------------------->
+    # ----------------Preoptimiztion-------------------------->
     # create list of options to choose a category of preoptimization options.
     preopt_Category_Names = []
     preopt_Category_Display_Names = []
@@ -97,8 +101,9 @@ def load_possible_experiments():
         preopt_Category_Definition.append(preopt_Category.getDefinition())
     g.section_preopt_Category_Names = preopt_Category_Names
     g.section_preopt_Category_Display_Names = preopt_Category_Display_Names
-    g.section_preopt_Category_Info =  preopt_Category_Definition
-    g.preopt_Categories = zip(g.section_preopt_Category_Names, g.section_preopt_Category_Display_Names, g.section_preopt_Category_Info)
+    g.section_preopt_Category_Info = preopt_Category_Definition
+    g.preopt_Categories = zip(g.section_preopt_Category_Names,
+                              g.section_preopt_Category_Display_Names, g.section_preopt_Category_Info)
 
     # create list of options for the first category of preoprtimization (I.E. Standardization)
     preopt_Names = []
@@ -111,10 +116,11 @@ def load_possible_experiments():
         preopt_Definition.append(preopt.getDefinition())
     g.section_preopt_Names = preopt_Names
     g.section_preopt_Display_Names = preopt_Display_Names
-    g.section_preopt_Info =  preopt_Definition
-    g.preopts = zip(g.section_preopt_Names, g.section_preopt_Display_Names, g.section_preopt_Info)
+    g.section_preopt_Info = preopt_Definition
+    g.preopts = zip(g.section_preopt_Names,
+                    g.section_preopt_Display_Names, g.section_preopt_Info)
 
-    #-------------------Neural Network Layers----------------------->
+    # -------------------Neural Network Layers----------------------->
     # create list of options to choose a category of layer options.
     layer_Category_Names = []
     layer_Category_Display_Names = []
@@ -126,8 +132,9 @@ def load_possible_experiments():
         layer_Category_Definition.append(layer_Category.getDefinition())
     g.layer_Category_Names = layer_Category_Names
     g.layer_Category_Display_Names = layer_Category_Display_Names
-    g.layer_Category_Info =  layer_Category_Definition
-    g.NN_layer_Categories = zip(g.layer_Category_Names, g.layer_Category_Display_Names, g.layer_Category_Info)
+    g.layer_Category_Info = layer_Category_Definition
+    g.NN_layer_Categories = zip(
+        g.layer_Category_Names, g.layer_Category_Display_Names, g.layer_Category_Info)
 
     # create list of options for the first category of preoprtimization (I.E. Core)
     layer_Names = []
@@ -140,9 +147,8 @@ def load_possible_experiments():
         layer_Definition.append(layer.getDefinition())
     g.layer_Names = layer_Names
     g.layer_Display_Names = layer_Display_Names
-    g.layer_Info =  layer_Definition
+    g.layer_Info = layer_Definition
     g.layers = zip(g.layer_Names, g.layer_Display_Names, g.layer_Info)
-
 
 
 # Old LCA for testing purposes, REMOVE BEFORE SUBMITTING.
@@ -151,13 +157,17 @@ def LCA_Old():
     return render_template("experiments/LCA_Old.html")
 
 # REMOVE ASAP
+
+
 @bp.route("/new_experiment")
 def new_experiment():
     return render_template("experiments/new_experiment.html")
 
+
 @bp.route("/lca")
 def lca():
     return render_template("experiments/lca.html")
+
 
 @bp.route("/cycon")
 def cycon():
@@ -195,10 +205,13 @@ def calculate():
             error = f"Missing equation for process for process {num_process}"
             return jsonify(error=error)
         name = process.get("name")
-        logger.debug("=== Process %s: %s %s", num_process, filename, process_data)
+        logger.debug("=== Process %s: %s %s",
+                     num_process, filename, process_data)
         calculator = Calculator()
-        evaluated, result = calculator.evaluate(equation=equation, data=process_data)
-        logger.debug("=== Process %s Results: %s, %s", num_process, evaluated, result)
+        evaluated, result = calculator.evaluate(
+            equation=equation, data=process_data)
+        logger.debug("=== Process %s Results: %s, %s",
+                     num_process, evaluated, result)
         if not evaluated:
             error = f"Error in the formula for process {num_process}\n{result}"
             return jsonify(error=error)
@@ -211,7 +224,7 @@ def calculate():
 
 
 @bp.route("/run_experiment", methods=["POST"])
-def run_experiment():    
+def run_experiment():
     processes_input = request.form.get("processes")
     data = json.loads(processes_input)
 
@@ -240,7 +253,7 @@ def run_experiment():
             fp = open(filepath, "a")
         else:
             fp = open(filepath, "a")
-    
+
         # write to json file
         metrics_Dump = json.dumps(Metrics)
 
@@ -253,8 +266,9 @@ def run_experiment():
 
     return json.dumps(Results)
 
+
 @bp.route("/getResults", methods=["POST"])
-def getResults(): 
+def getResults():
     output = request.get_json()
     formData = json.loads(output)
 
@@ -270,7 +284,7 @@ def getResults():
 
     # close the connection
     fp.close()
-    
+
     return json.dumps(Metrics)
 
 
@@ -282,6 +296,7 @@ def getAlgorithmParameters():
     Parameters = MLA.getParameters(data["Algorithm"])
 
     return json.dumps(Parameters)
+
 
 @bp.route("/getCategoryPreopts", methods=["POST"])
 def getCategoryPreopts():
@@ -315,6 +330,7 @@ def getCSVResults():
 
     return json.dumps(Results)
 
+
 @bp.route("/downloadCSV", methods=["POST"])
 def downloadCSV():
     processes_input = request.form.get("processes")
@@ -332,6 +348,7 @@ def downloadCSV():
 
     return json.dumps(Results)
 
+
 @bp.route("/getPreoptParameters", methods=["POST"])
 def getPreoptParameters():
     output = request.get_json()
@@ -340,6 +357,7 @@ def getPreoptParameters():
     Parameters = Preoptimization.getParameters(data["Preopt"])
 
     return json.dumps(Parameters)
+
 
 @bp.route("/getLayerParameters", methods=["POST"])
 def getLayerParameters():
@@ -351,6 +369,8 @@ def getLayerParameters():
     return json.dumps(Parameters)
 
 # Gets the colummn names inside the csv.
+
+
 @bp.route("/getCSVColumnTitles", methods=["POST"])
 def getCSVColumnTitles():
     filename = request.form.get("csvFileName")
