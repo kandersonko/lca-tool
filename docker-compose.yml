@@ -34,6 +34,7 @@ services:
       target: builder
     volumes:
       - ./backend:/backend
+      - /app/data/:/backend/data/
       # - "/etc/timezone:/etc/timezone:ro"
       # - "/etc/localtime:/etc/localtime:ro"
     restart: always
