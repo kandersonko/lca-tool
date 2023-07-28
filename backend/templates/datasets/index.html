@@ -5,8 +5,7 @@
 <div class="container mx-auto flex justify-center items-center pt-4">
     <div class="flex flex-col">
         <h1 class="text-xl font-medium text-slate-900 mb-6">Datasets</h1>
-        <h4>Supported files: <span class="font-medium uppercase">{{", ".join(extensions)}}</span>
-        <h5 class="font-medium text-md mb-2">Upload dataset (limitations: 10 files or 1Gb)</h5>
+        <h5 class="font-medium text-md mb-2">Upload dataset* (limitations: 10 files or 1Gb)</h5>
         <form method="POST" action="/datasets/upload" enctype="multipart/form-data"
               class="flex flex-col mb-4">
             <input type="file"
@@ -17,20 +16,24 @@
                    class="px-2 py-1 rounded-md bg-brand text-slate-200 font-medium">
         </form>
 
-        <h3 class="font-medium mb-2 mt-2">Your datasets:</h3>
-        <div class="flex flex-col space-y-2">
-            {% for file in files %}
-            <div class="flex space-x-2">
-                <form method="POST"
-                      action="/datasets/delete"
-                class="flex flex-row">
-                    <h3 class="font-medium mr-2">{{file}}</h3>
-                    <input type="hidden" name="filename" value="{{file}}" />
-                    <input type="submit"
-                           class="px-2 py-1 rounded-full text-sm font-medium mx-2 bg-slate-400 text-slate-100"
-                           value="Remove">
+        <h4 class="text">* Supported files: <span class="font-medium uppercase">{{", ".join(extensions)}}</span></h4>
 
-                </form>
+        <div class="flex flex-col mt-4 border-top-2 border-gray-500">
+            <h3 class="font-medium mb-2">Uploaded datasets:</h3>
+            <div class="flex flex-col space-y-2">
+                {% for file in files %}
+                <div class="flex space-x-2">
+                    <form method="POST"
+                          action="/datasets/delete"
+                          class="flex flex-row">
+                        <h3 class="font-medium mr-2">{{file}}</h3>
+                        <input type="hidden" name="filename" value="{{file}}" />
+                        <input type="submit"
+                               class="px-2 py-1 rounded-full text-sm font-medium mx-2 bg-slate-400 text-slate-100"
+                               value="Remove">
+
+                    </form>
+                </div>
             </div>
             {% endfor %}
         </div>

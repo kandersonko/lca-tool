@@ -31,8 +31,10 @@
             {% block content %}
             {% endblock %}
 
-            <div class="container mx-auto p-4">
-            {% include 'flash.html' %}
+            <div class="w-full">
+              <div class="flex justify-center items-center">
+                {% include 'flash.html' %}
+              </div>
             </div>
           </div>
 
@@ -42,7 +44,7 @@
     </div>
 
     <footer class="w-full bg-gray-700 text-white p-6">
-      Copyright <span>&copy; CyCon</span> 2023 <span>version 1.07.26</span>
+      Copyright <span>&copy; CyCon</span> 2023 <span>version 1.07.28</span>
     </footer>
 
     {% block scripts %}
