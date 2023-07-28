@@ -9,7 +9,7 @@ import os
 
 from mysql.connector import Error
 
-from backend.utils import add_security_headers, allowed_file
+from backend.utils import add_security_headers, allowed_file, ALLOWED_EXTENSIONS
 
 from backend.db import DBManager
 
@@ -18,6 +18,7 @@ bp = Blueprint("datasets", __name__)
 
 @bp.route("/datasets", methods=["GET", "POST"])
 def index():
+    extensions = list(ALLOWED_EXTENSIONS)
     if request.method == "GET":
         user_id = session.get("user_id")
         logging.debug("=== Uploading files: %s", user_id)
@@ -44,10 +45,12 @@ def index():
                 logging.debug(f"=== Retrieving files: %s", files)
                 return add_security_headers(
                     render_template("datasets/index.html",
-                                    files=files)
+                                    files=files, extensions=extensions)
                 )
 
-    return add_security_headers(render_template("datasets/index.html"))
+    return add_security_headers(
+        render_template("datasets/index.html",
+                        extensions=extensions))
 
 
 @bp.route('/datasets/upload', methods=['GET', 'POST'])
