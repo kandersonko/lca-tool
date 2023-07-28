@@ -12,7 +12,7 @@ db_config = {
     "host": "db",
     "database": "lca",
     "user": "root",
-    "auth_plugin": "mysql_native_password",
+    "auth_plugin": "caching_sha2_password",
 }
 
 
@@ -225,7 +225,7 @@ class DBManager(object):
 
                     connection.commit()
                     storage_path = Path("data/" + storage_url)
-                    os.makedirs(storage_path)
+                    Path(storage_path).mkdir(parents=True, exist_ok=True)
                     # logging.debug(
                     #     f"=== Created plan:  {tier}, {price}, {user_id}, {storage_url}"
                     # )

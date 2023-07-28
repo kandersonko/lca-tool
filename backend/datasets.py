@@ -93,6 +93,7 @@ def upload_file():
                 user_storage = plan.get("storage_url")
                 base_folder = os.getcwd()
                 upload_path = Path(base_folder + '/data/') / user_storage
+                Path(upload_path).mkdir(parents=True, exist_ok=True)
                 file.save(os.path.join(upload_path, filename))
                 flash("File uploaded successfully")
     return redirect(url_for("datasets.index"))
