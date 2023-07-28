@@ -97,8 +97,15 @@ def upload_file():
                 base_folder = os.getcwd()
                 upload_path = Path(base_folder + '/data/') / user_storage
                 Path(upload_path).mkdir(parents=True, exist_ok=True)
-                file.save(os.path.join(upload_path, filename))
-                flash("File uploaded successfully")
+                if os.path.getsize(upload_path) > 104857600:  # 100 MB
+                    error = "You have uploaded more than 100MB"
+                    flash(error)
+                elif len(os.listdir(upload_path)) >= 10:  # more than 10 files
+                    error = "You have uploaded more than 10 files"
+                    flash(error)
+                else:
+                    file.save(os.path.join(upload_path, filename))
+                    flash("File uploaded successfully")
     return redirect(url_for("datasets.index"))
 
 
