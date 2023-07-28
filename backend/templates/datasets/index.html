@@ -18,22 +18,20 @@
 
         <h4 class="text">* Supported files: <span class="font-medium uppercase">{{", ".join(extensions)}}</span></h4>
 
-        <div class="flex flex-col mt-4 border-top-2 border-gray-500">
-            <h3 class="font-medium mb-2">Uploaded datasets:</h3>
-            <div class="flex flex-col space-y-2">
-                {% for file in files %}
-                <div class="flex space-x-2">
-                    <form method="POST"
-                          action="/datasets/delete"
-                          class="flex flex-row">
-                        <h3 class="font-medium mr-2">{{file}}</h3>
-                        <input type="hidden" name="filename" value="{{file}}" />
-                        <input type="submit"
-                               class="px-2 py-1 rounded-full text-sm font-medium mx-2 bg-slate-400 text-slate-100"
-                               value="Remove">
+        <h3 class="font-medium mb-2">Uploaded datasets:</h3>
+        <div class="flex flex-col space-y-2">
+            {% for file in files %}
+            <div class="flex space-x-2">
+                <form method="POST"
+                      action="/datasets/delete"
+                      class="flex flex-row">
+                    <h3 class="font-medium mr-2">{{file}}</h3>
+                    <input type="hidden" name="filename" value="{{file}}" />
+                    <input type="submit"
+                           class="px-2 py-1 rounded-full text-sm font-medium mx-2 bg-slate-400 text-slate-100"
+                           value="Remove">
 
-                    </form>
-                </div>
+                </form>
             </div>
             {% endfor %}
         </div>
