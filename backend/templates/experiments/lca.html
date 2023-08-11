@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <!-- The library for the charts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
@@ -16,13 +15,13 @@
 
 {% block content %}
 <div class="container mx-auto p-4"
-     x-data="{fileSelected: false, processCount: 0, csvFiles: []}">
+     x-data="{fileSelected: false, processes: [], processCount: 0, csvFiles: []}">
   <div class="flex flex-col justify-center">
 
     <!-- LCA Header -->
     <header class="flex flex-col mt-4 mb-2">
       <div class="mb-2">
-        <h2 class="text-3xl font-medium mb-2">Life Cycle Assessment (LCA) v0.01</h2>
+        <h2 class="text-3xl font-medium mb-2">Life Cycle Assessment (LCA)</h2>
         <div>Manuals, case studies, and databases are available
           <a href="https://webpages.uidaho.edu/rsml/manual.html" class="font-bold">here.</a>
         </div>
@@ -49,17 +48,18 @@
     <div class="px-2 py-4 flex flex-col space-y-2 border-b border-gray-400">
       <h3 id="phase2Header" class="mb-2 text-xl font-bold">Life cycle inventory (LCI)</h3>
       <div x-show="processCount > 0" x-cloak>
-        <template x-for="(count, index) in processCount">
+        <template x-for="(item, index) in processes" :key="item.id">
           <div class="mb-4">
             <input type="file"
                    @change="fileSelected=$el.files[0];csvFiles=getCSVFiles('input-csv');upload(event, index)"
                    class="input-csv file:px-2 file:py-1 file:my-1 file:bg-violet-500 file:text-white file:font-medium file:text-sm file:rounded-full file:border-none"
                    name="File Upload" accept=".csv" />
+            <button @click="if(processCount > 0) { processes.splice(processes.indexOf(item), 1); processCount--;}" class="px-2 py-1 rounded-full text-sm font-medium mx-2 bg-slate-400 text-slate-100">Remove</button>
             <table :id="'CSVtable_'+index" class="display"></table>
           </div>
         </template>
       </div>
-      <button @click="if(processCount < 4) processCount++;"
+      <button @click="if(processCount < 4) { processCount++; processes.push({'id': new Date().getTime() + processes.length}) }"
               class="w-64 px-2 py-1 bg-white rounded-md border border-slate-400 my-2">
         Add Process
       </button>
@@ -78,8 +78,13 @@
       <!-- Calculator -->
       <div class="flex flex-col ">
         <h4 class="text-lg font-bold mb-2">Enter formula for LCA methods</h4>
+        <h5 class="mb-2">Documentation for writing the equation can be found
+          <a class="font-bold text-indigo-500 mb-2" href="https://docs.sympy.org/latest">here</a>
+          (<a class="text-indigo-600 font-medium mb-2" href="https://daabzlatex.s3.amazonaws.com/9065616cce623384fe5394eddfea4c52.pdf">SymPy Cheatsheet</a>)
+          .
+        </h5>
         <div class="flex flex-col">
-          <template x-for="(count, index) in processCount">
+          <template x-for="(item, index) in processes" :key="item.id">
             <div class="input-equation flex items-center mb-2">
               <input type="text" name="label" :value="'Process '+(index+1)" class="py-1 px-2 mr-2 border border-gray-400 rounded-lg" placeholder="Rename Process 1"">
               <select class="px-2 py-1 mr-2 rounded-md border border-gray-400">
@@ -91,7 +96,7 @@
             </div>
           </template>
         </div>
-        <button class="w-64 flex-none bg-brand text-slate-50 text-sm font-medium px-4 py-2 rounded-md shadow-md hover:bg-brand/75" onclick="showResult=true;calculate()">Process</button>
+        <button class="w-64 flex-none bg-brand text-slate-50 text-sm font-medium px-4 py-2 rounded-md hover:bg-brand/75" onclick="showResult=true;calculate()">Process</button>
       </div>
 
     </div>

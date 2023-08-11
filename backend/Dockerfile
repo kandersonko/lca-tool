@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM --platform=$BUILDPLATFORM python:3.11-slim AS builder
+FROM --platform=$BUILDPLATFORM python:3.10-slim AS builder
 
 WORKDIR /backend
 
@@ -30,6 +30,8 @@ RUN <<EOF
 apk update
 apk add git
 EOF
+
+RUN mkdir -p data
 
 RUN <<EOF
 addgroup -S docker

@@ -47,7 +47,7 @@ def load_logged_in_user():
                 password_file=current_app.config["DB_PASSWORD"]
             )
             g.user = manager.get_user_by_id(user_id)
-            logging.debug(f"=== User: {g.user} ")
+            # logging.debug(f"=== User: {g.user} ")
         except Error as e:
             logging.debug(f"=== load_logged_in_user error: {e} ===")
 
@@ -73,7 +73,8 @@ def plans():
             admin_email = (
                 "lcatool.mail@gmail.com"  # TODO Change this to real administrator email
             )
-            send_email(subject="New Plan Request", body=body, recipients=[admin_email])
+            send_email(subject="New Plan Request",
+                       body=body, recipients=[admin_email])
             flash("Plan request sent to admin!")
             return redirect(url_for("index"))
         except Error as e:
@@ -90,8 +91,9 @@ def register():
     """
     if request.method == "POST":
         error = None
-        manager = DBManager.instance(password_file=current_app.config["DB_PASSWORD"])
-        logging.debug(f"=== Register request: {request}")
+        manager = DBManager.instance(
+            password_file=current_app.config["DB_PASSWORD"])
+        # logging.debug(f"=== Register request: {request}")
         if request.method == "POST":
             email = request.form["email"]
             password = request.form["password"]
@@ -99,11 +101,12 @@ def register():
             first_name = request.form["first_name"]
             last_name = request.form["last_name"]
             affiliation = request.form["affiliation"]
-            logging.debug(f"Register: {email} | {password}")
+            # logging.debug(f"Register: {email} | {password}")
             if confirm_password != password:
                 error = "The password should matched."
                 return add_security_headers(
-                    render_template("auth/register.html", error=[error], isError=True)
+                    render_template("auth/register.html",
+                                    error=[error], isError=True)
                 )
 
             # check if user exists
@@ -126,14 +129,15 @@ def register():
                     )
                     if g.user is not None and g.user.get("id"):
                         session["user_id"] = g.user["id"]
-                        logging.debug("=== Create plan after registration")
+                        # logging.debug("=== Create plan after registration")
                         manager.create_user_plan(g.user["id"], tier="free")
                         return redirect(url_for("auth.activation"))
                 except Error as e:
                     logging.debug(f"=== Error registration: {e} ===")
             else:
                 return add_security_headers(
-                    render_template("auth/register.html", error=[error], isError=True)
+                    render_template("auth/register.html",
+                                    error=[error], isError=True)
                 )
 
     return add_security_headers(
@@ -149,10 +153,11 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
         user = None
-        manager = DBManager.instance(password_file=current_app.config["DB_PASSWORD"])
+        manager = DBManager.instance(
+            password_file=current_app.config["DB_PASSWORD"])
         try:
             user = manager.get_user_by_email(email)
-            logging.debug(f"=== Login: ", email, password, user)
+            # logging.debug(f"=== Login: ", email, password, user)
 
         except Error as e:
             logging.debug(f"=== Error login: {e} ===")
@@ -162,7 +167,7 @@ def login():
 
         if user is None:
             error = "The user does not have an account."
-            logging.debug(f"Login user found: {user}")
+            # logging.debug(f"Login user found: {user}")
             return add_security_headers(
                 render_template("auth/login.html", error=[error], isError=True)
             )
@@ -180,7 +185,7 @@ def login():
             g.user = user
             if user.get("status") != "active":
                 return redirect(url_for("auth.activation"))
-            return redirect(url_for("index"))
+            return redirect(url_for("datasets.index"))
 
     return add_security_headers(
         render_template("auth/login.html", error=[error], isError=False)
@@ -192,12 +197,13 @@ def forgot_password():
     if request.method == "POST":
         email = request.form["email"]
         # check if user's email is in the database
-        manager = DBManager.instance(password_file=current_app.config["DB_PASSWORD"])
+        manager = DBManager.instance(
+            password_file=current_app.config["DB_PASSWORD"])
         try:
             user = manager.get_user_by_email(email)
             has_email = user and user.get("email") is None
 
-            logging.debug(f"forgot password: {has_email}")
+            # logging.debug(f"forgot password: {has_email}")
             if has_email is None:
                 error = f"No account registered with this email {email}"
                 flash(error)
@@ -205,11 +211,13 @@ def forgot_password():
                 token = generate_token(email)
                 reset_link = url_for("auth.reset", token=token)
                 body = f"Here is your password reset link: {request.base_url.split('auth/forgot_password')[0][:-1]}{reset_link}"
-                send_email(subject="Password Reset Link", body=body, recipients=[email])
+                send_email(subject="Password Reset Link",
+                           body=body, recipients=[email])
                 try:
                     manager.set_user_status(email, status="disabled")
                 except Error as e:
-                    logging.debug(f"=== failed to set the user status to disabled: {e}")
+                    logging.debug(
+                        f"=== failed to set the user status to disabled: {e}")
 
                 flash(f"Password reset link sent to your email {email}.")
         except Error as e:
@@ -229,7 +237,8 @@ def activation():
         token = generate_token(user["email"])
         confirm_url = url_for("auth.activate", token=token)
         body = f"Here is your account activation link: {request.base_url.split('auth/activation')[0][:-1]}{confirm_url}"
-        send_email(subject="Account Activation Link", body=body, recipients=[email])
+        send_email(subject="Account Activation Link",
+                   body=body, recipients=[email])
         # flash(f"Activation link sent to your email {email}")
         g.activation_link_sent = True
         return add_security_headers(render_template("auth/activation.html"))
@@ -246,7 +255,8 @@ def activate(token):
         user_email = g.user.get("email")
         status = g.user.get("status")
         email_from_token = confirm_token(token)
-        manager = DBManager.instance(password_file=current_app.config["DB_PASSWORD"])
+        manager = DBManager.instance(
+            password_file=current_app.config["DB_PASSWORD"])
         if status == "active":
             flash("Account already active")
             return redirect(url_for("index"))
@@ -255,7 +265,7 @@ def activate(token):
                 manager.activate_user(user_email)
                 return redirect(url_for("index"))
             except Error as e:
-                logging.debug(f"=== Error account activation: {e}")
+                # logging.debug(f"=== Error account activation: {e}")
                 flash("Error during account activation try again")
 
         else:
@@ -275,7 +285,8 @@ def reset(token):
 
         user = None
         error = None
-        manager = DBManager.instance(password_file=current_app.config["DB_PASSWORD"])
+        manager = DBManager.instance(
+            password_file=current_app.config["DB_PASSWORD"])
         if confirm_token(token) != email:
             flash("Invalid token or email")
         else:
@@ -283,9 +294,10 @@ def reset(token):
                 user = manager.get_user_by_email(email)
 
             except Error as e:
-                logging.debug(f"=== Error login: {e} ===")
+                # logging.debug(f"=== Error login: {e} ===")
                 return add_security_headers(
-                    render_template("auth/login.html", error=[error], isError=True)
+                    render_template("auth/login.html",
+                                    error=[error], isError=True)
                 )
 
             if user is not None:

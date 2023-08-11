@@ -1,23 +1,48 @@
-
-
-<div class="sidenav">
-    {% if not g.user %}
-        <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('auth.register') }}">Register</a>
-        <a href="{{ url_for('auth.login') }}">Log In</a>
-        <a href="{{ url_for('modules.index') }}">Modules</a>
-        <a href="{{ url_for('about.index') }}">About</a>
-    {% else %}
-        {% if g.user['status'] != 'active' %}
-            <a href="{{ url_for('auth.activation') }}">Activation</a>
+<div x-data="{ selected: window.location.pathname}"
+     class="flex flex-col h-full w-64 p-4 bg-gray-900 font-semibold text-xl text-brand">
+    <div class="flex flex-col">
+        {% if not g.user %}
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/'}"
+           href="{{ url_for('index') }}">Home</a>
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/auth/register'}"
+           href="{{ url_for('auth.register') }}">Register</a>
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/auth/login'}"
+           href="{{ url_for('auth.login') }}">Log In</a>
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/modules'}"
+           href="{{ url_for('modules.index') }}">Modules</a>
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/about'}"
+           href="{{ url_for('about.index') }}">About</a>
         {% else %}
-            <a href="{{ url_for('modules.index') }}">Modules</a>
-            <a href="{{ url_for('auth.plans') }}">Plans</a>
-            <a href="{{ url_for('experiments.cycon') }}">ML/AI</a>
-            <a href="{{ url_for('experiments.lca') }}">LCA</a>
-            <a href="{{ url_for('index') }}">User</a>
-            <a href="{{ url_for('about.index') }}">About</a>
-            <a href="{{ url_for('auth.logout') }}">Log Out</a>
+        {% if g.user['status'] != 'active' %}
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/auth/activation'}"
+           href="{{ url_for('auth.activation') }}">Activation</a>
+        {% else %}
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/modules'}"
+           href="{{ url_for('modules.index') }}">Modules</a>
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/auth/plans'}"
+            href="{{ url_for('auth.plans') }}">Plans</a>
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/experiments/cycon'}"
+           href="{{ url_for('experiments.cycon') }}">ML/AI</a>
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/experiments/lca'}"
+           href="{{ url_for('experiments.lca') }}">LCA</a>
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/datasets'}"
+           href="{{ url_for('datasets.index') }}">Datasets</a>
+        <a class="hover:text-slate-200"
+           :class="{'text-slate-100': selected === '/about'}"
+           href="{{ url_for('about.index') }}">About</a>
+        <a class="hover:text-slate-200" href="{{ url_for('auth.logout') }}">Log Out</a>
         {% endif %}
-    {% endif %}
+        {% endif %}
+    </div>
 </div>

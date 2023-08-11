@@ -3,39 +3,12 @@
 
 {% block content %}
 
-<div id="home" class="container mx-auto px-2 py-4 mt-2 mb-4">
-        <div class="flex flex-col mt-4 mb-2">
-                {% if g.user %}
-
-                <h1>Welcome {{ g.user['last_name'] }}</h1>
-
-                <p>Account status: {{g.user['status']}}</p>
-
-                <p>Account plan id: {{g.user['plan_id']}}</p>
-
-                <p>Email: {{g.user['email']}}</p>
-
-                <p>First name: {{g.user['first_name']}}</p>
-
-                <p>Last name: {{g.user['last_name']}}</p>
-
-                <p>Affiliation: {{g.user['affiliation']}}</p>
-
-                <p>Status (Activation via email): {{g.user['status']}}</p>
-
-                <p>Account Creation Timestamp: {{g.user['created_at']}}</p>
-
-                <p>Last Login: {{g.user['last_login']}}</p>
-
-                <p>Last Updated: {{g.user['updated_at']}}</p>
-
-                {% else %}
-                <div class="flex justify-center items-center mb-2 mt-4 w-full h-full">
-                        <img src="{{ url_for('static', filename='Images/welcome.png') }}"
-                             alt="" width="848px" height="648px" class="inline-block mt-2" />
-                </div>
-                {% endif %}
+<div id="home" class="container mx-auto px-2 py-4 mb-2">
+        <div class="flex justify-center items-center mb-2 w-full h-full">
+                <img src="{{ url_for('static', filename='Images/welcome.png') }}"
+                     alt="" width="848px" height="648px" class="inline-block mt-2" />
         </div>
+</div>
 </div>
 
 {% endblock %}

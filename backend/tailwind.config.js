@@ -12,6 +12,7 @@ module.exports = {
           'system-ui',
           'sans-serif',
         ],
+        'roboto': ['Roboto', 'sans-serif'],
       },
       colors: {
         'brand': '#F6B700'

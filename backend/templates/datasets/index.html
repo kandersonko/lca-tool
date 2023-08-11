@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container mx-auto flex justify-center items-center pt-4">
+    <div class="flex flex-col">
+        <h1 class="text-xl font-medium text-slate-900 mb-6">Datasets</h1>
+        <h5 class="font-medium text-md mb-2">Upload dataset* (limitations: 10 files or 100MB)</h5>
+        <form method="POST" action="/datasets/upload" enctype="multipart/form-data"
+              class="flex flex-col mb-4">
+            <input type="file"
+                   name="file"
+                   class="file:px-2 file:py-1 file:my-1 file:bg-violet-500 file:text-white file:font-medium file:text-sm file:rounded-full file:border-none">
+            <input type="submit"
+                   value="upload"
+                   class="px-2 py-1 rounded-md bg-brand text-slate-200 font-medium">
+        </form>
+
+        <h4 class="text">* Supported files: <span class="font-medium uppercase">{{", ".join(extensions)}}</span></h4>
+
+        <h3 class="font-medium mb-2">Uploaded datasets:</h3>
+        <div class="flex flex-col space-y-2">
+            {% for file in files %}
+            <div class="flex space-x-2">
+                <form method="POST"
+                      action="/datasets/delete"
+                      class="flex flex-row">
+                    <h3 class="font-medium mr-2">{{file}}</h3>
+                    <input type="hidden" name="filename" value="{{file}}" />
+                    <input type="submit"
+                           class="px-2 py-1 rounded-full text-sm font-medium mx-2 bg-slate-400 text-slate-100"
+                           value="Remove">
+
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+</div>
+
+{% endblock %}

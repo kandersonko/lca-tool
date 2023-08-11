@@ -12,7 +12,7 @@ db_config = {
     "host": "db",
     "database": "lca",
     "user": "root",
-    "auth_plugin": "mysql_native_password",
+    "auth_plugin": "caching_sha2_password",
 }
 
 
@@ -35,12 +35,14 @@ def db_connection(password_file):
             connection = connection_pool.get_connection()
         except Error as e:
             logging.warning(e)
-            connection_pool = create_connection_pool(password_file, **db_config)
+            connection_pool = create_connection_pool(
+                password_file, **db_config)
             connection = connection_pool.get_connection()
 
     else:
         try:
-            connection_pool = create_connection_pool(password_file, **db_config)
+            connection_pool = create_connection_pool(
+                password_file, **db_config)
             connection = connection_pool.get_connection()
         except Error as e:
             logging.debug(f"==== Connection error: {e} ====")
@@ -128,11 +130,12 @@ class DBManager(object):
         connection = db_connection(self.password_file)
         if connection:
             with connection.cursor(buffered=True) as cursor:
-                cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+                cursor.execute(
+                    "SELECT * FROM users WHERE email = %s", (email,))
                 result = cursor.fetchone()
                 user = self._unpack_user(result)
-                logging.debug(f"get_user_by_id result: {result}")
-                logging.debug(f"=== FOUND user: {user} ===")
+                # logging.debug(f"get_user_by_id result: {result}")
+                # logging.debug(f"=== FOUND user: {user} ===")
                 if user:
                     user = self.update_user_last_login(user["id"])
 
@@ -140,19 +143,37 @@ class DBManager(object):
 
     def get_user_by_id(self, user_id):
         user = None
-        logging.debug(f"=== Retrieving user by user_id: {user_id} ===")
+        # logging.debug(f"=== Retrieving user by user_id: {user_id} ===")
         connection = db_connection(self.password_file)
         if connection:
             with connection.cursor(buffered=True) as cursor:
                 cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
                 result = cursor.fetchone()
-                logging.debug(f"=== get_user_by_id result: {result}")
+                # logging.debug(f"=== get_user_by_id result: {result}")
                 user = self._unpack_user(result)
         return user
 
+    def get_plan_by_user_id(self, user_id):
+        logging.error(f"=== Retrieving plan by user_id: {user_id} ===")
+        plan = None
+        connection = db_connection(self.password_file)
+        if connection:
+            with connection.cursor(buffered=True) as cursor:
+                cursor.execute("""
+                SELECT plans.id, plans.tier, plans.storage_url FROM users
+                INNER JOIN plans ON users.id = plans.id
+                WHERE users.id=%s
+                """, (user_id,))
+                result = cursor.fetchone()
+                (id, tier, storage_url) = result
+                plan = dict(id=id, tier=tier, storage_url=storage_url)
+                logging.debug(f"=== get_plan_by_user_id result: {result}")
+        return plan
+
     def update_user_last_login(self, user_id):
         user = None
-        logging.debug(f"=== Updating last_login_on for user with id : {user_id} ===")
+        # logging.debug(
+        #     f"=== Updating last_login_on for user with id : {user_id} ===")
         connection = db_connection(self.password_file)
         if connection:
             with connection.cursor(buffered=True) as cursor:
@@ -168,7 +189,8 @@ class DBManager(object):
         return user
 
     def create_user_plan(self, user_id, tier):
-        logging.debug(f"=== Creating plan {tier} for user with id : {user_id} ===")
+        # logging.debug(
+        #     f"=== Creating plan {tier} for user with id : {user_id} ===")
         plan_prices = {"free": 0.0, "premium": 200.0, "enterprise": 500.0}
         price = plan_prices.get(tier)
         storage_url = str(uuid4())
@@ -203,17 +225,17 @@ class DBManager(object):
 
                     connection.commit()
                     storage_path = Path("data/" + storage_url)
-                    os.makedirs(storage_path)
-                    logging.debug(
-                        f"=== Created plan:  {tier}, {price}, {user_id}, {storage_url}"
-                    )
+                    Path(storage_path).mkdir(parents=True, exist_ok=True)
+                    # logging.debug(
+                    #     f"=== Created plan:  {tier}, {price}, {user_id}, {storage_url}"
+                    # )
 
                 except Error as e:
                     logging.debug(f"=== Error creating plan: {e}")
                     connection.rollback()
 
     def activate_user(self, email):
-        logging.debug(f"=== Activating user with email : {email} ===")
+        # logging.debug(f"=== Activating user with email : {email} ===")
         user = None
         connection = db_connection(self.password_file)
         if connection:

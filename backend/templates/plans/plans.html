@@ -1,19 +1,15 @@
 {% extends "layout.html" %}
 
-{% block head %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/plans.css') }}">
-{% endblock %}
-
 {% block content %}
-  <div class="container mx-auto p-2 mt-4" style="width: 70%">
-    <form id="plans" method="POST">
+  <div class="container mx-auto p-2 mt-4 flex flex-col items-center justify-center" style="width: 70%">
+    <form id="plans" method="POST" class="flex flex-col space-y-2 max-w-sm mb-4">
       <h2 class="mb-2 font-bold">Choose a Plan</h2>
-      <select name="plan" form="plans" id="plan-select" autofocus>
+      <select class="px-2 py-1 rounded-md border border-gray-300" name="plan" form="plans" id="plan-select" autofocus>
         <option value="free">Free</option>
         <option value="premium">Premium</option>
         <option value="enterprise">Enterprise</option>
       </select>
-      <button type="submit" id="choose-plan-btn" class="bg-sky-700">Choose Plan</button>
+      <button type="submit" id="choose-plan-btn" class="px-2 py-1 rounded-md shadow-md text-slate-100 bg-sky-700">Choose Plan</button>
     </form>
 
     <div id="csv-files">
