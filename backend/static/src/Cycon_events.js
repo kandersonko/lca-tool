@@ -113,6 +113,49 @@ function changePreoptCategory(category, ID_Preopts) {
     });
 }
 
+function changeLayerCategory(category, ID_Layers) {
+    var category_selection = document.getElementById(category)
+    var category_name = category_selection.value
+
+    dict_values = { Category: category_name };
+
+    const sent_data = JSON.stringify(dict_values)
+
+    $.ajax({
+        url: "/experiments/getCategoryLayers",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(sent_data),
+        async: false,
+        dataType: 'json',
+        success: function (data) {
+            select = document.getElementById(ID_Layers);
+            select.options.length = 0;
+            // Remove existing options in the selection
+            var len = select.length;
+            for (var i = 0; i < len; i++) {
+                select.remove(0);
+            }
+
+            // For each preoptimization in the category, create a selection possibility.
+            for (var Layer in data) {
+                var Layer_Name = data[Layer]["Name"];
+                var Layer_Display_Name = data[Layer]["Display_Name"];
+
+                if (data.hasOwnProperty(Layer)) {
+                    newOption = document.createElement('option');
+                    optionText = document.createTextNode(Layer_Display_Name);
+
+                    newOption.appendChild(optionText);
+                    newOption.setAttribute('value', Layer_Name);
+
+                    select.appendChild(newOption);
+                }
+            }
+        }
+    });
+}
+
 
 
 function changeAlgorithm(algorithms, ID_Parameters) {
@@ -218,11 +261,12 @@ function getData(form) {
     formData.append("class_col", class_column);
 
     formData.append("preoptCounter", preoptCounter)
+    formData.append("layerCounter", layerCounter)
 
-    var checkbox = $("#cyconForm").find("input[type=checkbox]");
-    $.each(checkbox, function (key, val) {
-        formData.append($(val).attr('name') + "_checked", $(this).is(':checked'));
-    });
+    // var checkbox = $("#cyconForm").find("input[type=checkbox]");
+    // $.each(checkbox, function (key, val) {
+    //    formData.append($(val).attr('name') + "_checked", $(this).is(':checked'));
+    // });
 
     // iterate through entries...
     for (var pair of formData.entries()) {
@@ -231,12 +275,73 @@ function getData(form) {
         dict_data[pair[0]] = pair[1]
     }
 
+    // Preoptimization form
     const preoptform = document.getElementById("preoptForm");
 
     var preoptForm = new FormData(preoptform);
 
     // iterate through entries...
     for (var pair of preoptForm.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+        document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        dict_data[pair[0]] = pair[1]
+    }
+
+    // Methodology form
+    const methodform = document.getElementById("methodologyForm");
+
+    var methodForm = new FormData(methodform);
+
+    // iterate through entries...
+    for (var pair of methodForm.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+        document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        dict_data[pair[0]] = pair[1]
+    }
+
+    // MLA form
+    const mla_form = document.getElementById("MLA_Form");
+
+    var mla_Form = new FormData(mla_form);
+
+    // iterate through entries...
+    for (var pair of mla_Form.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+        document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        dict_data[pair[0]] = pair[1]
+    }
+
+    // DLANN form
+    const dlann_form = document.getElementById("DLANN_Form");
+
+    var dlann_Form = new FormData(dlann_form);
+
+    // iterate through entries...
+    for (var pair of dlann_Form.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+        document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        dict_data[pair[0]] = pair[1]
+    }
+
+    // Model Compile Form
+    const model_compile_form = document.getElementById("Model_Compile_Form");
+
+    var model_compile_Form = new FormData(model_compile_form);
+
+    // iterate through entries...
+    for (var pair of model_compile_Form.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+        document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        dict_data[pair[0]] = pair[1]
+    }
+
+    // Model Validation Form
+    const model_val_form = document.getElementById("Model_Validation_Form");
+
+    var model_val_Form = new FormData(model_val_form);
+
+    // iterate through entries...
+    for (var pair of model_val_Form.entries()) {
         console.log(pair[0] + ": " + pair[1]);
         document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
         dict_data[pair[0]] = pair[1]
@@ -397,7 +502,7 @@ function getData(form) {
     });
 }
 
-document.getElementById("cyconForm").addEventListener("submit", function (e) {
+document.getElementById("MLAI_Form").addEventListener("submit", function (e) {
     e.preventDefault();
     getData(e.target);
 });
@@ -1123,6 +1228,80 @@ function selectPreopt(Preopt, ID_Preopt) {
     }
 }
 
+function getCompilerOptions(ID_Compiler) {
+    document.getElementById(ID_Compiler).innerHTML = "";
+
+    $.ajax({
+        url: "/experiments/getCompilerOptions",
+        type: "POST",
+        contentType: "application/json",
+        async: false,
+        dataType: 'json',
+        success: function (data) {
+            // Create the html section to place in the cycon page.
+            var html_section = document.getElementById(ID_Compiler);
+
+            // create the field box for the new layer option.
+            var field = document.createElement('fieldset');
+            // create title for the field.
+            var legend = document.createElement('legend');
+            legend_text = document.createTextNode("Compiler");
+            legend.appendChild(legend_text);
+            field.appendChild(legend);
+
+            // Create option to edit the parameter for the NN layer option.
+            for (var Parameter in data["Parameters"]) {
+                //document.getElementById("Results").innerHTML += "<br><br>"
+                //document.getElementById("Results").innerHTML += data["Parameters"][Parameter]["Name"]
+                //document.getElementById("Results").innerHTML += data["Parameters"][Parameter]["Default_value"]
+                //document.getElementById("Results").innerHTML += data["Parameters"][Parameter]["Definition"]
+
+
+                //var Parameter_Name = data["Parameters"][Parameter]["Name"];
+
+                if (data["Parameters"].hasOwnProperty(Parameter)) {
+                    // Create a label, which will be the parameter Name followed by the default value.
+                    var name_label = data["Parameters"][Parameter]["Name"] + " (Default: " + data["Parameters"][Parameter]["Default_value"] + ") ";
+                    var label = document.createElement('label');
+                    label.htmlFor = name_label;
+                    label.appendChild(document.createTextNode(name_label));
+                    let id_info = data["Parameters"][Parameter]["Name"] + "_Info";
+
+                    field.appendChild(label);
+
+                    // Create popup information.
+                    let newDiv = document.createElement("div");
+                    newDiv.className = "popup";
+                    newDiv.onclick = function () { popupInformation(id_info); };
+
+                    let newImage = document.createElement("img");
+                    newImage.src = "../../static/Images/information_icon.png";
+                    newImage.width = "20";
+                    newImage.height = "20";
+
+                    newDiv.appendChild(newImage);
+
+                    newSpan = document.createElement("span");
+                    newSpan.style = "white-space: pre-wrap";
+                    newSpan.className = "popuptext";
+                    newSpan.id = id_info;
+                    newSpan.textContent = data["Parameters"][Parameter]["Definition"];
+
+                    newDiv.appendChild(newSpan);
+
+                    field.appendChild(newDiv);
+
+                    // Create choices and options to edit the parameter
+                    fillSection(field, data["Parameters"], Parameter, "Compiler", 0)
+                }
+            }
+
+            // add field to div section
+            html_section.appendChild(field)
+        }
+    });
+}
+
 // Addes the selected layer to the form. 
 function selectLayers(Layer, ID_Layer) {
     if (layerCounter != 20) {
@@ -1275,6 +1454,14 @@ function fillSection(section, data, Parameter, Location, counter) {
         Parameter_Name = "Preopt_" + counter + "_" + data[Parameter]["Name"];
     }
 
+    else if (Location == "Layer") {
+        Parameter_Name = "Layer_" + counter + "_" + data[Parameter]["Name"];
+    }
+
+    else if (Location == "Compiler") {
+        Parameter_Name = "Compiler_" + data[Parameter]["Name"];
+    }
+
 
     // Create choices and options to alter the parameter
     for (var Type_Int in data[Parameter]["Type"]) {
@@ -1292,6 +1479,31 @@ function fillSection(section, data, Parameter, Location, counter) {
                 section.appendChild(radio);
                 if (option == default_opt) {
                     radio.checked = true;
+                }
+
+                // create label for radio button
+                var name_label = option;
+                var label = document.createElement('label')
+                label.htmlFor = name_label;
+                label.appendChild(document.createTextNode(name_label));
+
+                section.appendChild(label);
+            }
+        }
+
+        // Selectable checkboxes for multiple options to be selected.
+        if (data[Parameter]["Type"][Type_Int] == "checkbox") {
+            for (var Option_Int in data[Parameter]["Possible"]) {
+                // create checkbox
+                var check_name = Parameter_Name + "_Input";
+                var option = data[Parameter]["Possible"][Option_Int];
+                var checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.name = checkbox_name;
+                checkbox.id = option;
+                section.appendChild(checkbox);
+                if (option == default_opt) {
+                    checkbox.checked = true;
                 }
 
                 // create label for radio button
@@ -1429,7 +1641,7 @@ function fillSection(section, data, Parameter, Location, counter) {
 
                 if (typeof default_opt == 'number' && !isNaN(default_opt)) {
                     if (option == "float") {
-                        radio.check = true;
+                        radio.checked = true;
                     }
                 }
 
@@ -1449,7 +1661,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     section.appendChild(textbox);
 
                     if (typeof default_opt == 'number' && !isNaN(default_opt)) {
-                        texbox.value = default_opt;
+                        textbox.value = default_opt;
                     }
                 }
             }
@@ -1459,6 +1671,7 @@ function fillSection(section, data, Parameter, Location, counter) {
         if (data[Parameter]["Type"][Type_Int] == "option_int") {
             for (var Option_Int in data[Parameter]["Possible"]) {
                 // create radio button
+
                 var radio_name = Parameter_Name + "_Input";
                 var option = data[Parameter]["Possible"][Option_Int];
                 var radio = document.createElement("input");
@@ -1476,7 +1689,7 @@ function fillSection(section, data, Parameter, Location, counter) {
 
                 if (typeof default_opt == 'number' && !isNaN(default_opt)) {
                     if (option == "int") {
-                        radio.check = true;
+                        radio.checked = true;
                     }
                 }
 
@@ -1496,7 +1709,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     section.appendChild(textbox);
 
                     if (typeof default_opt == 'number' && !isNaN(default_opt)) {
-                        texbox.value = default_opt;
+                        textbox.value = default_opt;
                     }
                 }
             }
@@ -1704,3 +1917,87 @@ function changeCSV() {
         }
     });
 }
+
+
+// Checks that the CSV file is able to load and displays the csv information after all selected preoptimizations with additional pdf graphs
+// such as balance and distibution of data to help the user make informed desitions when preoptimizing.
+function checkModel(form) {
+    document.getElementById("model_Error").innerHTML = "";
+    document.getElementById("model_Results").innerHTML = "";
+
+    var formData = new FormData(form);
+
+    var dict_data = {};
+
+    formData.append("layerCounter", layerCounter)
+
+    // iterate through entries...
+    for (var pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+        dict_data[pair[0]] = pair[1]
+    }
+
+    //Send information to run model experiment.
+    // will save into a json file tilted the "projectName".json
+    $("#model_Error").hide();
+    $("#model_Title").hide();
+    $("#model_Results").hide();
+
+    const sent_data = JSON.stringify(dict_data)
+
+    const data = new FormData();
+    data.append("processes", JSON.stringify(dict_data))
+
+    $.ajax({
+        url: "/experiments/getModelSummary",
+        data: data,
+        type: "POST",
+        dataType: 'json',
+        processData: false, // important
+        contentType: false, // important,
+        success: function (Results) {
+            if (Results[0] == "worked") {
+
+                Results = Results[2]
+
+                var writeData = {
+                    paragraph: ''
+                }
+
+                document.getElementById("model_Results").innerHTML = Results['model_summary'];
+
+                $("#model_Title").show();
+                $("#model_Results").show();
+            }
+            else {
+                var writeData = {
+                    paragraph: ''
+                }
+
+                writeData.paragraph += '<FONT COLOR="#ff0000">ERROR: <br>';
+                writeData.paragraph += Results[1];
+                writeData.paragraph += '</FONT >';
+
+                document.getElementById("model_Error").innerHTML = writeData.paragraph;
+
+                $("#model_Error").show();
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            var writeData = {
+                paragraph: ''
+            }
+
+            writeData.paragraph += '<FONT COLOR="#ff0000">ERROR: <br>';
+            writeData.paragraph += "Error with connection to server!";
+            writeData.paragraph += '</FONT >';
+
+            document.getElementById("model_Preopt").innerHTML = writeData.paragraph;
+        }
+    });
+}
+
+document.getElementById("DLANN_Form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    checkModel(e.target);
+});

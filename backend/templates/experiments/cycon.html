@@ -102,8 +102,8 @@
     </style>
 </head>
 
-<div id="home" class="container mx-auto p-4 mb-6">
-    <div class="flex flex flex-col space-y-4">
+<div id="home" class="panel">
+    <div class="main" style="width: 70%">
 
         <script src="../../static/js/jquery-3.5.1.min.js"></script>
 
@@ -143,8 +143,10 @@
                     if (methodology == "DLANN") {
                         $("div.methodology_desc").hide();
                         $("#DLANN_Options").show();
+                        getCompilerOptions("Compile_Selection")
                     }
                 });
+
             });
 
         </script>
@@ -166,7 +168,7 @@
                  height="20" />
             <span class="popuptext" id="Experiment_Name_Info">Project name that will be used for future reference.</span>
         </div>
-        <input class="input" id="projectName" type="text" name="projectName" placeholder="Name of the project">
+        <input id="projectName" type="text" name="projectName" placeholder="Name of the project">
         <br>
 
         Goal and Scope:
@@ -281,11 +283,7 @@
         </form>
 
 
-        <form id="cyconForm">
-            <!-- Copy of information from prior sections -->
-            <input id="projectName_copy" name="projectName" type="hidden" />
-            <input id="phase1Text_copy" name="phase1Text" type="hidden" />
-            <input id="csvFile_copy" name="csvFile" type="hidden" />
+        <form id="methodologyForm">
 
             <!-- Methodology section 1 -->
             {% if g.Methodologies %}
@@ -319,7 +317,10 @@
             {% endfor %}
             {% endfor %}
             {% endif %}
+        </form>
 
+
+        <form id="MLA_Form">
             <!-- Section for MLA -->
             <div id="MLA_Options" class="methodology_desc">
 
@@ -396,16 +397,18 @@
                 <input type="radio" id="Stratify_True" name="Stratify" value=True> <label for="Stratify_True">True</label>
                 <input type="radio" id="Stratify_False" name="Stratify" value=False checked> <label for="Stratify_False">False</label><br>
             </div>
+        </form>
 
-            <!-- Section for DLANN -->
-            <div id="DLANN_Options" class="methodology_desc">
+
+        <div id="DLANN_Options" class="methodology_desc">
+            <form id="DLANN_Form">
+
                 <!-- Dynamically pull methods names and create radio buttons for each choice
-                <input type="radio" id=Method_BNN name="networks" value=network_BNN onclick=> <label for=Network_BNN>Basic Neural Network</label><br>
-                <input type="radio" id=Method_CNN name="networks" value=network_CNN onclick=> <label for=Network_CNN>Convolutional Neural Network</label><br>
+        <input type="radio" id=Method_BNN name="networks" value=network_BNN onclick=> <label for=Network_BNN>Basic Neural Network</label><br>
+        <input type="radio" id=Method_CNN name="networks" value=network_CNN onclick=> <label for=Network_CNN>Convolutional Neural Network</label><br>
 
-                <p>Basic Neural Network: (Info will be added later) </p>
-                <p>Convolutional Neural Network: (Info will be added later) </p>-->
-
+        <p>Basic Neural Network: (Info will be added later) </p>
+        <p>Convolutional Neural Network: (Info will be added later) </p>-->
                 <!-- Methods section-->
                 <h2>Model Creation</h2><br>
 
@@ -430,14 +433,67 @@
 
                 <div id="Layers_Selection"></div>
 
-                <button type="submit" value="Check" onclick="changePreoptSubmit('Check')"> Check </button>
+                <button type="submit" name="submit"> Check Model </button>
 
-                <p id="csv_Error_Preopt"></p>
+                <p id="model_Error"></p>
+                <p id="model_Title">Model Summary:</p>
+                <div style="overflow: auto; max-height: 1000px; max-width: 1100px; ">
+                    <p id="model_Results" style="background-color: white;"></p>
+                </div>
 
-            </div>
+            </form>
+
+            <form id="Model_Compile_Form">
+                <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Compiler</h1><br>
+                <div id="Compile_Selection"></div>
+            </form>
+
+            <form id="Model_Validation_Form">
+                <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Validation</h1>
+
+                <input type="radio" id=Split name="validation" value=Split> <label for=Split>Split</label>
+                <div class="popup" onclick="popupInformation('Split_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span style="white-space: pre-wrap" class="popuptext" id="Split_Info" }>Split arrays or matrices into random train and test subsets.<br><br>Quick utility that wraps input validation, next(ShuffleSplit().split(X, y)), and application to input data into a single call for splitting (and optionally subsampling) data into a one-liner.<br><br>Input value is the percent set for the testing dataset given as a decimal.</span>
+                </div>
+                Test Percent: 
+                <input type="text" id="NN_Split_Test_Input" name="NN_Split_Test_Input">
+                Validation Percent:
+                <input type="text" id="NN_Split_Val_Input" name="NN_Split_Val_Input">
+                <br><br>
+
+                <p><b>Optional Options:</b></p>
+                <label for=Random_State>Random State </label>
+                <div class="popup" onclick="popupInformation('Random_State_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span style="white-space: pre-wrap" class="popuptext" id="Random_State_Info" }>Whether to shuffle the data before splitting into batches. Note that the samples within each split will not be shuffled.</span>
+                </div>
+                <input type="text" id="NN_Random_State_Input" name="NN_Random_State_Input"><br>
+
+                <label for=Shuffle>Shuffle </label>
+                <div class="popup" onclick="popupInformation('Random_State_Info')">
+                    <img src="../../static/Images/information_icon.png"
+                         width="20"
+                         height="20" />
+                    <span style="white-space: pre-wrap" class="popuptext" id="Random_State_Info" }>When shuffle is True, random_state affects the ordering of the indices, which controls the randomness of each fold. Otherwise, this parameter has no effect. Pass an int for reproducible output across multiple function calls.</span>
+                </div>
+                <input type="radio" id="Shuffle_True" name="NN_Shuffle" value=True> <label for="Shuffle_True">True</label>
+                <input type="radio" id="Shuffle_False" name="NN_Shuffle" value=False checked> <label for="Shuffle_False">False</label><br>
+
+            </form>
+        </div>
+
+        <form id="MLAI_Form">
+            <!-- Copy of information from prior sections -->
+            <input id="projectName_copy" name="projectName" type="hidden" />
+            <input id="phase1Text_copy" name="phase1Text" type="hidden" />
+            <input id="csvFile_copy" name="csvFile" type="hidden" />
 
             <button type="submit" name="submit"> Perform Experiment </button>
-
         </form>
 
         <!-- Metrics section-->

@@ -76,7 +76,7 @@ def perform_Preopt(data, i, df):
     # KBinsDiscretizer
     if method == "KBinsDiscretizer":
         
-        settings = HyperParameters.getSettings(data, Parameters, i)
+        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
 
         pp = preprocessing.KBinsDiscretizer(n_bins=settings["Parameter_0"],
                                              encode=settings["Parameter_1"],
@@ -90,7 +90,7 @@ def perform_Preopt(data, i, df):
     # Binarizer
     if method == "Binarizer":
 
-        settings = HyperParameters.getSettings(data, Parameters, i)
+        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
 
         pp = preprocessing.Binarizer(threshold=settings["Parameter_0"],
                                              copy=settings["Parameter_1"])

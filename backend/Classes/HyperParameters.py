@@ -19,13 +19,13 @@ def getParameters(Preopt_Name, list_P):
     return Parameters
 
 # get settings to fill the model parameters.
-def getSettings(data, Parameters, counter):
+def getSettings(data, Parameters, counter, operation):
     settings = {}
 
     # contains the naming fill for the counter if there is one associated to the preopt process.
     fill = ""
     if counter != -1:
-        fill = "Preopt_" + str(counter) + "_"
+        fill = operation + "_" + str(counter) + "_"
 
     # Cycle through parameters
     for i in range(len(Parameters)):
@@ -74,6 +74,9 @@ def convertToType(value, Type, additionalInput = 0):
             return True
         elif value == "false" or value == False:
             return False
+        else: 
+            return None
+            
 
     elif Type[0] == "option":
         if value == "null" or value == "None" or value == "":
