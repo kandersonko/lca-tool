@@ -13,6 +13,7 @@ import logging
 from pathlib import Path
 
 from sympy.printing.latex import latex
+import sympy
 
 import pandas as pd
 import numpy as np
@@ -286,16 +287,17 @@ def calculate():
         logger.debug("=== Process %s: %s %s",
                      num_process, filename, process_data)
         calculator = Calculator()
-        evaluated, result = calculator.evaluate(
+        evaluated, result, formula = calculator.evaluate(
             equation=equation, data=process_data)
-        logger.debug("=== Process %s Results: %s, %s",
-                     num_process, evaluated, result)
+        logger.debug("=== Process %s Results: %s, %s %s",
+                     num_process, evaluated, result, formula)
         if not evaluated:
             error = f"Error in the formula for process {num_process}\n{result}"
             return jsonify(error=error)
 
-        equation = latex(equation, mode='plain')
-        output = dict(result=result, name=name, equation=equation)
+        sympy.init_printing(use_latex='mathjax')
+        formula = latex(formula, mode="equation")
+        output = dict(result=result, name=name, equation=formula)
         results.append(output)
 
     logger.debug("=== results: %s | dtype %s", results, type(results))

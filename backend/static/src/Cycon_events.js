@@ -1346,6 +1346,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     var textbox = document.createElement("input");
                     textbox.type = "text";
                     textbox.name = selection;
+                    textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
                     section.appendChild(textbox);
 
                     if (default_opt == 'str') {
@@ -1358,6 +1359,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     var textbox = document.createElement("input");
                     textbox.type = "text";
                     textbox.name = selection;
+                    textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
                     section.appendChild(textbox);
 
                     if (default_opt == "int") {
@@ -1372,6 +1374,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     var textbox = document.createElement("input");
                     textbox.type = "text";
                     textbox.name = selection;
+                    textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
                     section.appendChild(textbox);
 
                     if (default_opt == "float") {
@@ -1390,6 +1393,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                 select = document.createElement('select');
                 select.id = Parameter_Name + "_Input";
                 select.name = Parameter_Name + "_Input";
+                select.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
 
                 // Possible choises, (I.E. column titles)
                 for (title in columnTitles) {
@@ -1446,6 +1450,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     var textbox = document.createElement("input");
                     textbox.type = "text";
                     textbox.name = selection;
+                    textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
                     section.appendChild(textbox);
 
                     if (typeof default_opt == 'number' && !isNaN(default_opt)) {
@@ -1493,6 +1498,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     var textbox = document.createElement("input");
                     textbox.type = "text";
                     textbox.name = selection;
+                    textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
                     section.appendChild(textbox);
 
                     if (typeof default_opt == 'number' && !isNaN(default_opt)) {
@@ -1509,6 +1515,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             var textbox = document.createElement("input");
             textbox.type = "text";
             textbox.name = selection;
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
 
             textbox.value = default_opt;
 
@@ -1522,6 +1529,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             var textbox = document.createElement("input");
             textbox.type = "text";
             textbox.name = selection;
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
 
             if (typeof default_opt == 'number' && !isNaN(default_opt)) {
                 textbox.value = default_opt;
@@ -1537,6 +1545,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             var textbox = document.createElement("input");
             textbox.type = "text";
             textbox.name = selection;
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
 
             if (typeof default_opt == 'number' && !isNaN(default_opt)) {
                 textbox.value = default_opt;
@@ -1554,6 +1563,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             textbox.name = selection;
 
             textbox.value = default_opt;
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
 
             section.appendChild(textbox);
         }
@@ -1593,6 +1603,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             textbox.type = "text";
             textbox.name = selection;
             textbox.value = data[Parameter]["Default_value"];
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
             section.appendChild(textbox);
         }
 
@@ -1603,6 +1614,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             var textbox = document.createElement("input");
             textbox.type = "text";
             textbox.name = selection;
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
             section.appendChild(textbox);
         }
         section.appendChild(document.createElement("br"));
@@ -1684,6 +1696,7 @@ function changeCSV() {
             select = document.createElement('select');
             select.id = "class_col";
             select.name = "class_col";
+            select.className = "px-2 py-1 mr-2 rounded-md border border-gray-400";
 
             // Possible choises, (I.E. column titles)
             for (title in columnTitles) {
