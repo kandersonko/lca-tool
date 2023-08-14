@@ -12,6 +12,8 @@ from flask import jsonify
 import logging
 from pathlib import Path
 
+from sympy.printing.latex import latex
+
 import pandas as pd
 import numpy as np
 from sklearn.svm import SVC
@@ -292,6 +294,7 @@ def calculate():
             error = f"Error in the formula for process {num_process}\n{result}"
             return jsonify(error=error)
 
+        equation = latex(equation, mode='plain')
         output = dict(result=result, name=name, equation=equation)
         results.append(output)
 

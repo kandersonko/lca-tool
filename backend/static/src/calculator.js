@@ -17,18 +17,19 @@ const getCSVFiles = (className) => {
 }
 
 const getFilesByClassname = (className) => {
-    return Array.from(document.getElementsByClassName(className))
-                .map((el, index) => {
-                  let filename = el;
-                  let file = null;
-                  if(Array.from(el.classList).includes('input-csv')) {
-                    file = el.files[0];
-                    filename = file ? file.name: '';
-                  }
-                  return ({file_id: index, filename: filename, file: file });
-                });
+  return Array.from(document.getElementsByClassName(className))
+              .map((el, index) => {
+                let filename = el;
+                let file = null;
+                if(Array.from(el.classList).includes('input-csv')) {
+                  file = el.files[0];
+                  filename = file ? file.name: '';
+                }
+                return ({file_id: index, filename: filename, file: file });
+              });
 
 }
+
 
 function calculate(csvFiles, uploadedFiles) {
 
@@ -96,23 +97,29 @@ function calculate(csvFiles, uploadedFiles) {
     success: function(response){
       console.log("response", response);
       let output = "";
+      let equations = [];
       let results = [];
       if(response.error) {
         $("#results").html(response.error);
       }
       if(response.processes) {
         response.processes.forEach(process => {
+          const equation = MathJax.tex2chtml(process.equation).outerHTML;
+          console.log("equation: ", equation);
           output += `
-          <div class="calculator-result" class="flex flex-row mb-3">
+          <div class="calculator-result" class="flex flex-row mb-3 border-x-4 border-gray-400 p-2">
             <h4 class="mr-2 font-medium">
               ${process.name}: <span class="font-bold">${process.result}</span>
-              <span>| Formula: ${process.equation}</span>
+              <span>${equation}</span>
             </h4>
           </div/>`;
           results.push({name: process.name, value: process.result});
         });
         if(results.length > 0) {
+          const node = document.getElementById("results");
+          MathJax.typesetPromise([node]).then(() => {
           $("#results").html(output);
+          });
           if(chartInitialized) {
             updateChart(chart, results);
           } else {
