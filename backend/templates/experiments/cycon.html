@@ -236,7 +236,9 @@
                                      height="20" />
                                 <span style="white-space: pre-wrap" class="popuptext" id="KDE_IND_Info">A kernel density estimate (KDE) plot is a method for visualizing the distribution of observations in a dataset, analogous to a histogram. KDE represents the data using a continuous probability density curve in one or more dimensions.<br><br>Relative to a histogram, KDE can produce a plot that is less cluttered and more interpretable, especially when drawing multiple distributions. But it has the potential to introduce distortions if the underlying distribution is bounded or not smooth. Like a histogram, the quality of the representation also depends on the selection of good smoothing parameters.<br><br>Evaluation points for the estimated PDF. If None (default), 1000 equally spaced points are used. If ind is a NumPy array, the KDE is evaluated at the points passed. If ind is an integer, ind number of equally spaced points are used.\n\nGiving an int value will calculate the KDE for all columns when considering each class.</span>
                             </div>
-                            <input id="kde_ind" type="text" name="kde_ind"> <br>
+                            <input id="kde_ind"
+                                   class="w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white"
+                                   type="text" name="kde_ind"> <br>
                         </div>
 
                         <button type="submit"
