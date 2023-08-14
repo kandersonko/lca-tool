@@ -5,33 +5,85 @@ const getFilename = (inputFile) => {
 }
 
 const getCSVFiles = (className) => {
+  console.log("class name: ", className);
+  if(className === "uploaded-csv") {
+    return getFilesByClassname(className);
+
+  }
   const csvFiles = Array.from(document.getElementsByClassName(className))
                         .map((el, index) => ({file_id: index, filename: getFilename(el), file: el.files[0]}))
                         .filter(el => el.filename !== '');
   return csvFiles;
 }
 
-function calculate(e) {
+const getFilesByClassname = (className) => {
+    return Array.from(document.getElementsByClassName(className))
+                .map((el, index) => {
+                  let filename = el;
+                  let file = null;
+                  if(Array.from(el.classList).includes('input-csv')) {
+                    file = el.files[0];
+                    filename = file ? file.name: '';
+                  }
+                  return ({file_id: index, filename: filename, file: file });
+                });
 
-  const csvFiles = getCSVFiles("input-csv")
-  console.log("csv files: ", csvFiles);
+}
+
+function calculate(csvFiles, uploadedFiles) {
+
+  let selectionFiles = getFilesByClassname("selection-csv");
+  console.log("calculator files: ", selectionFiles);
   const processes = Array.from(document.getElementsByClassName("input-equation"))
                          .map((el, index) => {
-                           return ({
-                             name: el.children[0].value,
-                             filename: el.children[1].value,
-                             file_id: index,
-                             equation: el.children[2].value
-                           });
+                           let kind;
+                           const name= el.children[0].value;
+                           const equation= el.children[2].value;
+                           let filename = el.children[1].value;
+                           let file = csvFiles.find(f => f.filename === filename);
+                           if(file) {
+                             kind = 'file';
+                             return ({
+                               name: name,
+                               filename: filename,
+                               file_id: index,
+                               file: file.file,
+                               equation: equation,
+                               kind: kind
+                             });
+                           }
+                           file = uploadedFiles.find(f => f.filename === filename);
+                           if(file) {
+                             kind = 'csv';
+                             return ({
+                               name: name,
+                               filename: filename,
+                               file_id: index,
+                               file: file,
+                               equation: equation,
+                               kind: kind
+                             });
+                           }
+                           return ({});
+
                          });
-  console.log("processes", processes);
+
+  console.log("processes: ", processes, csvFiles, uploadedFiles);
+  let files;
 
   const data = new FormData();
   data.append("processes", JSON.stringify(processes));
-  data.append("files", JSON.stringify(csvFiles));
-  csvFiles.forEach(csv => {
-    data.append(csv.filename, csv.file);
-  });
+  processes.forEach(process => {
+    if(process.kind === 'file')
+      data.append(process.filename, process.file);
+  })
+  // data.append("files", JSON.stringify(files));
+  // data.append("choice", upload_choice)
+  // files.forEach(csv => {
+  //   if(csv.filename )
+  //   data.append(csv.filename, csv.file);
+  // });
+
   console.log("data", data);
 
   $.ajax({
@@ -314,28 +366,44 @@ function populateTable(dataSet, tableElement, tableId) {
 
 
 // Method that reads and processes the selected file
-function upload(evt, index) {
+function upload(evt, index, choice, filename, files) {
+  console.log("upload:", index, choice, filename, files);
   if (!browserSupportFileUpload()) {
     alert('The File APIs are not fully supported in this browser!');
   }
   else {
-    var data = null;
-    var file = evt.target.files[0];
-    var reader = new FileReader();
-    reader.readAsText(file);
+    let data = null;
+    let file;
+    if(choice === 'Upload new CSV') {
+      file = evt.target.files[0];
+      console.log('csv file:', file);
+      let reader = new FileReader();
+      reader.readAsText(file);
 
-    var uploadId = index;
 
-    reader.onload = function (event) {
-      var csvData = event.target.result;
-      data = $.csv.toArrays(csvData);
+      reader.onload = function (event) {
+        var csvData = event.target.result;
+        data = $.csv.toArrays(csvData);
 
-      populateTable(data, $('#CSVtable_'+index), index);
+        populateTable(data, $('#CSVtable_'+index), index);
 
-    };
-    reader.onerror = function () {
-      alert('Unable to read ' + file.fileName);
-    };
+      };
+      reader.onerror = function () {
+        alert('Unable to read ' + file.fileName);
+      };
+    }
+    else {
+      if(filename) {
+        let csvFile = files.find(f => f.filename === filename)
+        file = csvFile;
+      } else {
+        file = files[0];
+      }
+      // data = $.csv.toArrays(file.content);
+      console.log("found file: ", file, file.content);
+
+      populateTable(file.content, $('#CSVtable_'+index), index);
+    }
   }
 }
 
