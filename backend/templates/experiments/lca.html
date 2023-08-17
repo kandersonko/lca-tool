@@ -11,15 +11,48 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css">
 
-<!-- <script type="text/javascript" id="MathJax-script" async
-     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
-     </script> -->
-
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<!-- <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> -->
+<!-- <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<!-- MathJax SVG -->
+<!-- <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/mml-svg.js"></script> -->
 
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+
+<script type="module">
+ import {
+   Canvg,
+   presets
+ } from 'https://cdn.skypack.dev/canvg@^4.0.0';
+
+ const preset = presets.offscreen()
+
+ async function toPng(data) {
+   const {
+     width,
+     height,
+     svg
+   } = data
+   const canvas = new OffscreenCanvas(width, height)
+   const ctx = canvas.getContext('2d')
+   const v = await Canvg.fromString(ctx, svg, preset)
+
+   // Render only first frame, ignoring animations and mouse.
+   await v.render()
+
+   const blob = await canvas.convertToBlob()
+   const pngUrl = URL.createObjectURL(blob)
+
+   return pngUrl
+ }
+ window.toPng = toPng;
+
+
+</script>
 
 {% endblock %}
+
 
 
 {% block content %}
@@ -185,7 +218,7 @@
 
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='src/calculator.js')}}"></script>
+<script defer src="{{ url_for('static', filename='src/calculator.js')}}"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>

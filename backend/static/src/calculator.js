@@ -1,3 +1,4 @@
+
 let chart;
 
 const getFilename = (inputFile) => {
@@ -103,7 +104,7 @@ function calculate(csvFiles, uploadedFiles) {
         $("#results").html(response.error);
       }
       if(response.processes) {
-        response.processes.forEach(process => {
+        response.processes.forEach((process, index) => {
           // Make the equation pretty-printed
           let equation  = process.equation.replaceAll(/\\\mathtt/g, '');
           equation = equation.replaceAll(/\\text/g, '');
@@ -113,22 +114,55 @@ function calculate(csvFiles, uploadedFiles) {
           equation = equation.replaceAll(/\ /g, '\\ ');
           equation = equation.replace(/sum/g, "\\sum");
 
-          console.log("equation: ", equation);
-          let formula = MathJax.tex2chtml(equation).outerHTML;
+          console.log("equation: ", equation, index);
+          // let formula = MathJax.tex2chtml(equation).outerHTML;
+          // formula = MathJax.mathml2svg(formula).outerHTML;
+          let formula = MathJax.tex2svg(equation).outerHTML;
+
+          // console.log("formula: ", formula);
+          const el_id = `equation_img_${index}`;
+          const el_svg = `${el_id}_svg`;
+          const el_img = `${el_id}_img`;
           output += `
-          <div class="calculator-result" class="flex flex-row mb-3 border-x-4 border-gray-400 p-2">
+          <div class="calculator-result flex flex-col justify-center items-center mb-3 border-x-4 border-gray-400 p-2">
             <h4 class="mr-2 font-medium">
               ${process.name}: <span class="font-bold">${process.result}</span>
-              <span>${formula}</span>
             </h4>
-          </div/>`;
+            <div id="${el_svg}" class="output-equation flex justify-center">${formula}</div>
+            <img id="${el_img}" class="text-center" alt="" src=""/>
+          </div>`;
           results.push({name: process.name, value: process.result});
-        });
-        if(results.length > 0) {
           const node = document.getElementById("results");
           MathJax.typesetPromise([node]).then(() => {
-          $("#results").html(output);
-          });
+            $("#results").html(output);
+            setTimeout(() => {
+
+            let el = document.getElementById(el_svg);
+            let svg = el.children[0].children[0];
+
+            window.toPng({
+              width: 16,
+              height: 8,
+              svg: svg.outerHTML
+            }).then((pngUrl) => {
+              // const img = document.querySelector('img')
+              let img = document.getElementById(el_img)
+
+              img.src = pngUrl
+              el.remove();
+              console.log("svg: ", svg, pngUrl, img);
+
+            });
+            }, 500);
+          })
+        });
+        if(results.length > 0) {
+          // const node = document.getElementById("results");
+          // MathJax.typesetPromise([node]).then(() => {
+          //   $("#results").html(output);
+          //   let img_width =
+
+          // });
           if(chartInitialized) {
             updateChart(chart, results);
           } else {
@@ -216,10 +250,6 @@ $(document).ready(function () {
 
     //Get the rest of the HTML elemensts here (name, scope, GWP etc.)
 
-    // Get the canvas from the HTML
-    var canvas = document.querySelector('#myChart');
-    //creates image
-    var canvasImg = canvas.toDataURL("image/png", 1.0);
 
     // We add all the info into one list in order to put them into the pdf
     var list = [];
@@ -244,7 +274,8 @@ $(document).ready(function () {
     //   list.push($("label[for='"+idVal+"']").text());
     // });
 
-    var equation_image = null;
+    //creates image
+
 
 
     // Add the result
@@ -252,18 +283,18 @@ $(document).ready(function () {
 
     // list.push($("#Result1").text());
     // list.push($("#Result2").text());
-    $("#results").each((_, el) => {
-      list.push(el.innerHTML);
-    })
+    // $("#results").each((_, el) => {
+    //   list.push(el.innerHTML);
+    // })
 
     // list.push($("#phase4Header").text());
 
 
-    createPDF(canvasImg, null, equation_image, list);
+    createPDF(list);
   });
 
 
-  function createPDF(canvasImg, LifeExpectancyTableImg, equation, list) {
+  function createPDF(list) {
 
     // console.log(LifeExpectancyTableImg);
 
@@ -271,9 +302,9 @@ $(document).ready(function () {
       return null;
     }
 
-    if(canvasImg == null){
-      return null;
-    }
+    // if(canvasImg == null){
+    //   return null;
+    // }
 
     // creates PDF from the img that the chart is converted to
     var doc = new jspdf.jsPDF();
@@ -309,18 +340,32 @@ $(document).ready(function () {
       doc.text(lMargin,y_margin,line);
       y_margin+=10;
 
-      // if(line === "Phase 3. Life cycle impact assessment (LCIA):"){
-
-      //   if(equation_image!=null){
-      //     doc.addImage(equation_image, 'JPEG', lMargin, y_margin+1, 40, 22);
-      //     y_margin+=30;
-      //   }
-      // }
     });
-    // doc.text(lMargin,20,lines);
+
+    // add the equations
+    let margin_y = 80;
+    let canvas_added = false;
+    let alias = 0;
+    $(".calculator-result").each(function(index) {
+      // const img = document.querySelector('img')
+      let title = this.children[0].innerText;
+      let img = this.children[1];
+      console.log("save pdf", img, margin_y);
+
+      // doc.addSvgAsImage(svg, 1, 1, 100, 100, '', false);
+      doc.text(20,margin_y,title);
+      doc.addImage(img, 'png', 20, margin_y+3, 24, 8, `alias_${alias}`);
+      margin_y += 20;
+      alias += 1;
+    });
 
     // Add the chart/plot
-    doc.addImage(canvasImg, 'JPEG', 20, 180, 160, 100, 'NONE');
+        // Get the canvas from the HTML
+    let canvas = document.querySelector('#myChart');
+    //creates image
+    const canvasImg = canvas.toDataURL("image/png", 1.0);
+    doc.addImage(canvasImg, 'JPEG', 20, 180, 160, 100, `alias_${alias+1}`);
+    canvas_added = true;
 
     // Add the footer with the link to our tool
     doc.setFontSize(9);
@@ -332,7 +377,8 @@ $(document).ready(function () {
 
     doc.save('report.pdf');
   }
-})
+
+});
 
 let datatables = [];
 
