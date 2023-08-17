@@ -104,13 +104,22 @@ function calculate(csvFiles, uploadedFiles) {
       }
       if(response.processes) {
         response.processes.forEach(process => {
-          const equation = MathJax.tex2chtml(process.equation).outerHTML;
+          // Make the equation pretty-printed
+          let equation  = process.equation.replaceAll(/\\\mathtt/g, '');
+          equation = equation.replaceAll(/\\text/g, '');
+          equation = equation.replaceAll(/{|}/g, '');
+          equation = equation.replaceAll(/\\/g, '');
+          equation = equation.replaceAll(/"/g, '');
+          equation = equation.replaceAll(/\ /g, '\\ ');
+          equation = equation.replace(/sum/g, "\\sum");
+
           console.log("equation: ", equation);
+          let formula = MathJax.tex2chtml(equation).outerHTML;
           output += `
           <div class="calculator-result" class="flex flex-row mb-3 border-x-4 border-gray-400 p-2">
             <h4 class="mr-2 font-medium">
               ${process.name}: <span class="font-bold">${process.result}</span>
-              <span>${equation}</span>
+              <span>${formula}</span>
             </h4>
           </div/>`;
           results.push({name: process.name, value: process.result});
@@ -230,10 +239,10 @@ $(document).ready(function () {
     list.push($("#methodHeader").text());
     //list.push($('input:radio[name="methodCalculation"]:checked').text());
 
-    $('input:radio[name="methodCalculation"]:checked').each(function() {
-      var idVal = $(this).attr("id");
-      list.push($("label[for='"+idVal+"']").text());
-    });
+    // $('input:radio[name="methodCalculation"]:checked').each(function() {
+    //   var idVal = $(this).attr("id");
+    //   list.push($("label[for='"+idVal+"']").text());
+    // });
 
     var equation_image = null;
 
@@ -243,11 +252,11 @@ $(document).ready(function () {
 
     // list.push($("#Result1").text());
     // list.push($("#Result2").text());
-    $(".calculator-result").each((_, el) => {
-      list.push(el.innerText);
+    $("#results").each((_, el) => {
+      list.push(el.innerHTML);
     })
 
-    list.push($("#phase4Header").text());
+    // list.push($("#phase4Header").text());
 
 
     createPDF(canvasImg, null, equation_image, list);

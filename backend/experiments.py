@@ -296,7 +296,7 @@ def calculate():
             return jsonify(error=error)
 
         sympy.init_printing(use_latex='mathjax')
-        formula = latex(formula, mode="equation")
+        formula = latex(equation, mode="plain")
         output = dict(result=result, name=name, equation=formula)
         results.append(output)
 

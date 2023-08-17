@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div id="activation" class="panel">
+<div id="activation" class="container mx-auto">
     <div class="main" style="width: 70%">
         <h1>Account Activation</h1>
         {% if g.user and g.user.get('status') == 'active' %}
