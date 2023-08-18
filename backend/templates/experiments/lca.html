@@ -135,7 +135,7 @@
           </div>
         </template>
       </div>
-      <button @click="if(processCount < 4) { processCount++; processes.push({'id': new Date().getTime() + processes.length, 'filename':'', 'choice': 'Upload new CSV'}) }"
+      <button x-show="processCount < 4" @click="if(processCount < 4) { processCount++; processes.push({'id': new Date().getTime() + processes.length, 'filename':'', 'choice': 'Upload new CSV'}) }"
               class="w-64 px-2 py-1 bg-white rounded-md border border-slate-400 my-2">
         Add Process
       </button>
