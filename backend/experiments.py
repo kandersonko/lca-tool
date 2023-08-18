@@ -37,6 +37,8 @@ from backend.Classes.PreoptimizationFiles import Standardization
 from backend.Classes.NeuralNetworkFiles import NeuralNetwork
 from backend.Classes.NeuralNetworkFiles import Core
 from backend.Classes.NeuralNetworkFiles import Compiler
+from backend.Classes.NeuralNetworkFiles import Validation as NN_Validation
+from backend.Classes.NeuralNetworkFiles import Callbacks
 
 from keras.utils import to_categorical 
 
@@ -58,6 +60,8 @@ def load_possible_experiments():
     # list for Neural Network options
     list_Layer_Categories = NeuralNetwork.getLayer_Categories()
     list_Core = Core.getCore()
+    # list for Callback options
+    list_Callbacks = Callbacks.getCallbacks()
 
     #----------------Data Types-------------------------->
     g.data_types = ["Tabular", "Image", "Text", "Signal"]
@@ -147,7 +151,20 @@ def load_possible_experiments():
     g.layer_Info =  layer_Definition
     g.layers = zip(g.layer_Names, g.layer_Display_Names, g.layer_Info)
 
+    #-------------------Callbacks----------------------->
+    # create list of options to choose a callback options.
+    callback_Names = []
+    callback_Display_Names = []
+    callback_Definition = []
 
+    for callback in list_Callbacks:
+        callback_Names.append(callback.getName())
+        callback_Display_Names.append(callback.getDisplayName())
+        callback_Definition.append(callback.getDefinition())
+    g.callback_Names = callback_Names
+    g.callback_Display_Names = callback_Display_Names
+    g.callback_Info =  callback_Definition
+    g.callbacks = zip(g.callback_Names, g.callback_Display_Names, g.callback_Info)
 
 # Old LCA for testing purposes, REMOVE BEFORE SUBMITTING.
 @bp.route("/LCA_Old")
@@ -159,7 +176,7 @@ def LCA_Old():
 def new_experiment():
     return render_template("experiments/new_experiment.html")
 
-@bp.route("/lca")
+@bp.route("/lca", methods=["GET"])
 def lca():
     return render_template("experiments/lca.html")
 
@@ -171,22 +188,15 @@ def cycon():
 @bp.route("/calculate", methods=["POST"])
 def calculate():
     processes_input = request.form.get("processes")
-    if not processes_input:
-        return flash("Invalid arguments!")
     processes = json.loads(processes_input)
     logger.debug("=== Equations: %s %s", processes, processes_input)
     calculator = Calculator()
 
     results = []
-    num_process = 0
     for process in processes:
-        num_process += 1
         filename = process.get("filename")
         csv_file = request.files.get(filename)
         equation = process.get("equation")
-        if not equation or equation == "":
-            error = f"Missing equation for process for process {num_process}"
-            return jsonify(error=error)
         name = process.get("name")
         logger.debug("=== Process (file): %s %s %s", filename, csv_file, request.form)
         evaluated, result = calculator.evaluate(equation=equation, csv_file=csv_file)
@@ -389,6 +399,15 @@ def getLayerParameters():
 
     return json.dumps(Parameters)
 
+@bp.route("/getCallbackParameters", methods=["Post"])
+def getCallbackParameters():
+    output = request.get_json()
+    data = json.loads(output)
+
+    Parameters = Callbacks.getParameters(data["Callback"])
+
+    return json.dumps(Parameters)
+
 # Gets the colummn names inside the csv.
 @bp.route("/getCSVColumnTitles", methods=["POST"])
 def getCSVColumnTitles():
@@ -401,8 +420,16 @@ def getCSVColumnTitles():
 
     return json.dumps(columnTitles)
 
+# Gets all the options that is available via the keras model.compile 
 @bp.route("/getCompilerOptions", methods=["POST"])
 def getCompilerOptions():
     compiler_Options = Compiler.getCompilerOptions()
 
     return json.dumps(compiler_Options)
+
+# Gets all the options that is available for the model to fit,train, and validate.
+@bp.route("/getValidationOptions", methods=["POST"])
+def getValidationOptions():
+    validation_Options = NN_Validation.getValidationOptions()
+
+    return json.dumps(validation_Options)

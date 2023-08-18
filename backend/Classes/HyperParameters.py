@@ -61,6 +61,8 @@ def convertToType(value, Type, additionalInput = 0):
             return int(value)
 
     elif Type[0] == "float":
+        if value == "null" or value == "None" or value == "":
+            return None
         return float(value)
 
     elif Type[0] == "str":

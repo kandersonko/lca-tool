@@ -205,7 +205,7 @@ def K_Fold(data):
         y_test_list = np.empty(1)
         y_predict_list = np.empty(1)
 
-        for i, (train_index, test_index) in enumerate(kf.split(X)):
+        for i, (train_index, test_index) in enumerate(kf.split(X,y)):
             print("Fold: " + str(i) + " ===============================")
             x_train = X[train_index]
             y_train = y[train_index]

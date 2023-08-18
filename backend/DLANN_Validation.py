@@ -19,6 +19,7 @@ from sklearn.metrics import confusion_matrix
 
 from backend.Classes.PreoptimizationFiles import Preoptimization
 from backend.Classes.NeuralNetworkFiles import Compiler
+from backend.Classes.NeuralNetworkFiles import Validation
 
 from backend import Loading
 
@@ -39,13 +40,13 @@ def Split(data):
 
         # Split dataset to training and testing set
         random_state = None
-        if data["NN_Random_State_Input"] != "":
-            random_state = int(data["NN_Random_State_Input"])
+        if data["Validation_random_state_Input"] != "":
+            random_state = int(data["Validation_random_state_Input"])
         shuffle = False
-        if data["NN_Shuffle"] == "True":
+        if data["Validation_shuffle_before_split_Input"] == "true":
             shuffle = True
     
-        train_set, test_set = train_test_split(df, test_size=float(data["NN_Split_Test_Input"]), shuffle=shuffle, random_state = random_state)
+        train_set, test_set = train_test_split(df, test_size=float(data["Validation_test_split_Input"]), shuffle=shuffle, random_state = random_state)
 
         length = train_set.shape[1] -1
 
@@ -65,9 +66,7 @@ def Split(data):
         model = NeuralNetwork.createModel(data)
 
         Compiler.compileModel(model, data)
-        #model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-        history = model.fit(x_train, y_train, epochs=10, batch_size=7)
+        history = Validation.fitModel(model, data, x_train, y_train)
 
         y_pred = model.predict(x_test)
         y_pred = np.argmax(y_pred, axis = 1)
@@ -95,7 +94,34 @@ def Split(data):
         my_stringIObytes = io.BytesIO()
         plt.savefig(my_stringIObytes, format='jpg')
         my_stringIObytes.seek(0)
-        my_base64_jpgData = base64.b64encode(my_stringIObytes.read()).decode()
+        cm_graph = base64.b64encode(my_stringIObytes.read()).decode()
+        plt.close()
+
+        # summarize history for accuracy
+        plt.plot(history.history['accuracy'])
+        plt.plot(history.history['val_accuracy'])
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'validation'], loc='upper left')
+        my_stringIObytes = io.BytesIO()
+        plt.savefig(my_stringIObytes, format='jpg')
+        my_stringIObytes.seek(0)
+        acc_graph = base64.b64encode(my_stringIObytes.read()).decode()
+        plt.close()
+
+        # summarize history for loss
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'validation'], loc='upper left')
+        my_stringIObytes = io.BytesIO()
+        plt.savefig(my_stringIObytes, format='jpg')
+        my_stringIObytes.seek(0)
+        loss_graph = base64.b64encode(my_stringIObytes.read()).decode()
+        plt.close()
         
         # Send the Metrics
         Metrics = {"Validation": "Split",
@@ -116,7 +142,9 @@ def Split(data):
                     "F1_micro": F1_micro,
                     "F1_macro": F1_macro,
 
-                    "cm_overall": my_base64_jpgData,
+                    "cm_overall": cm_graph,
+                    "acc_history": acc_graph,
+                    "loss_history": loss_graph,
                 
                     "Val_Random_State": random_state,
                     "Val_Shuffle": shuffle}

@@ -12,7 +12,7 @@ loss = ["binary_crossentropy","categorical_crossentropy","sparse_categorical_cro
 ## Input
 Name = "Compiler"
 Display_Name = "Compiler"
-Definition = ["Configures the model for training."]
+Definition = ["Options to compile the determined model."]
 Parameter_0 = {"Name":"optimizer", "Type": ["option"], "Default_option":"rmsprop", "Default_value":"rmsprop", "Possible":["adadelta", "adam", "adamax", "ftrl", "nadam", "sgd", "rmsprop"],
              "Definition":"String (name of optimizer) or optimizer instance."}
 # This may be added later to show graph of history. For now, this is not implemented as there may be better way to do with with the choices of the model Callbacks.
@@ -58,5 +58,5 @@ def compileModel(model, data):
     else:
         jit_compile = False
 
-    model.compile(optimizer=data["Compiler_optimizer_Input"], loss=data["Compiler_loss_Input"], 
+    model.compile(optimizer=data["Compiler_optimizer_Input"], loss=data["Compiler_loss_Input"], metrics=['accuracy'],
                   run_eagerly=run_eagerly, steps_per_execution=data["Compiler_steps_per_execution_Input"], jit_compile=jit_compile) 

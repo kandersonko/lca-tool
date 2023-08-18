@@ -144,6 +144,7 @@
                         $("div.methodology_desc").hide();
                         $("#DLANN_Options").show();
                         getCompilerOptions("Compile_Selection")
+                        getValidationOptions("Validation_Selection")
                     }
                 });
 
@@ -450,40 +451,21 @@
 
             <form id="Model_Validation_Form">
                 <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Validation</h1>
-
-                <input type="radio" id=Split name="validation" value=Split> <label for=Split>Split</label>
-                <div class="popup" onclick="popupInformation('Split_Info')">
-                    <img src="../../static/Images/information_icon.png"
-                         width="20"
-                         height="20" />
-                    <span style="white-space: pre-wrap" class="popuptext" id="Split_Info" }>Split arrays or matrices into random train and test subsets.<br><br>Quick utility that wraps input validation, next(ShuffleSplit().split(X, y)), and application to input data into a single call for splitting (and optionally subsampling) data into a one-liner.<br><br>Input value is the percent set for the testing dataset given as a decimal.</span>
-                </div>
-                Test Percent: 
-                <input type="text" id="NN_Split_Test_Input" name="NN_Split_Test_Input">
-                Validation Percent:
-                <input type="text" id="NN_Split_Val_Input" name="NN_Split_Val_Input">
-                <br><br>
+                <div id="Validation_Selection"></div>
 
                 <p><b>Optional Options:</b></p>
-                <label for=Random_State>Random State </label>
-                <div class="popup" onclick="popupInformation('Random_State_Info')">
-                    <img src="../../static/Images/information_icon.png"
-                         width="20"
-                         height="20" />
-                    <span style="white-space: pre-wrap" class="popuptext" id="Random_State_Info" }>Whether to shuffle the data before splitting into batches. Note that the samples within each split will not be shuffled.</span>
-                </div>
-                <input type="text" id="NN_Random_State_Input" name="NN_Random_State_Input"><br>
+                Callback:
+                {% if g.callbacks %}
+                <select id="callbacks" name="callbacks">
+                    {% for choices, names, infos in g.callbacks%}
+                    <option value={{ choices }}>{{ names }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" id="AddCallbacks" onclick="selectCallback('callbacks', 'Callback_Selection')">Add</button>
+                <button type="button" id="clearCallbacks" onclick="clearAllCallbacks()"> Remove All </button>
+                {% endif %}
 
-                <label for=Shuffle>Shuffle </label>
-                <div class="popup" onclick="popupInformation('Random_State_Info')">
-                    <img src="../../static/Images/information_icon.png"
-                         width="20"
-                         height="20" />
-                    <span style="white-space: pre-wrap" class="popuptext" id="Random_State_Info" }>When shuffle is True, random_state affects the ordering of the indices, which controls the randomness of each fold. Otherwise, this parameter has no effect. Pass an int for reproducible output across multiple function calls.</span>
-                </div>
-                <input type="radio" id="Shuffle_True" name="NN_Shuffle" value=True> <label for="Shuffle_True">True</label>
-                <input type="radio" id="Shuffle_False" name="NN_Shuffle" value=False checked> <label for="Shuffle_False">False</label><br>
-
+                <div id="Callback_Selection"></div>
             </form>
         </div>
 
