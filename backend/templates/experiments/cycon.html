@@ -102,7 +102,9 @@
     </style>
 </head>
 
-<div id="home" class="container mx-auto p-4">
+<div id="home" class="container mx-auto p-4"
+x-data="{fileSelected: '', choice: null, files: {{files}}}"
+>
     <div class="flex flex flex-col space-y-4">
 
         <script src="../../static/js/jquery-3.5.1.min.js"></script>
@@ -225,8 +227,7 @@
                                  class="input-csv selection-csv mb-2 file:px-2 file:py-1 file:my-1 file:bg-violet-500 file:text-white file:font-medium file:text-sm file:rounded-full file:border-none"
                                  name="csvFile" accept=".csv" onchange="changeCSV()"> -->
 
-                            <div class="flex flex-col"
-                                 x-data="{fileSelected: '', choice: null, files: {{files}}}">
+                            <div class="flex flex-col" >
                                 <div class="flex flex-col mb-3 space-y-2 mb-2">
                                     <fieldset class="flex items-center mb-2" id="upload_group_1">
                                         <input type="radio"
@@ -251,7 +252,7 @@
                                            x-ref="csv"
                                            x-show="choice == 'Upload new CSV'"
                                            @change="changeCSV($refs.csv.files[0], $refs.csv.files[0], choice)"
-                                           class="input-csv selection-csv mb-2 file:px-2 file:py-1 file:my-1 file:bg-violet-500 file:text-white file:font-medium file:text-sm file:rounded-full file:border-none"
+                                           class="input-csv selection-csv mb-2"
                                            name="File Upload" accept=".csv" v-model="process.filename"/>
 
                                     <select class="px-2 py-1 mr-2 rounded-md border border-gray-400"
@@ -285,7 +286,7 @@
                         </div>
 
                         <button type="submit"
-                                class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                class="px-2 px-1.5 my-2 rounded-lg bg-white border border-gray-400"
                                 name="submit"> Check </button>
 
                         <p id="csv_Error"></p>
@@ -343,7 +344,7 @@
                         <div id="Preopt_Selection"></div>
 
                         <button type="submit"
-                                class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                class="my-2 px-2 px-1.5 rounded-lg bg-white border border-gray-400"
                                 value="Check" onclick="changePreoptSubmit('Check')"> Check </button>
 
                         <p id="csv_Error_Preopt"></p>
@@ -369,7 +370,7 @@
 
                 <!-- MLA -->
                 <div class="border-b border-gray-400 p-2">
-                    <form id="cyconForm">
+                    <form id="cyconForm" @submit.prevent="getData(files, fileSelected, choice)">
                         <!-- Copy of information from prior sections -->
                         <input id="projectName_copy" name="projectName" type="hidden" />
                         <input id="phase1Text_copy" name="phase1Text" type="hidden" />
@@ -409,7 +410,7 @@
                         {% endif %}
 
                         <!-- Section for MLA -->
-                        <div id="MLA_Options" class="methodology_desc">
+                        <div id="MLA_Options" class="methodology_desc space-y-2 space-x-2">
 
                             <!-- Dynamically pull algorithms names and create radio buttons for each choice-->
                             <br>
@@ -433,8 +434,9 @@
 
                             <div id="Parameters"></div>
 
+                <div class="border-t border-gray-400 p-2">
                             <!-- Validation section-->
-                            <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Validation</h1>
+                    <h1 class="mb-2 font-bold text-xl">Validation</h1>
 
                             <input type="radio" id=K-Fold name="validation" value=K-Fold> <label for=K-Fold>K-Fold</label>
                             <div class="popup" onclick="popupInformation('K-Fold_Info')">
@@ -443,7 +445,7 @@
                                      height="20" />
                                 <span style="white-space: pre-wrap" class="popuptext" id="K-Fold_Info" }>K-Folds cross-validator<br><br>Provides train/test indices to split data in train/test sets. Split dataset into k consecutive folds (without shuffling by default).<br><br>Each fold is then used once as a validation while the k - 1 remaining folds form the training set.<br><br>Input values is the desired number of folds.</span>
                             </div>
-                            <input type="text" id="K-Fold_Input" name="K-Fold_Input">
+                            <input type="text" class="input-text" id="K-Fold_Input" name="K-Fold_Input">
                             <br>
 
                             <input type="radio" id=Split name="validation" value=Split> <label for=Split>Split</label>
@@ -453,7 +455,7 @@
                                      height="20" />
                                 <span style="white-space: pre-wrap" class="popuptext" id="Split_Info" }>Split arrays or matrices into random train and test subsets.<br><br>Quick utility that wraps input validation, next(ShuffleSplit().split(X, y)), and application to input data into a single call for splitting (and optionally subsampling) data into a one-liner.<br><br>Input value is the percent set for the testing dataset given as a decimal.</span>
                             </div>
-                            <input type="text" id="Split_Input" name="Split_Input">
+                            <input type="text" class="input-text" id="Split_Input" name="Split_Input">
                             <br><br>
 
                             <p><b>Optional Options:</b></p>
@@ -464,7 +466,7 @@
                                      height="20" />
                                 <span style="white-space: pre-wrap" class="popuptext" id="Random_State_Info" }>Whether to shuffle the data before splitting into batches. Note that the samples within each split will not be shuffled.</span>
                             </div>
-                            <input type="text" id="Random_State_Input" name="Random_State_Input"><br>
+                            <input type="text" class="input-text" id="Random_State_Input" name="Random_State_Input"><br>
 
                             <label for=Shuffle>Shuffle </label>
                             <div class="popup" onclick="popupInformation('Random_State_Info')">
@@ -487,6 +489,7 @@
                             <input type="radio" id="Stratify_False" name="Stratify" value=False checked> <label for="Stratify_False">False</label><br>
                         </div>
 
+                        </div>
                         <!-- Section for DLANN -->
                         <div id="DLANN_Options" class="methodology_desc">
                             <!-- Dynamically pull methods names and create radio buttons for each choice
@@ -529,7 +532,7 @@
                             <div id="Layers_Selection"></div>
 
                             <button type="submit"
-                                    class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                    class="my-2 px-2 px-1.5 rounded-lg bg-white border border-gray-400"
                                     value="Check" onclick="changePreoptSubmit('Check')"> Check </button>
 
                             <p id="csv_Error_Preopt"></p>

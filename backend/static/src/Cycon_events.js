@@ -203,7 +203,9 @@ function readTextFile(file, callback) {
     rawFile.send(null);
 }
 
-function getData(form) {
+function getData(files, fileSelected, choice) {
+    const form = document.getElementById("cyconForm");
+    console.log("get form :", form, files, choice, fileSelected);
     // Copy over information from element outside of form to the copy inside form
     document.getElementById("projectName_copy").value = document.getElementById("projectName").value;
     document.getElementById("phase1Text_copy").value = document.getElementById("phase1Text").value;
@@ -245,8 +247,32 @@ function getData(form) {
     //Send information to run model experiment.
     // will save into a json file tilted the "projectName".json
 
-    const csvFileName = document.getElementById("csvFile").files[0].name;
-    const csvFile = document.getElementById("csvFile").files[0];
+    // const csvFileName = document.getElementById("csvFile").files[0].name;
+    // const csvFile = document.getElementById("csvFile").files[0];
+    let csvFileName;
+    let csvFile;
+    // create option to select classification column
+    if(choice === "Choose uploaded file") {
+        const foundFile = files.find(f => f.filename === fileSelected);
+        const data = JSON.parse(JSON.stringify(foundFile.content));
+        console.log("data: ", data, );
+
+        // Create CSV content
+        const csvContent = createCSV(data);
+
+        // Create Blob from CSV content
+        const csvBlob = createCSVBlob(csvContent);
+
+        csvFileName = fileSelected;
+        csvFile = csvBlob;
+
+        console.log("get csv: ", csvFile, csvBlob)
+    } else {
+        csvFileName = document.getElementById("csvFile").files[0].name;
+        csvFile = document.getElementById("csvFile").files[0];
+    }
+    console.log("getData", files, fileSelected, csvFile);
+
 
     const data = new FormData();
     data.append("processes", JSON.stringify(dict_data))
@@ -397,10 +423,10 @@ function getData(form) {
     });
 }
 
-document.getElementById("cyconForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    getData(e.target);
-});
+// document.getElementById("cyconForm").addEventListener("submit", function (e) {
+//     e.preventDefault();
+//     getData(e.target);
+// });
 
 
 
