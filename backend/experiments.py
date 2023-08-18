@@ -209,7 +209,39 @@ def lca():
 
 @bp.route("/cycon")
 def cycon():
-    return render_template("experiments/cycon.html")
+    user_id = session.get("user_id")
+
+    if user_id is None:
+        g.user = None
+        return redirect(url_for("auth.login"))
+    else:
+        try:
+            manager = DBManager.instance(
+                password_file=current_app.config["DB_PASSWORD"]
+            )
+            plan = manager.get_plan_by_user_id(user_id)
+        except Error:
+            return redirect(url_for("auth.plans"))
+
+        if plan is None:
+            flash("You have not subscribed to a plan!")
+            return redirect(url_for("auth.plans"))
+        else:
+            user_storage = plan.get("storage_url")
+            base_folder = os.getcwd()
+            upload_path = Path(base_folder+'/data/') / user_storage
+            filenames = os.listdir(upload_path)
+            files = []
+            for filename in filenames:
+                file_path = upload_path / filename
+                with open(file_path) as file:
+                    data = csv.reader(file)
+                    content = [row for row in data]
+                    files.append(dict(filename=filename, content=content))
+
+            return render_template("experiments/cycon.html", files=files)
+
+    return render_template("experiments/cycon.html", files=[])
 
 
 @bp.route("/calculate", methods=["POST"])

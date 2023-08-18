@@ -1624,15 +1624,45 @@ function fillSection(section, data, Parameter, Location, counter) {
     // section.appendChild(document.createElement("br"));
 }
 
+// Function to create a CSV file from an array of data
+function createCSV(dataArray) {
+  const csvContent = dataArray.map(row => row.join(',')).join('\n');
+  return csvContent;
+}
+
+// Function to create a Blob from CSV content
+function createCSVBlob(csvContent) {
+  return new Blob([csvContent], { type: 'text/csv' });
+}
 
 // Updates the csv dataset information. Changing selectable column names and resetting the preoptimization.
-function changeCSV() {
+function changeCSV(files, selectedFile, choice) {
     clearAllCSV()
     clearAllPreopt()
 
+    let csvFileName;
+    let csvFile;
     // create option to select classification column
-    const csvFileName = document.getElementById("csvFile").files[0].name;
-    const csvFile = document.getElementById("csvFile").files[0];
+    if(choice === "Choose uploaded file") {
+        const foundFile = files.find(f => f.filename === selectedFile);
+        const data = JSON.parse(JSON.stringify(foundFile.content));
+        console.log("data: ", data, );
+
+        // Create CSV content
+        const csvContent = createCSV(data);
+
+        // Create Blob from CSV content
+        const csvBlob = createCSVBlob(csvContent);
+
+        csvFileName = selectedFile;
+        csvFile = csvBlob;
+
+        console.log("created csv: ", csvFile, csvBlob)
+    } else {
+        csvFileName = document.getElementById("csvFile").files[0].name;
+        csvFile = document.getElementById("csvFile").files[0];
+    }
+    console.log("changeCSV", files, selectedFile, csvFile);
 
     dict_values = { "csvFileName": csvFileName, "csvFile": csvFile };
 
