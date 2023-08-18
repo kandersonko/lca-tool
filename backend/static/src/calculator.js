@@ -354,7 +354,7 @@ $(document).ready(function () {
 
       // doc.addSvgAsImage(svg, 1, 1, 100, 100, '', false);
       doc.text(20,margin_y,title);
-      doc.addImage(img, 'png', 20, margin_y+3, 24, 8, `alias_${alias}`);
+      doc.addImage(img, 'png', 20, margin_y+3, 25, 10, `alias_${alias}`);
       margin_y += 20;
       alias += 1;
     });
