@@ -698,7 +698,8 @@ document.getElementById("resultForm").addEventListener("button", function (e) {
 
 // Checks that the CSV file is able to load and displays the original csv information with additional pdf graphs
 // such as balance and distibution of data to help the user make informed desitions when preoptimizing.
-function checkCSV(form) {
+function checkCSV(files, fileSelected, choice) {
+    const form = document.getElementById("cyconForm");
     document.getElementById("csv_Error").innerHTML = "";
     document.getElementById("csv_Results").innerHTML = "";
 
@@ -729,8 +730,33 @@ function checkCSV(form) {
     $("#csv_Scale_Title").hide();
     $("#csv_Scale_Results").hide();
 
-    const csvFileName = document.getElementById("csvFile").files[0].name;
-    const csvFile = document.getElementById("csvFile").files[0];
+    // const csvFileName = document.getElementById("csvFile").files[0].name;
+    // const csvFile = document.getElementById("csvFile").files[0];
+
+    let csvFileName;
+    let csvFile;
+    // create option to select classification column
+    if(choice === "Choose uploaded file") {
+        const foundFile = files.find(f => f.filename === fileSelected);
+        const data = JSON.parse(JSON.stringify(foundFile.content));
+        console.log("data: ", data, );
+
+        // Create CSV content
+        const csvContent = createCSV(data);
+
+        // Create Blob from CSV content
+        const csvBlob = createCSVBlob(csvContent);
+
+        csvFileName = fileSelected;
+        csvFile = csvBlob;
+
+        console.log("created csv: ", csvFile, csvBlob)
+    } else {
+        csvFileName = document.getElementById("csvFile").files[0].name;
+        csvFile = document.getElementById("csvFile").files[0];
+    }
+    console.log("changeCSV", files, fileSelected, csvFile);
+
 
     const data = new FormData();
     data.append("processes", JSON.stringify(dict_data))
@@ -807,11 +833,6 @@ function checkCSV(form) {
         }
     });
 }
-
-document.getElementById("csvForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    checkCSV(e.target);
-});
 
 
 // Checks that the CSV file is able to load and displays the csv information after all selected preoptimizations with additional pdf graphs

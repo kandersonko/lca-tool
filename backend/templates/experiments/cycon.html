@@ -196,7 +196,7 @@ x-data="{fileSelected: '', choice: null, files: {{files}}}"
                 <!-- Dataset section -->
                 <div class="border-b border-gray-400 p-2">
                     <h1 class="mb-2 font-bold text-xl">Data</h1>
-                    <form id="csvForm">
+                    <form id="csvForm" @submit.prevent="checkCSV(files, fileSelected, choice)">
                         <div class="mb-2">
                             Data Type:
                             {% if g.Data_Types %}
