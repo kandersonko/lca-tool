@@ -1,3 +1,4 @@
+
 let chart;
 
 const getFilename = (inputFile) => {
@@ -5,33 +6,86 @@ const getFilename = (inputFile) => {
 }
 
 const getCSVFiles = (className) => {
+  console.log("class name: ", className);
+  if(className === "uploaded-csv") {
+    return getFilesByClassname(className);
+
+  }
   const csvFiles = Array.from(document.getElementsByClassName(className))
                         .map((el, index) => ({file_id: index, filename: getFilename(el), file: el.files[0]}))
                         .filter(el => el.filename !== '');
   return csvFiles;
 }
 
-function calculate(e) {
+const getFilesByClassname = (className) => {
+  return Array.from(document.getElementsByClassName(className))
+              .map((el, index) => {
+                let filename = el;
+                let file = null;
+                if(Array.from(el.classList).includes('input-csv')) {
+                  file = el.files[0];
+                  filename = file ? file.name: '';
+                }
+                return ({file_id: index, filename: filename, file: file });
+              });
 
-  const csvFiles = getCSVFiles("input-csv")
-  console.log("csv files: ", csvFiles);
+}
+
+
+function calculate(csvFiles, uploadedFiles) {
+
+  let selectionFiles = getFilesByClassname("selection-csv");
+  console.log("calculator files: ", selectionFiles);
   const processes = Array.from(document.getElementsByClassName("input-equation"))
                          .map((el, index) => {
-                           return ({
-                             name: el.children[0].value,
-                             filename: el.children[1].value,
-                             file_id: index,
-                             equation: el.children[2].value
-                           });
+                           let kind;
+                           const name= el.children[0].value;
+                           const equation= el.children[2].value;
+                           let filename = el.children[1].value;
+                           let file = csvFiles.find(f => f.filename === filename);
+                           if(file) {
+                             kind = 'file';
+                             return ({
+                               name: name,
+                               filename: filename,
+                               file_id: index,
+                               file: file.file,
+                               equation: equation,
+                               kind: kind
+                             });
+                           }
+                           file = uploadedFiles.find(f => f.filename === filename);
+                           if(file) {
+                             kind = 'csv';
+                             return ({
+                               name: name,
+                               filename: filename,
+                               file_id: index,
+                               file: file,
+                               equation: equation,
+                               kind: kind
+                             });
+                           }
+                           return ({});
+
                          });
-  console.log("processes", processes);
+
+  console.log("processes: ", processes, csvFiles, uploadedFiles);
+  let files;
 
   const data = new FormData();
   data.append("processes", JSON.stringify(processes));
-  data.append("files", JSON.stringify(csvFiles));
-  csvFiles.forEach(csv => {
-    data.append(csv.filename, csv.file);
-  });
+  processes.forEach(process => {
+    if(process.kind === 'file')
+      data.append(process.filename, process.file);
+  })
+  // data.append("files", JSON.stringify(files));
+  // data.append("choice", upload_choice)
+  // files.forEach(csv => {
+  //   if(csv.filename )
+  //   data.append(csv.filename, csv.file);
+  // });
+
   console.log("data", data);
 
   $.ajax({
@@ -44,23 +98,71 @@ function calculate(e) {
     success: function(response){
       console.log("response", response);
       let output = "";
+      let equations = [];
       let results = [];
       if(response.error) {
         $("#results").html(response.error);
       }
       if(response.processes) {
-        response.processes.forEach(process => {
+        response.processes.forEach((process, index) => {
+          // Make the equation pretty-printed
+          let equation  = process.equation.replaceAll(/\\\mathtt/g, '');
+          equation = equation.replaceAll(/\\text/g, '');
+          equation = equation.replaceAll(/{|}/g, '');
+          equation = equation.replaceAll(/\\/g, '');
+          equation = equation.replaceAll(/"/g, '');
+          equation = equation.replaceAll(/\ /g, '\\ ');
+          equation = equation.replace(/sum/g, "\\sum");
+
+          console.log("equation: ", equation, index);
+          // let formula = MathJax.tex2chtml(equation).outerHTML;
+          // formula = MathJax.mathml2svg(formula).outerHTML;
+          let formula = MathJax.tex2svg(equation).outerHTML;
+
+          // console.log("formula: ", formula);
+          const el_id = `equation_img_${index}`;
+          const el_svg = `${el_id}_svg`;
+          const el_img = `${el_id}_img`;
           output += `
-          <div class="calculator-result" class="flex flex-row mb-3">
+          <div class="calculator-result flex flex-col justify-center items-center mb-3 border-x-4 border-gray-400 p-2">
             <h4 class="mr-2 font-medium">
               ${process.name}: <span class="font-bold">${process.result}</span>
-              <span>| Formula: ${process.equation}</span>
             </h4>
-          </div/>`;
+            <div id="${el_svg}" class="output-equation flex justify-center">${formula}</div>
+            <img id="${el_img}" class="text-center" alt="" src=""/>
+          </div>`;
           results.push({name: process.name, value: process.result});
+          const node = document.getElementById("results");
+          MathJax.typesetPromise([node]).then(() => {
+            $("#results").html(output);
+            setTimeout(() => {
+
+            let el = document.getElementById(el_svg);
+            let svg = el.children[0].children[0];
+
+            window.toPng({
+              width: 16,
+              height: 8,
+              svg: svg.outerHTML
+            }).then((pngUrl) => {
+              // const img = document.querySelector('img')
+              let img = document.getElementById(el_img)
+
+              img.src = pngUrl
+              el.remove();
+              console.log("svg: ", svg, pngUrl, img);
+
+            });
+            }, 500);
+          })
         });
         if(results.length > 0) {
-          $("#results").html(output);
+          // const node = document.getElementById("results");
+          // MathJax.typesetPromise([node]).then(() => {
+          //   $("#results").html(output);
+          //   let img_width =
+
+          // });
           if(chartInitialized) {
             updateChart(chart, results);
           } else {
@@ -148,10 +250,6 @@ $(document).ready(function () {
 
     //Get the rest of the HTML elemensts here (name, scope, GWP etc.)
 
-    // Get the canvas from the HTML
-    var canvas = document.querySelector('#myChart');
-    //creates image
-    var canvasImg = canvas.toDataURL("image/png", 1.0);
 
     // We add all the info into one list in order to put them into the pdf
     var list = [];
@@ -171,12 +269,13 @@ $(document).ready(function () {
     list.push($("#methodHeader").text());
     //list.push($('input:radio[name="methodCalculation"]:checked').text());
 
-    $('input:radio[name="methodCalculation"]:checked').each(function() {
-      var idVal = $(this).attr("id");
-      list.push($("label[for='"+idVal+"']").text());
-    });
+    // $('input:radio[name="methodCalculation"]:checked').each(function() {
+    //   var idVal = $(this).attr("id");
+    //   list.push($("label[for='"+idVal+"']").text());
+    // });
 
-    var equation_image = null;
+    //creates image
+
 
 
     // Add the result
@@ -184,18 +283,18 @@ $(document).ready(function () {
 
     // list.push($("#Result1").text());
     // list.push($("#Result2").text());
-    $(".calculator-result").each((_, el) => {
-      list.push(el.innerText);
-    })
+    // $("#results").each((_, el) => {
+    //   list.push(el.innerHTML);
+    // })
 
-    list.push($("#phase4Header").text());
+    // list.push($("#phase4Header").text());
 
 
-    createPDF(canvasImg, null, equation_image, list);
+    createPDF(list);
   });
 
 
-  function createPDF(canvasImg, LifeExpectancyTableImg, equation, list) {
+  function createPDF(list) {
 
     // console.log(LifeExpectancyTableImg);
 
@@ -203,9 +302,9 @@ $(document).ready(function () {
       return null;
     }
 
-    if(canvasImg == null){
-      return null;
-    }
+    // if(canvasImg == null){
+    //   return null;
+    // }
 
     // creates PDF from the img that the chart is converted to
     var doc = new jspdf.jsPDF();
@@ -241,18 +340,32 @@ $(document).ready(function () {
       doc.text(lMargin,y_margin,line);
       y_margin+=10;
 
-      // if(line === "Phase 3. Life cycle impact assessment (LCIA):"){
-
-      //   if(equation_image!=null){
-      //     doc.addImage(equation_image, 'JPEG', lMargin, y_margin+1, 40, 22);
-      //     y_margin+=30;
-      //   }
-      // }
     });
-    // doc.text(lMargin,20,lines);
+
+    // add the equations
+    let margin_y = 80;
+    let canvas_added = false;
+    let alias = 0;
+    $(".calculator-result").each(function(index) {
+      // const img = document.querySelector('img')
+      let title = this.children[0].innerText;
+      let img = this.children[1];
+      console.log("save pdf", img, margin_y);
+
+      // doc.addSvgAsImage(svg, 1, 1, 100, 100, '', false);
+      doc.text(20,margin_y,title);
+      doc.addImage(img, 'png', 20, margin_y+3, 25, 10, `alias_${alias}`);
+      margin_y += 20;
+      alias += 1;
+    });
 
     // Add the chart/plot
-    doc.addImage(canvasImg, 'JPEG', 20, 180, 160, 100, 'NONE');
+        // Get the canvas from the HTML
+    let canvas = document.querySelector('#myChart');
+    //creates image
+    const canvasImg = canvas.toDataURL("image/png", 1.0);
+    doc.addImage(canvasImg, 'JPEG', 20, 180, 160, 100, `alias_${alias+1}`);
+    canvas_added = true;
 
     // Add the footer with the link to our tool
     doc.setFontSize(9);
@@ -264,7 +377,8 @@ $(document).ready(function () {
 
     doc.save('report.pdf');
   }
-})
+
+});
 
 let datatables = [];
 
@@ -314,28 +428,44 @@ function populateTable(dataSet, tableElement, tableId) {
 
 
 // Method that reads and processes the selected file
-function upload(evt, index) {
+function upload(evt, index, choice, filename, files) {
+  console.log("upload:", index, choice, filename, files);
   if (!browserSupportFileUpload()) {
     alert('The File APIs are not fully supported in this browser!');
   }
   else {
-    var data = null;
-    var file = evt.target.files[0];
-    var reader = new FileReader();
-    reader.readAsText(file);
+    let data = null;
+    let file;
+    if(choice === 'Upload new CSV') {
+      file = evt.target.files[0];
+      console.log('csv file:', file);
+      let reader = new FileReader();
+      reader.readAsText(file);
 
-    var uploadId = index;
 
-    reader.onload = function (event) {
-      var csvData = event.target.result;
-      data = $.csv.toArrays(csvData);
+      reader.onload = function (event) {
+        var csvData = event.target.result;
+        data = $.csv.toArrays(csvData);
 
-      populateTable(data, $('#CSVtable_'+index), index);
+        populateTable(data, $('#CSVtable_'+index), index);
 
-    };
-    reader.onerror = function () {
-      alert('Unable to read ' + file.fileName);
-    };
+      };
+      reader.onerror = function () {
+        alert('Unable to read ' + file.fileName);
+      };
+    }
+    else {
+      if(filename) {
+        let csvFile = files.find(f => f.filename === filename)
+        file = csvFile;
+      } else {
+        file = files[0];
+      }
+      // data = $.csv.toArrays(file.content);
+      console.log("found file: ", file, file.content);
+
+      populateTable(file.content, $('#CSVtable_'+index), index);
+    }
   }
 }
 

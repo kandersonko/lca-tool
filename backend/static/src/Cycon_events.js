@@ -251,7 +251,9 @@ function readTextFile(file, callback) {
     rawFile.send(null);
 }
 
-function getData(form) {
+function getData(files, fileSelected, choice) {
+    const form = document.getElementById("cyconForm");
+    console.log("get form :", form, files, choice, fileSelected);
     // Copy over information from element outside of form to the copy inside form
     document.getElementById("projectName_copy").value = document.getElementById("projectName").value;
     document.getElementById("phase1Text_copy").value = document.getElementById("phase1Text").value;
@@ -351,8 +353,32 @@ function getData(form) {
     //Send information to run model experiment.
     // will save into a json file tilted the "projectName".json
 
-    const csvFileName = document.getElementById("csvFile").files[0].name;
-    const csvFile = document.getElementById("csvFile").files[0];
+    // const csvFileName = document.getElementById("csvFile").files[0].name;
+    // const csvFile = document.getElementById("csvFile").files[0];
+    let csvFileName;
+    let csvFile;
+    // create option to select classification column
+    if(choice === "Choose uploaded file") {
+        const foundFile = files.find(f => f.filename === fileSelected);
+        const data = JSON.parse(JSON.stringify(foundFile.content));
+        console.log("data: ", data, );
+
+        // Create CSV content
+        const csvContent = createCSV(data);
+
+        // Create Blob from CSV content
+        const csvBlob = createCSVBlob(csvContent);
+
+        csvFileName = fileSelected;
+        csvFile = csvBlob;
+
+        console.log("get csv: ", csvFile, csvBlob)
+    } else {
+        csvFileName = document.getElementById("csvFile").files[0].name;
+        csvFile = document.getElementById("csvFile").files[0];
+    }
+    console.log("getData", files, fileSelected, csvFile);
+
 
     const data = new FormData();
     data.append("processes", JSON.stringify(dict_data))
@@ -579,10 +605,12 @@ function getData(form) {
     });
 }
 
+
 document.getElementById("MLAI_Form").addEventListener("submit", function (e) {
     e.preventDefault();
     getData(e.target);
 });
+
 
 
 
@@ -867,7 +895,8 @@ document.getElementById("resultForm").addEventListener("button", function (e) {
 
 // Checks that the CSV file is able to load and displays the original csv information with additional pdf graphs
 // such as balance and distibution of data to help the user make informed desitions when preoptimizing.
-function checkCSV(form) {
+function checkCSV(files, fileSelected, choice) {
+    const form = document.getElementById("cyconForm");
     document.getElementById("csv_Error").innerHTML = "";
     document.getElementById("csv_Results").innerHTML = "";
 
@@ -898,8 +927,33 @@ function checkCSV(form) {
     $("#csv_Scale_Title").hide();
     $("#csv_Scale_Results").hide();
 
-    const csvFileName = document.getElementById("csvFile").files[0].name;
-    const csvFile = document.getElementById("csvFile").files[0];
+    // const csvFileName = document.getElementById("csvFile").files[0].name;
+    // const csvFile = document.getElementById("csvFile").files[0];
+
+    let csvFileName;
+    let csvFile;
+    // create option to select classification column
+    if(choice === "Choose uploaded file") {
+        const foundFile = files.find(f => f.filename === fileSelected);
+        const data = JSON.parse(JSON.stringify(foundFile.content));
+        console.log("data: ", data, );
+
+        // Create CSV content
+        const csvContent = createCSV(data);
+
+        // Create Blob from CSV content
+        const csvBlob = createCSVBlob(csvContent);
+
+        csvFileName = fileSelected;
+        csvFile = csvBlob;
+
+        console.log("created csv: ", csvFile, csvBlob)
+    } else {
+        csvFileName = document.getElementById("csvFile").files[0].name;
+        csvFile = document.getElementById("csvFile").files[0];
+    }
+    console.log("changeCSV", files, fileSelected, csvFile);
+
 
     const data = new FormData();
     data.append("processes", JSON.stringify(dict_data))
@@ -976,11 +1030,6 @@ function checkCSV(form) {
         }
     });
 }
-
-document.getElementById("csvForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    checkCSV(e.target);
-});
 
 
 // Checks that the CSV file is able to load and displays the csv information after all selected preoptimizations with additional pdf graphs
@@ -1855,6 +1904,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     var textbox = document.createElement("input");
                     textbox.type = "text";
                     textbox.name = selection;
+                    textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
                     section.appendChild(textbox);
 
                     if (default_opt == 'str') {
@@ -1867,6 +1917,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     var textbox = document.createElement("input");
                     textbox.type = "text";
                     textbox.name = selection;
+                    textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
                     section.appendChild(textbox);
 
                     if (default_opt == "int") {
@@ -1881,6 +1932,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     var textbox = document.createElement("input");
                     textbox.type = "text";
                     textbox.name = selection;
+                    textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
                     section.appendChild(textbox);
 
                     if (default_opt == "float") {
@@ -1899,6 +1951,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                 select = document.createElement('select');
                 select.id = Parameter_Name + "_Input";
                 select.name = Parameter_Name + "_Input";
+                select.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
 
                 // Possible choises, (I.E. column titles)
                 for (title in columnTitles) {
@@ -1955,6 +2008,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     var textbox = document.createElement("input");
                     textbox.type = "text";
                     textbox.name = selection;
+                    textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
                     section.appendChild(textbox);
 
                     if (typeof default_opt == 'number' && !isNaN(default_opt)) {
@@ -2003,6 +2057,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     var textbox = document.createElement("input");
                     textbox.type = "text";
                     textbox.name = selection;
+                    textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
                     section.appendChild(textbox);
 
                     if (typeof default_opt == 'number' && !isNaN(default_opt)) {
@@ -2019,6 +2074,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             var textbox = document.createElement("input");
             textbox.type = "text";
             textbox.name = selection;
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
 
             textbox.value = default_opt;
 
@@ -2032,6 +2088,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             var textbox = document.createElement("input");
             textbox.type = "text";
             textbox.name = selection;
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
 
             if (typeof default_opt == 'number' && !isNaN(default_opt)) {
                 textbox.value = default_opt;
@@ -2047,6 +2104,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             var textbox = document.createElement("input");
             textbox.type = "text";
             textbox.name = selection;
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
 
             if (typeof default_opt == 'number' && !isNaN(default_opt)) {
                 textbox.value = default_opt;
@@ -2064,6 +2122,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             textbox.name = selection;
 
             textbox.value = default_opt;
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
 
             section.appendChild(textbox);
         }
@@ -2103,6 +2162,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             textbox.type = "text";
             textbox.name = selection;
             textbox.value = data[Parameter]["Default_value"];
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
             section.appendChild(textbox);
         }
 
@@ -2113,6 +2173,7 @@ function fillSection(section, data, Parameter, Location, counter) {
             var textbox = document.createElement("input");
             textbox.type = "text";
             textbox.name = selection;
+            textbox.className = "w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white";
             section.appendChild(textbox);
         }
         section.appendChild(document.createElement("br"));
@@ -2122,15 +2183,45 @@ function fillSection(section, data, Parameter, Location, counter) {
     // section.appendChild(document.createElement("br"));
 }
 
+// Function to create a CSV file from an array of data
+function createCSV(dataArray) {
+  const csvContent = dataArray.map(row => row.join(',')).join('\n');
+  return csvContent;
+}
+
+// Function to create a Blob from CSV content
+function createCSVBlob(csvContent) {
+  return new Blob([csvContent], { type: 'text/csv' });
+}
 
 // Updates the csv dataset information. Changing selectable column names and resetting the preoptimization.
-function changeCSV() {
+function changeCSV(files, selectedFile, choice) {
     clearAllCSV()
     clearAllPreopt()
 
+    let csvFileName;
+    let csvFile;
     // create option to select classification column
-    const csvFileName = document.getElementById("csvFile").files[0].name;
-    const csvFile = document.getElementById("csvFile").files[0];
+    if(choice === "Choose uploaded file") {
+        const foundFile = files.find(f => f.filename === selectedFile);
+        const data = JSON.parse(JSON.stringify(foundFile.content));
+        console.log("data: ", data, );
+
+        // Create CSV content
+        const csvContent = createCSV(data);
+
+        // Create Blob from CSV content
+        const csvBlob = createCSVBlob(csvContent);
+
+        csvFileName = selectedFile;
+        csvFile = csvBlob;
+
+        console.log("created csv: ", csvFile, csvBlob)
+    } else {
+        csvFileName = document.getElementById("csvFile").files[0].name;
+        csvFile = document.getElementById("csvFile").files[0];
+    }
+    console.log("changeCSV", files, selectedFile, csvFile);
 
     dict_values = { "csvFileName": csvFileName, "csvFile": csvFile };
 
@@ -2194,6 +2285,7 @@ function changeCSV() {
             select = document.createElement('select');
             select.id = "class_col";
             select.name = "class_col";
+            select.className = "px-2 py-1 mr-2 rounded-md border border-gray-400";
 
             // Possible choises, (I.E. column titles)
             for (title in columnTitles) {
@@ -2214,6 +2306,7 @@ function changeCSV() {
         }
     });
 }
+
 
 
 // Checks that the CSV file is able to load and displays the csv information after all selected preoptimizations with additional pdf graphs
@@ -2298,3 +2391,5 @@ document.getElementById("DLANN_Form").addEventListener("submit", function (e) {
     e.preventDefault();
     checkModel(e.target);
 });
+
+

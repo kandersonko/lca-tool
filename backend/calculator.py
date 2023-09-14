@@ -87,4 +87,4 @@ class Calculator(object):
         if evaluated:
             result = np.round(result.astype(np.float64), 3).tolist()
 
-        return validated, result
+        return validated, result, equation

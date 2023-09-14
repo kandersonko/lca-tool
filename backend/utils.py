@@ -1,6 +1,7 @@
 from flask import make_response
 
-ALLOWED_EXTENSIONS = {'csv', 'mp4', 'mp3', 'png', 'jpg', 'jpeg', 'gif', 'wav'}
+ALLOWED_EXTENSIONS = {'csv', 'mp4', 'mp3',
+                      'png', 'jpg', 'jpeg', 'gif', 'wav', "txt", "npy"}
 
 
 def allowed_file(filename):

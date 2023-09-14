@@ -10,12 +10,54 @@
 <!-- scripts to run LCA, will need to be changed later-->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css">
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<!-- <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> -->
+<!-- <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<!-- MathJax SVG -->
+<!-- <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/mml-svg.js"></script> -->
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+
+<script type="module">
+ import {
+   Canvg,
+   presets
+ } from 'https://cdn.skypack.dev/canvg@^4.0.0';
+
+ const preset = presets.offscreen()
+
+ async function toPng(data) {
+   const {
+     width,
+     height,
+     svg
+   } = data
+   const canvas = new OffscreenCanvas(width, height)
+   const ctx = canvas.getContext('2d')
+   const v = await Canvg.fromString(ctx, svg, preset)
+
+   // Render only first frame, ignoring animations and mouse.
+   await v.render()
+
+   const blob = await canvas.convertToBlob()
+   const pngUrl = URL.createObjectURL(blob)
+
+   return pngUrl
+ }
+ window.toPng = toPng;
+
+
+</script>
+
 {% endblock %}
+
 
 
 {% block content %}
 <div class="container mx-auto p-4"
-     x-data="{fileSelected: false, processes: [], processCount: 0, csvFiles: []}">
+     x-data="{fileSelected: '', processes: [], processCount: 0, csvFiles: [], files: {{files}}}">
   <div class="flex flex-col justify-center">
 
     <!-- LCA Header -->
@@ -48,18 +90,52 @@
     <div class="px-2 py-4 flex flex-col space-y-2 border-b border-gray-400">
       <h3 id="phase2Header" class="mb-2 text-xl font-bold">Life cycle inventory (LCI)</h3>
       <div x-show="processCount > 0" x-cloak>
-        <template x-for="(item, index) in processes" :key="item.id">
+        <template x-for="(process, index) in processes" :key="process.id">
           <div class="mb-4">
-            <input type="file"
-                   @change="fileSelected=$el.files[0];csvFiles=getCSVFiles('input-csv');upload(event, index)"
-                   class="input-csv file:px-2 file:py-1 file:my-1 file:bg-violet-500 file:text-white file:font-medium file:text-sm file:rounded-full file:border-none"
-                   name="File Upload" accept=".csv" />
-            <button @click="if(processCount > 0) { processes.splice(processes.indexOf(item), 1); processCount--;}" class="px-2 py-1 rounded-full text-sm font-medium mx-2 bg-slate-400 text-slate-100">Remove</button>
+            <div class="flex flex-col mb-3 space-y-2 mb-2">
+              <fieldset class="flex items-center mb-2" :id="'upload_group_1_'+index">
+                <input type="radio"
+                       :name="'upload_group_1_'+index"
+                       x-model="process.choice"
+                       value="Upload new CSV">
+                <label class="ml-2" :for="'upload_group_1_'+index">Upload CSV</label>
+              </fieldset>
+              <fieldset class="flex items-center mb-2" :id="'upload_group_2_'+index">
+                <input type="radio"
+                       :name="'upload_group_2_'+index+1"
+                       x-model="process.choice"
+
+                       value="Choose uploaded file">
+                <label class="ml-2" :for="'upload_choice_2_'+index+1">Choose uploaded CSV</label>
+              </fieldset>
+            </div>
+
+            <div class="flex flex-col max-w-xs">
+              <input type="file"
+                     x-show="process.choice == 'Upload new CSV'"
+                     @change="fileSelected=$el.files[0];process.filename=$el.files[0];csvFiles=getCSVFiles('input-csv');upload(event, index, process.choice, files, process.filename)"
+                     class="input-csv selection-csv mb-2"
+                     name="File Upload" accept=".csv" v-model="process.filename"/>
+
+              <select class="px-2 py-1 mr-2 rounded-md border border-gray-400"
+                      x-show="process.choice == 'Choose uploaded file'"
+                      x-ref="select_file"
+                      @change="upload(event, index, process.choice, process.filename, files)"
+                      x-model="process.filename">
+                <option>Select file</option>
+                <template x-for="file in {{files}}">
+                  <option x-text="file.filename"
+                          class="uploaded-csv selection-csv mb-2"></option>
+                </template>
+              </select>
+            </div>
+
             <table :id="'CSVtable_'+index" class="display"></table>
+            <button @click="if(processCount > 0) { processes.splice(processes.indexOf(process), 1); processCount--;}" class="my-2 px-2 py-1 rounded-full text-sm font-medium mx-2 bg-slate-400 text-slate-100">Remove</button>
           </div>
         </template>
       </div>
-      <button @click="if(processCount < 4) { processCount++; processes.push({'id': new Date().getTime() + processes.length}) }"
+      <button x-show="processCount < 4" @click="if(processCount < 4) { processCount++; processes.push({'id': new Date().getTime() + processes.length, 'filename':'', 'choice': 'Upload new CSV'}) }"
               class="w-64 px-2 py-1 bg-white rounded-md border border-slate-400 my-2">
         Add Process
       </button>
@@ -83,20 +159,31 @@
           (<a class="text-indigo-600 font-medium mb-2" href="https://daabzlatex.s3.amazonaws.com/9065616cce623384fe5394eddfea4c52.pdf">SymPy Cheatsheet</a>)
           .
         </h5>
-        <div class="flex flex-col">
-          <template x-for="(item, index) in processes" :key="item.id">
+        <div class="flex flex-col" x-data="{'process_data': ''}">
+          <template x-for="(process, index) in processes" :key="process.id">
             <div class="input-equation flex items-center mb-2">
-              <input type="text" name="label" :value="'Process '+(index+1)" class="py-1 px-2 mr-2 border border-gray-400 rounded-lg" placeholder="Rename Process 1"">
-              <select class="px-2 py-1 mr-2 rounded-md border border-gray-400">
-                <template x-for="csvFile in csvFiles">
-                  <option x-text="csvFile.filename"></option>
+              <input type="text" name="label" :value="'Process '+(index+1)" class="py-1 px-2 mr-2 border border-gray-400 rounded-lg" placeholder="Rename Process 1">
+              <select class="px-2 py-1 mr-2 rounded-md border border-gray-400"
+              >
+                <template x-if="process.choice == 'Upload new CSV'">
+                  <template x-for="csvFile in csvFiles" x-model="process.filename">
+                    <option x-text="csvFile.filename"></option>
+                  </template>
+                </template>
+                <template x-if="process.choice != 'Upload new CSV'">
+                  <template x-for="file in files" x-model="process.filename" >
+                    <option x-text="file.filename"></option>
+                  </template>
                 </template>
               </select>
               <textarea class="py-1 px-2 w-64 resize border border-gray-400 rounded-lg" rows="1" cols="30" placeholder="Enter the equation"></textarea>
             </div>
           </template>
+          <button
+            class="w-64 flex-none bg-brand text-slate-50 text-sm font-medium px-4 py-2 rounded-md hover:bg-brand/75" @click="showResult=true;calculate(csvFiles, files)">
+            Process
+          </button>
         </div>
-        <button class="w-64 flex-none bg-brand text-slate-50 text-sm font-medium px-4 py-2 rounded-md hover:bg-brand/75" onclick="showResult=true;calculate()">Process</button>
       </div>
 
     </div>
@@ -110,7 +197,7 @@
       {% if error %}
       <div class="error">{{ error }}</div>
       {% endif %}
-      <div id="results" class="mb-4"></div>
+      <div id="results" class="mb-4 text-center flex flex-col space-y-4 "></div>
 
 
       <div class="mb-2"> Analyzing the results and comparison</div>
@@ -131,7 +218,7 @@
 
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='src/calculator.js')}}"></script>
+<script defer src="{{ url_for('static', filename='src/calculator.js')}}"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
