@@ -1,4 +1,4 @@
-class Preoptimizer:
+class Callback:
     def __init__(self, name, display_name, definition, parameters):
         self.name = name
         self.display_name = display_name
@@ -17,6 +17,6 @@ class Preoptimizer:
     def getParameters(self):
         return self.parameters
 
-# Returns the name convention for the Preoptimization
+# Returns the name convention
 def getName():
-    return "Preopt"
+    return "Callback"
