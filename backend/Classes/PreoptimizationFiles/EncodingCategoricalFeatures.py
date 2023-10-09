@@ -113,7 +113,7 @@ def perform_Preopt(data, i, df):
     # OrdinalEncoder
     if method == "OrdinalEncoder":
 
-        settings = HyperParameters.getSettings(data, Parameters, i)
+        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
 
         pp = preprocessing.OrdinalEncoder(categories=[df[data["Preopt_" + str(i) + "_column_Input"]].unique().tolist()],
                              dtype=settings["Parameter_0"],
@@ -126,7 +126,7 @@ def perform_Preopt(data, i, df):
     # OneHotEncoder
     if method == "OneHotEncoder":
 
-        settings = HyperParameters.getSettings(data, Parameters, i)
+        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
 
         pp = preprocessing.OneHotEncoder(categories=[df[data["Preopt_" + str(i) + "_column_Input"]].unique().tolist()],
                                          drop=settings["Parameter_0"],
@@ -152,7 +152,7 @@ def perform_Preopt(data, i, df):
     # Dummy Variables
     if method == "DummyVariables":
 
-        settings = HyperParameters.getSettings(data, Parameters, i)
+        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
 
         new_df = pd.get_dummies(data=df,
                                 prefix=settings["Parameter_0"],
