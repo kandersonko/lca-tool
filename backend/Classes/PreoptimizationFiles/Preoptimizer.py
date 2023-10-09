@@ -16,7 +16,3 @@ class Preoptimizer:
 
     def getParameters(self):
         return self.parameters
-
-# Returns the name convention for the Preoptimization
-def getName():
-    return "Preopt"
