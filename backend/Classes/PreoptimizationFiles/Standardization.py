@@ -107,7 +107,7 @@ def perform_Preopt(data, i, df):
 
     ### Standard Scaler
     if method == "StandardScaler":
-        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
+        settings = HyperParameters.getSettings(data, Parameters, i)
 
         pp = preprocessing.StandardScaler(copy=settings["Parameter_0"],
                             with_mean=settings["Parameter_1"],
@@ -121,7 +121,7 @@ def perform_Preopt(data, i, df):
 
     ## Minmax Scaler
     if method == "MinMaxScaler":
-        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
+        settings = HyperParameters.getSettings(data, Parameters, i)
 
         pp = preprocessing.MinMaxScaler(feature_range=(settings["Parameter_0"],settings["Parameter_1"]),
                             copy=settings["Parameter_2"],
@@ -135,7 +135,7 @@ def perform_Preopt(data, i, df):
 
     ## MaxAbsScaler
     if method == "MaxAbsScaler":
-        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
+        settings = HyperParameters.getSettings(data, Parameters, i)
 
         pp = preprocessing.MaxAbsScaler(copy=settings["Parameter_0"])
         
@@ -147,7 +147,7 @@ def perform_Preopt(data, i, df):
 
     ## RobustScaler
     if method == "RobustScaler":
-        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
+        settings = HyperParameters.getSettings(data, Parameters, i)
 
         pp = preprocessing.RobustScaler(with_centering=settings["Parameter_0"],
                                         with_scaling=settings["Parameter_1"],

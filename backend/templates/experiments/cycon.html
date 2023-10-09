@@ -102,117 +102,54 @@
     </style>
 </head>
 
-
 <div id="home" class="container mx-auto p-4"
 x-data="{fileSelected: '', choice: null, files: {{files}}}"
 >
     <div class="flex flex flex-col space-y-4">
 
-
         <script src="../../static/js/jquery-3.5.1.min.js"></script>
 
         <!-- Method to change the visable sections -->
         <script>
+         $(document).ready(function () {
+             $("div.methodology_desc").hide();
 
-            $(document).ready(function () {
-                $("div.methodology_desc").hide();
+             $("#kde_Input").hide();
+             $("#csv_Title").hide();
+             $("#csv_Null_Title").hide();
+             $("#csv_Null_Results").hide();
+             $("#csv_Class_Balance_Title").hide();
+             $("#csv_Class_Balance_Results").hide();
+             $("#csv_Scale_Title").hide();
+             $("#csv_Scale_Results").hide();
 
-                $("#kde_Input").hide();
-                $("#csv_Title").hide();
-                $("#csv_Null_Title").hide();
-                $("#csv_Null_Results").hide();
-                $("#csv_Class_Balance_Title").hide();
-                $("#csv_Class_Balance_Results").hide();
-                $("#csv_Scale_Title").hide();
-                $("#csv_Scale_Results").hide();
+             $("#kde_Input_Preopt").hide();
+             $("#csv_Title_Preopt").hide();
+             $("#csv_Null_Title_Preopt").hide();
+             $("#csv_Null_Results_Preopt").hide();
+             $("#csv_Class_Balance_Title_Preopt").hide();
+             $("#csv_Class_Balance_Results_Preopt").hide();
+             $("#csv_Scale_Title_Preopt").hide();
+             $("#csv_Scale_Results_Preopt").hide();
 
-                $("#kde_Input_Preopt").hide();
-                $("#csv_Title_Preopt").hide();
-                $("#csv_Null_Title_Preopt").hide();
-                $("#csv_Null_Results_Preopt").hide();
-                $("#csv_Class_Balance_Title_Preopt").hide();
-                $("#csv_Class_Balance_Results_Preopt").hide();
-                $("#csv_Scale_Title_Preopt").hide();
-                $("#csv_Scale_Results_Preopt").hide();
+             $("input[name$='methodology' ]").click(function () {
+                 var methodology = $(this).val();
+                 var num = 0
+                 var count = 1
 
-                $("input[name$='methodology' ]").click(function () {
-                    var methodology = $(this).val();
-                    var num = 0
-                    var count = 1
+                 if (methodology == "MLA") {
+                     $("div.methodology_desc").hide();
+                     $("#MLA_Options").show();
+                 }
 
-                    if (methodology == "MLA") {
-                        $("div.methodology_desc").hide();
-                        $("#MLA_Options").show();
-                    }
-
-                    if (methodology == "DLANN") {
-                        $("div.methodology_desc").hide();
-                        $("#DLANN_Options").show();
-                        getCompilerOptions("Compile_Selection")
-                        getValidationOptions("Validation_Selection")
-                    }
-                });
-
-            });
+                 if (methodology == "DLANN") {
+                     $("div.methodology_desc").hide();
+                     $("#DLANN_Options").show();
+                 }
+             });
+         });
 
         </script>
-
-        <!--
-        <script type="text/javascript">
-            function changeMethod(methods, Parameters) {
-                document.getElementById("Results").innerHTML = "Hello?"
-            }
-        </script>
-            -->
-        <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Goal and Scope</h1>
-
-        Project Name:
-        <!-- information to display for the name of the project -->
-        <div class="popup" onclick="popupInformation('Experiment_Name_Info')">
-            <img src="../../static/Images/information_icon.png"
-                 width="20"
-                 height="20" />
-            <span class="popuptext" id="Experiment_Name_Info">Project name that will be used for future reference.</span>
-        </div>
-        <input id="projectName" type="text" name="projectName" placeholder="Name of the project">
-        <br>
-
-        Goal and Scope:
-        <!-- information to display for the definition of the project -->
-        <div class="popup" onclick="popupInformation('Experiment_Definition_Info')">
-            <img src="../../static/Images/information_icon.png"
-                 width="20"
-                 height="20" />
-            <span class="popuptext" id="Experiment_Definition_Info">Project definition. <br><br> Will be shown for viewer`s understanding when displaying the results.</span>
-        </div>
-
-        <textarea id="phase1Text" name="phase1Text" rows="3" cols="50" style="width: 100%; max-width: 100%;"></textarea>
-
-        <!-- Dataset section -->
-        <form id="csvForm">
-            <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Data</h1>
-            <div>
-            Data Type:
-            {% if g.Data_Types %}
-            <select id="types" name="Types" onchange="changeDataType(this.id)">
-                {% for choices, names, infos in g.Data_Types%}
-                <option value={{ choices }}>{{ names }}</option>
-                {% endfor %}
-            </select>
-            {% endif %}
-            </div>
-            File:
-            <!-- information to display for the loadable dataset -->
-            <div class="popup" onclick="popupInformation('Experiment_Dataset_Info')">
-                <img src="../../static/Images/information_icon.png"
-                     width="20"
-                     height="20" />
-                <span style="white-space: pre-wrap" class="popuptext" id="Experiment_Dataset_Info">File to load for cycon project. <br><br> Currently accepts CSVs (comma-separated values) only.</span>
-            </div>
-
-            <input type="file" id="csvFile" name="csvFile" accept=".csv" onchange="changeCSV()">
-
-            <div id="class_col_section"></div>
 
 
         <!-- Goal and Scope -->
@@ -252,82 +189,6 @@ x-data="{fileSelected: '', choice: null, files: {{files}}}"
                           class="resize w-64 px-2 py-1 border border-gray-400 rounded-lg bg-white"
                 ></textarea>
             </div>
-
-
-            <button type="submit" value="Download" onclick="changePreoptSubmit('Download')"> Download </button>
-        </form>
-
-
-        <form id="methodologyForm">
-
-            <!-- Methodology section 1 -->
-            {% if g.Methodologies %}
-            <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Method</h1>
-
-            {% for choices, name, infos in g.Methodologies%}
-            <input type="radio" id={{ choices }} name="methodology" value={{ choices }}> <label for={{ choices }}>{{ name }}</label>
-            {% for sentence in infos%}
-            {% if sentence != null and sentence != ""%}
-            <!-- information to display for the selectable methodology section
-            Its a mess and will need to fix later as the onclick will not accept variables...-->
-            {% if "MLA" in choices%}
-            <div class="popup" onclick="popupInformation('MLA_info')">
-                <img src="../../static/Images/information_icon.png"
-                     width="20"
-                     height="20" />
-                <span style="white-space: pre-wrap" class="popuptext" id="MLA_info" }>{{ sentence }}</span>
-            </div>
-            <br>
-            {% endif %}
-            {% if "DLANN" in choices%}
-            <div class="popup" onclick="popupInformation('DLANN_info')">
-                <img src="../../static/Images/information_icon.png"
-                     width="20"
-                     height="20" />
-                <span style="white-space: pre-wrap" class="popuptext" id="DLANN_info" }>{{ sentence }}</span>
-            </div>
-            <br>
-            {% endif %}
-            {% endif %}
-            {% endfor %}
-            {% endfor %}
-            {% endif %}
-        </form>
-
-
-        <form id="MLA_Form">
-            <!-- Section for MLA -->
-            <div id="MLA_Options" class="methodology_desc">
-
-                <!-- Dynamically pull algorithms names and create radio buttons for each choice-->
-                <br>
-                Algorithm:
-                {% if g.Algorithms %}
-                <select id="MLalgorithm" name="MLalgorithm" onchange="changeAlgorithm(this.id, 'Parameters')">
-                    {% for choices, infos in g.Algorithms%}
-                    <option value={{ choices }}>{{ choices }}</option>
-                    {% endfor %}
-                </select>
-                {% endif %}
-
-                <br><br>
-                For more information on MLA algorithms, visit  <a href="https://scikit-learn.org/stable/supervised_learning.html">scikit-learn.org</a>
-
-                <br><br>
-
-                <!-- Hyperparameters section-->
-
-                <div id="Parameters"></div>
-
-                <!-- Validation section-->
-                <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Validation</h1>
-
-                <input type="radio" id=K-Fold name="validation" value=K-Fold> <label for=K-Fold>K-Fold</label>
-                <div class="popup" onclick="popupInformation('K-Fold_Info')">
-                    <img src="../../static/Images/information_icon.png"
-                         width="20"
-                         height="20" />
-                    <span style="white-space: pre-wrap" class="popuptext" id="K-Fold_Info" }>K-Folds cross-validator<br><br>Provides train/test indices to split data in train/test sets. Split dataset into k consecutive folds (without shuffling by default).<br><br>Each fold is then used once as a validation while the k - 1 remaining folds form the training set.<br><br>Input values is the desired number of folds.</span>
 
                 </div>
 
@@ -444,88 +305,246 @@ x-data="{fileSelected: '', choice: null, files: {{files}}}"
                     </form>
                 </div>
 
-                <input type="radio" id="Stratify_True" name="Stratify" value=True> <label for="Stratify_True">True</label>
-                <input type="radio" id="Stratify_False" name="Stratify" value=False checked> <label for="Stratify_False">False</label><br>
-            </div>
-        </form>
 
+                <!-- Preprocess section-->
+                <div class="border-b border-gray-400 p-2">
+                    <h1 class="mb-2 font-bold text-xl">Preprocessing (Optional)</h1>
+                    <form id="preoptForm">
 
-        <div id="DLANN_Options" class="methodology_desc">
-            <form id="DLANN_Form">
+                        <!-- Dynamically pull preoptimization options and create new identifyer when selected. -->
+                        Category:
+                        {% if g.preopt_Categories %}
+                        <select id="preopt_categories"
+                                class="px-2 py-1 mr-2 rounded-md border border-gray-400"
+                                name="preopt_categories" onchange="changePreoptCategory(this.id,'preopts')">
+                            {% for choices, names, infos in g.preopt_Categories%}
+                            <option value={{ choices }}>{{ names }}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                        Optimizer:
+                        {% if g.preopts %}
+                        <select id="preopts"
+                                class="px-2 py-1 mr-2 rounded-md border border-gray-400"
+                                name="preopts">
+                            {% for choices, names, infos in g.preopts%}
+                            <option value={{ choices }}>{{ names }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="button"
+                                id="AddPreopts"
+                                class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                onclick="selectPreopt('preopts', 'Preopt_Selection')">Add</button>
+                        <button type="button"
+                                id="clearPreopts"
+                                class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                onclick="clearAllPreopt()"> Remove All </button>
+                        {% endif %}
 
-                <!-- Dynamically pull methods names and create radio buttons for each choice
-        <input type="radio" id=Method_BNN name="networks" value=network_BNN onclick=> <label for=Network_BNN>Basic Neural Network</label><br>
-        <input type="radio" id=Method_CNN name="networks" value=network_CNN onclick=> <label for=Network_CNN>Convolutional Neural Network</label><br>
+                        <div id="Preopt_Selection"></div>
 
-        <p>Basic Neural Network: (Info will be added later) </p>
-        <p>Convolutional Neural Network: (Info will be added later) </p>-->
-                <!-- Methods section-->
-                <h2>Model Creation</h2><br>
+                        <button type="submit"
+                                class="my-2 px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                value="Check" onclick="changePreoptSubmit('Check')"> Check </button>
 
-                Category:
-                {% if g.NN_layer_Categories %}
-                <select id="layer_categories" name="layer_categories" onchange="changeLayerCategory(this.id,'layers')">
-                    {% for choices, names, infos in g.NN_layer_Categories%}
-                    <option value={{ choices }}>{{ names }}</option>
-                    {% endfor %}
-                </select>
-                {% endif %}
-                Layer:
-                {% if g.layers %}
-                <select id="layers" name="layers">
-                    {% for choices, names, infos in g.layers%}
-                    <option value={{ choices }}>{{ names }}</option>
-                    {% endfor %}
-                </select>
-                <button type="button" id="AddLayer" onclick="selectLayers('layers', 'Layers_Selection')">Add</button>
-                <button type="button" id="clearNN" onclick="clearAllNN()"> Remove All </button>
-                {% endif %}
+                        <p id="csv_Error_Preopt"></p>
+                        <p id="csv_Title_Preopt">CSV values:</p>
+                        <div style="overflow: auto; max-height: 1000px; max-width: 1100px; ">
+                            <p id="csv_Results_Preopt" style="background-color: white;"></p>
+                        </div>
+                        <p id="csv_Null_Title_Preopt">Null instances:</p>
+                        <p id="csv_Null_Results_Preopt" style="background-color: white;"></p>
+                        <p id="csv_Class_Balance_Title_Preopt">Number of Class Instances:</p>
+                        <p id="csv_Class_Balance_Results_Preopt" style="background-color: white;"></p>
+                        <p id="csv_Scale_Title_Preopt">KDE plots for each class:</p>
+                        <div style="overflow: auto; max-height: 600px; max-width: 600px; ">
+                            <p id="csv_Scale_Results_Preopt" style="background-color: white;"></p>
+                        </div>
 
-                <div id="Layers_Selection"></div>
-
-                <button type="submit" name="submit"> Check Model </button>
-
-                <p id="model_Error"></p>
-                <p id="model_Title">Model Summary:</p>
-                <div style="overflow: auto; max-height: 1000px; max-width: 1100px; ">
-                    <p id="model_Results" style="background-color: white;"></p>
+                        <button type="submit"
+                                class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                value="Download" onclick="changePreoptSubmit('Download')"> Download </button>
+                    </form>
                 </div>
 
-            </form>
 
-            <form id="Model_Compile_Form">
-                <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Compiler</h1><br>
-                <div id="Compile_Selection"></div>
-            </form>
+                <!-- MLA -->
+                <div class="border-b border-gray-400 p-2">
+                    <form id="cyconForm" @submit.prevent="getData(files, fileSelected, choice)">
+                        <!-- Copy of information from prior sections -->
+                        <input id="projectName_copy" name="projectName" type="hidden" />
+                        <input id="phase1Text_copy" name="phase1Text" type="hidden" />
+                        <input id="csvFile_copy" name="csvFile" type="hidden" />
 
-            <form id="Model_Validation_Form">
-                <h1 body style="background-color: #F6B700; border: black; border-width: 3px; border-style: solid">Validation</h1>
-                <div id="Validation_Selection"></div>
+                        <!-- Methodology section 1 -->
+                        {% if g.Methodologies %}
+                        <h1 class="mb-2 font-bold text-xl">Method</h1>
 
-                <p><b>Optional Options:</b></p>
-                Callback:
-                {% if g.callbacks %}
-                <select id="callbacks" name="callbacks">
-                    {% for choices, names, infos in g.callbacks%}
-                    <option value={{ choices }}>{{ names }}</option>
-                    {% endfor %}
-                </select>
-                <button type="button" id="AddCallbacks" onclick="selectCallback('callbacks', 'Callback_Selection')">Add</button>
-                <button type="button" id="clearCallbacks" onclick="clearAllCallbacks()"> Remove All </button>
-                {% endif %}
+                        {% for choices, name, infos in g.Methodologies%}
+                        <input type="radio" id={{ choices }} name="methodology" value={{ choices }}> <label for={{ choices }}>{{ name }}</label>
+                        {% for sentence in infos%}
+                        {% if sentence != null and sentence != ""%}
+                        <!-- information to display for the selectable methodology section
+                             Its a mess and will need to fix later as the onclick will not accept variables...-->
+                        {% if "MLA" in choices%}
+                        <div class="popup" onclick="popupInformation('MLA_info')">
+                            <img src="../../static/Images/information_icon.png"
+                                 width="20"
+                                 height="20" />
+                            <span style="white-space: pre-wrap" class="popuptext" id="MLA_info" }>{{ sentence }}</span>
+                        </div>
+                        <br>
+                        {% endif %}
+                        {% if "DLANN" in choices%}
+                        <div class="popup" onclick="popupInformation('DLANN_info')">
+                            <img src="../../static/Images/information_icon.png"
+                                 width="20"
+                                 height="20" />
+                            <span style="white-space: pre-wrap" class="popuptext" id="DLANN_info" }>{{ sentence }}</span>
+                        </div>
+                        <br>
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                        {% endfor %}
+                        {% endif %}
 
-                <div id="Callback_Selection"></div>
-            </form>
-        </div>
+                        <!-- Section for MLA -->
+                        <div id="MLA_Options" class="methodology_desc space-y-2 space-x-2">
 
-        <form id="MLAI_Form">
-            <!-- Copy of information from prior sections -->
-            <input id="projectName_copy" name="projectName" type="hidden" />
-            <input id="phase1Text_copy" name="phase1Text" type="hidden" />
-            <input id="csvFile_copy" name="csvFile" type="hidden" />
+                            <!-- Dynamically pull algorithms names and create radio buttons for each choice-->
+                            <br>
+                            Algorithm:
+                            {% if g.Algorithms %}
+                            <select id="MLalgorithm"
+                                    class="px-2 py-1 mr-2 rounded-md border border-gray-400"
+                                    name="MLalgorithm" onchange="changeAlgorithm(this.id, 'Parameters')">
+                                {% for choices, infos in g.Algorithms%}
+                                <option value={{ choices }}>{{ choices }}</option>
+                                {% endfor %}
+                            </select>
+                            {% endif %}
 
-            <button type="submit" name="submit"> Perform Experiment </button>
-        </form>
+                            <br><br>
+                            For more information on MLA algorithms, visit  <a href="https://scikit-learn.org/stable/supervised_learning.html">scikit-learn.org</a>
+
+                            <br><br>
+
+                            <!-- Hyperparameters section-->
+
+                            <div id="Parameters"></div>
+
+                <div class="border-t border-gray-400 p-2">
+                            <!-- Validation section-->
+                    <h1 class="mb-2 font-bold text-xl">Validation</h1>
+
+                            <input type="radio" id=K-Fold name="validation" value=K-Fold> <label for=K-Fold>K-Fold</label>
+                            <div class="popup" onclick="popupInformation('K-Fold_Info')">
+                                <img src="../../static/Images/information_icon.png"
+                                     width="20"
+                                     height="20" />
+                                <span style="white-space: pre-wrap" class="popuptext" id="K-Fold_Info" }>K-Folds cross-validator<br><br>Provides train/test indices to split data in train/test sets. Split dataset into k consecutive folds (without shuffling by default).<br><br>Each fold is then used once as a validation while the k - 1 remaining folds form the training set.<br><br>Input values is the desired number of folds.</span>
+                            </div>
+                            <input type="text" class="input-text" id="K-Fold_Input" name="K-Fold_Input">
+                            <br>
+
+                            <input type="radio" id=Split name="validation" value=Split> <label for=Split>Split</label>
+                            <div class="popup" onclick="popupInformation('Split_Info')">
+                                <img src="../../static/Images/information_icon.png"
+                                     width="20"
+                                     height="20" />
+                                <span style="white-space: pre-wrap" class="popuptext" id="Split_Info" }>Split arrays or matrices into random train and test subsets.<br><br>Quick utility that wraps input validation, next(ShuffleSplit().split(X, y)), and application to input data into a single call for splitting (and optionally subsampling) data into a one-liner.<br><br>Input value is the percent set for the testing dataset given as a decimal.</span>
+                            </div>
+                            <input type="text" class="input-text" id="Split_Input" name="Split_Input">
+                            <br><br>
+
+                            <p><b>Optional Options:</b></p>
+                            <label for=Random_State>Random State </label>
+                            <div class="popup" onclick="popupInformation('Random_State_Info')">
+                                <img src="../../static/Images/information_icon.png"
+                                     width="20"
+                                     height="20" />
+                                <span style="white-space: pre-wrap" class="popuptext" id="Random_State_Info" }>Whether to shuffle the data before splitting into batches. Note that the samples within each split will not be shuffled.</span>
+                            </div>
+                            <input type="text" class="input-text" id="Random_State_Input" name="Random_State_Input"><br>
+
+                            <label for=Shuffle>Shuffle </label>
+                            <div class="popup" onclick="popupInformation('Random_State_Info')">
+                                <img src="../../static/Images/information_icon.png"
+                                     width="20"
+                                     height="20" />
+                                <span style="white-space: pre-wrap" class="popuptext" id="Random_State_Info" }>When shuffle is True, random_state affects the ordering of the indices, which controls the randomness of each fold. Otherwise, this parameter has no effect. Pass an int for reproducible output across multiple function calls.</span>
+                            </div>
+                            <input type="radio" id="Shuffle_True" name="Shuffle" value=True> <label for="Shuffle_True">True</label>
+                            <input type="radio" id="Shuffle_False" name="Shuffle" value=False checked> <label for="Shuffle_False">False</label><br>
+
+                            <label for=Shuffle>Stratify. </label>
+                            <div class="popup" onclick="popupInformation('Stratify_Info')">
+                                <img src="../../static/Images/information_icon.png"
+                                     width="20"
+                                     height="20" />
+                                <span style="white-space: pre-wrap" class="popuptext" id="Stratify_Info" }>If not None, data is split in a stratified fashion, using this as the class labels.<br><br>When using split validation, set to true will statify on the class column information.<br>When usng k-fold, the method will use stratify k-fold.</span>
+                            </div>
+                            <input type="radio" id="Stratify_True" name="Stratify" value=True> <label for="Stratify_True">True</label>
+                            <input type="radio" id="Stratify_False" name="Stratify" value=False checked> <label for="Stratify_False">False</label><br>
+                        </div>
+
+                        </div>
+                        <!-- Section for DLANN -->
+                        <div id="DLANN_Options" class="methodology_desc">
+                            <!-- Dynamically pull methods names and create radio buttons for each choice
+                                 <input type="radio" id=Method_BNN name="networks" value=network_BNN onclick=> <label for=Network_BNN>Basic Neural Network</label><br>
+                                 <input type="radio" id=Method_CNN name="networks" value=network_CNN onclick=> <label for=Network_CNN>Convolutional Neural Network</label><br>
+
+                                 <p>Basic Neural Network: (Info will be added later) </p>
+                                 <p>Convolutional Neural Network: (Info will be added later) </p>-->
+
+                            <!-- Methods section-->
+                            <h2>Model Creation</h2><br>
+
+                            Category:
+                            {% if g.NN_layer_Categories %}
+                            <select id="layer_categories"
+                                    class="px-2 py-1 mr-2 rounded-md border border-gray-400"
+                                    name="layer_categories" onchange="changeLayerCategory(this.id,'layers')">
+                                {% for choices, names, infos in g.NN_layer_Categories%}
+                                <option value={{ choices }}>{{ names }}</option>
+                                {% endfor %}
+                            </select>
+                            {% endif %}
+                            Layer:
+                            {% if g.layers %}
+                            <select id="layers"
+                                    class="px-2 py-1 mr-2 rounded-md border border-gray-400"
+                                    name="layers">
+                                {% for choices, names, infos in g.layers%}
+                                <option value={{ choices }}>{{ names }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button"
+                                    class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                    id="AddLayer" onclick="selectLayers('layers', 'Layers_Selection')">Add</button>
+                            <button type="button"
+                                    class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                    id="clearNN" onclick="clearAllNN()"> Remove All </button>
+                            {% endif %}
+
+                            <div id="Layers_Selection"></div>
+
+                            <button type="submit"
+                                    class="my-2 px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                    value="Check" onclick="changePreoptSubmit('Check')"> Check </button>
+
+                            <p id="csv_Error_Preopt"></p>
+
+                        </div>
+
+                        <button type="submit"
+                                class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                name="submit"> Perform Experiment </button>
+
+                    </form>
+                </div>
 
                 <!-- Metrics section-->
                 <div class="border-b border-gray-400 p-2">
