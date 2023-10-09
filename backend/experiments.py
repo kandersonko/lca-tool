@@ -1,11 +1,19 @@
 import os
 import sys
+import csv
+from pathlib import Path
 import json
 from flask import Blueprint
 from flask import Flask, request, render_template, g, redirect, url_for, flash
+from flask import session
+from mysql.connector import Error
+from flask import current_app
 from flask import jsonify
 import logging
 from pathlib import Path
+
+from sympy.printing.latex import latex
+import sympy
 
 import pandas as pd
 import numpy as np
@@ -25,6 +33,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from werkzeug.utils import secure_filename
 
 from backend.calculator import Calculator
+
+from backend.db import DBManager
 
 # sys.path.append("backend")
 # sys.path.append("Classes")
@@ -166,41 +176,176 @@ def load_possible_experiments():
     g.callback_Info =  callback_Definition
     g.callbacks = zip(g.callback_Names, g.callback_Display_Names, g.callback_Info)
 
-# Old LCA for testing purposes, REMOVE BEFORE SUBMITTING.
-@bp.route("/LCA_Old")
-def LCA_Old():
-    return render_template("experiments/LCA_Old.html")
 
-# REMOVE ASAP
+
 @bp.route("/new_experiment")
 def new_experiment():
     return render_template("experiments/new_experiment.html")
 
+
 @bp.route("/lca", methods=["GET"])
 def lca():
-    return render_template("experiments/lca.html")
+    user_id = session.get("user_id")
+    logging.debug("=== Uploading files: %s", user_id)
+
+    if user_id is None:
+        g.user = None
+        flash("You need to login to upload your datasets!")
+        return redirect(url_for("auth.login"))
+    else:
+        try:
+            manager = DBManager.instance(
+                password_file=current_app.config["DB_PASSWORD"]
+            )
+            plan = manager.get_plan_by_user_id(user_id)
+        except Error as e:
+            logging.debug(f"=== Failed to get user plan: {e} ===")
+            return redirect(url_for("auth.plans"))
+
+        logging.debug("=== Upload plan: %s", plan)
+        if plan is None:
+            flash("You have not subscribed to a plan!")
+            return redirect(url_for("auth.plans"))
+        else:
+            # if plan.get('tier') == 'free':
+            # TODO check file size
+            user_storage = plan.get("storage_url")
+            base_folder = os.getcwd()
+            upload_path = Path(base_folder+'/data/') / user_storage
+            filenames = os.listdir(upload_path)
+            files = []
+            for filename in filenames:
+                file_path = upload_path / filename
+                with open(file_path) as file:
+                    data = csv.reader(file)
+                    content = [row for row in data]
+                    files.append(dict(filename=filename, content=content))
+
+            return render_template("experiments/lca.html", files=files)
 
 @bp.route("/cycon")
 def cycon():
-    return render_template("experiments/cycon.html")
+    user_id = session.get("user_id")
+
+    if user_id is None:
+        g.user = None
+        return redirect(url_for("auth.login"))
+    else:
+        try:
+            manager = DBManager.instance(
+                password_file=current_app.config["DB_PASSWORD"]
+            )
+            plan = manager.get_plan_by_user_id(user_id)
+        except Error:
+            return redirect(url_for("auth.plans"))
+
+        if plan is None:
+            flash("You have not subscribed to a plan!")
+            return redirect(url_for("auth.plans"))
+        else:
+            user_storage = plan.get("storage_url")
+            base_folder = os.getcwd()
+            upload_path = Path(base_folder+'/data/') / user_storage
+            filenames = os.listdir(upload_path)
+            files = []
+            for filename in filenames:
+                file_path = upload_path / filename
+                with open(file_path) as file:
+                    data = csv.reader(file)
+                    content = [row for row in data]
+                    files.append(dict(filename=filename, content=content))
+
+            return render_template("experiments/cycon.html", files=files)
+
+    return render_template("experiments/cycon.html", files=[])
 
 
 @bp.route("/calculate", methods=["POST"])
 def calculate():
     processes_input = request.form.get("processes")
+
+    choice = request.form.get("choice")
+    user_data = dict()
+    user_id = session.get("user_id")
+
+    if user_id is None:
+        g.user = None
+        flash("You need to login to upload your datasets!")
+        return redirect(url_for("auth.login"))
+    else:
+        try:
+            manager = DBManager.instance(
+                password_file=current_app.config["DB_PASSWORD"]
+            )
+            plan = manager.get_plan_by_user_id(user_id)
+        except Error as e:
+            logging.debug(f"=== Failed to get user plan: {e} ===")
+        if plan is None:
+            flash('You have not yet created a plan.j')
+            return redirect(url_for("auth.plans"))
+        else:
+            user_storage = plan.get("storage_url")
+            files_path = Path('data/') / user_storage
+            files = [(f.name, f.absolute())
+                        for f in list(files_path.glob("*"))]
+            for (key, value) in files:
+                logger.debug("=== file data: %s %s", key, value)
+                user_data[key], error = read_data(value)
+                if error:
+                    return jsonify(error=error)
+
+    # else:
+    if not processes_input:
+        return flash("Invalid arguments!")
     processes = json.loads(processes_input)
-    logger.debug("=== Equations: %s %s", processes, processes_input)
-    calculator = Calculator()
+    # for key, value in request.files.items():
+    #     logger.debug("=== file data: %s %s", key, value)
+    #     data[key], error = read_data(value)
+    #     if error:
+    #         return jsonify(error=error)
+    logger.debug("=== Equations: %s %s", processes)
+
 
     results = []
     for process in processes:
         filename = process.get("filename")
-        csv_file = request.files.get(filename)
+
+        kind = process.get("kind")
+        data = None
+        if not filename:
+            error = f"Missing filename for process {num_process}"
+            return jsonify(error=error)
+        if kind == "csv":
+            data = user_data.get(filename)
+        else:
+            file = request.files.get(filename)
+            data, error = read_data(file)
+            if error:
+                return jsonify(error=error)
+        process_data = data
+
+        logger.debug("=== Process data: %s", data)
+        if process_data is None:
+            error = f"Missing csv file '{filename}' for process {num_process}"
+            return jsonify(error=error)
+
         equation = process.get("equation")
         name = process.get("name")
-        logger.debug("=== Process (file): %s %s %s", filename, csv_file, request.form)
-        evaluated, result = calculator.evaluate(equation=equation, csv_file=csv_file)
-        output = dict(result=result, name=name)
+
+        logger.debug("=== Process %s: %s %s",
+                     num_process, filename, process_data)
+        calculator = Calculator()
+        evaluated, result, formula = calculator.evaluate(
+            equation=equation, data=process_data)
+        logger.debug("=== Process %s Results: %s, %s %s",
+                     num_process, evaluated, result, formula)
+        if not evaluated:
+            error = f"Error in the formula for process {num_process}\n{result}"
+            return jsonify(error=error)
+
+        sympy.init_printing(use_latex='mathjax')
+        formula = latex(equation, mode="plain")
+        output = dict(result=result, name=name, equation=formula)
         results.append(output)
 
         if not evaluated:
