@@ -150,7 +150,7 @@ def perform_Preopt(data, i, df):
 
     ## SimpleImputer
     if method == "SimpleImputer":
-        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
+        settings = HyperParameters.getSettings(data, Parameters, i)
 
         pp = SimpleImputer(missing_values=settings["Parameter_0"],
                             strategy=settings["Parameter_1"],
@@ -180,7 +180,7 @@ def perform_Preopt(data, i, df):
     '''
     ## IterativeImputer
     if method == "IterativeImputer":
-        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
+        settings = HyperParameters.getSettings(data, Parameters, i)
 
         pp = IterativeImputer(missing_values=settings["Parameter_0"],
                               sample_posterior=settings["Parameter_1"],
@@ -219,7 +219,7 @@ def perform_Preopt(data, i, df):
 
     ## KNNImputer
     if method == "KNNImputer":
-        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
+        settings = HyperParameters.getSettings(data, Parameters, i)
 
         pp = KNNImputer(missing_values=settings["Parameter_0"],
                         n_neighbors=settings["Parameter_1"],
