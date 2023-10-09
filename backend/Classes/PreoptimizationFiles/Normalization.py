@@ -51,7 +51,7 @@ def perform_Preopt(data, i, df):
     ## normalizer
     if method == "Normalize":
         
-        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
+        settings = HyperParameters.getSettings(data, Parameters, i)
 
         new_df.loc[:, new_df.columns != data["class_col"]] = preprocessing.normalize(X=new_df.loc[:, new_df.columns != data["class_col"]],
                                         norm=settings["Parameter_0"],

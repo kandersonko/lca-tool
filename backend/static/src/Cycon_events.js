@@ -1,11 +1,6 @@
 var preoptCounter = 0;
 var layerCounter = 0;
-var callbackCounter = 0;
 var columnTitles = [];
-
-// Indicatiors is callback is already chosen to be used.
-var Using_EarlyStopping = false;
-var Using_ReduceLROnPlateau = false;
 
 $(document).ready(function () {
     // Method that reads and processes the selected file
@@ -110,49 +105,6 @@ function changePreoptCategory(category, ID_Preopts) {
 
                     newOption.appendChild(optionText);
                     newOption.setAttribute('value', Preopt_Name);
-
-                    select.appendChild(newOption);
-                }
-            }
-        }
-    });
-}
-
-function changeLayerCategory(category, ID_Layers) {
-    var category_selection = document.getElementById(category)
-    var category_name = category_selection.value
-
-    dict_values = { Category: category_name };
-
-    const sent_data = JSON.stringify(dict_values)
-
-    $.ajax({
-        url: "/experiments/getCategoryLayers",
-        type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(sent_data),
-        async: false,
-        dataType: 'json',
-        success: function (data) {
-            select = document.getElementById(ID_Layers);
-            select.options.length = 0;
-            // Remove existing options in the selection
-            var len = select.length;
-            for (var i = 0; i < len; i++) {
-                select.remove(0);
-            }
-
-            // For each preoptimization in the category, create a selection possibility.
-            for (var Layer in data) {
-                var Layer_Name = data[Layer]["Name"];
-                var Layer_Display_Name = data[Layer]["Display_Name"];
-
-                if (data.hasOwnProperty(Layer)) {
-                    newOption = document.createElement('option');
-                    optionText = document.createTextNode(Layer_Display_Name);
-
-                    newOption.appendChild(optionText);
-                    newOption.setAttribute('value', Layer_Name);
 
                     select.appendChild(newOption);
                 }
@@ -268,8 +220,11 @@ function getData(files, fileSelected, choice) {
     formData.append("class_col", class_column);
 
     formData.append("preoptCounter", preoptCounter)
-    formData.append("layerCounter", layerCounter)
-    formData.append("callbackCounter", callbackCounter)
+
+    var checkbox = $("#cyconForm").find("input[type=checkbox]");
+    $.each(checkbox, function (key, val) {
+        formData.append($(val).attr('name') + "_checked", $(this).is(':checked'));
+    });
 
     // iterate through entries...
     for (var pair of formData.entries()) {
@@ -278,73 +233,12 @@ function getData(files, fileSelected, choice) {
         dict_data[pair[0]] = pair[1]
     }
 
-    // Preoptimization form
     const preoptform = document.getElementById("preoptForm");
 
     var preoptForm = new FormData(preoptform);
 
     // iterate through entries...
     for (var pair of preoptForm.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-        document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
-        dict_data[pair[0]] = pair[1]
-    }
-
-    // Methodology form
-    const methodform = document.getElementById("methodologyForm");
-
-    var methodForm = new FormData(methodform);
-
-    // iterate through entries...
-    for (var pair of methodForm.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-        document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
-        dict_data[pair[0]] = pair[1]
-    }
-
-    // MLA form
-    const mla_form = document.getElementById("MLA_Form");
-
-    var mla_Form = new FormData(mla_form);
-
-    // iterate through entries...
-    for (var pair of mla_Form.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-        document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
-        dict_data[pair[0]] = pair[1]
-    }
-
-    // DLANN form
-    const dlann_form = document.getElementById("DLANN_Form");
-
-    var dlann_Form = new FormData(dlann_form);
-
-    // iterate through entries...
-    for (var pair of dlann_Form.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-        document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
-        dict_data[pair[0]] = pair[1]
-    }
-
-    // Model Compile Form
-    const model_compile_form = document.getElementById("Model_Compile_Form");
-
-    var model_compile_Form = new FormData(model_compile_form);
-
-    // iterate through entries...
-    for (var pair of model_compile_Form.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-        document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
-        dict_data[pair[0]] = pair[1]
-    }
-
-    // Model Validation Form
-    const model_val_form = document.getElementById("Model_Validation_Form");
-
-    var model_val_Form = new FormData(model_val_form);
-
-    // iterate through entries...
-    for (var pair of model_val_Form.entries()) {
         console.log(pair[0] + ": " + pair[1]);
         document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
         dict_data[pair[0]] = pair[1]
@@ -413,183 +307,107 @@ function getData(files, fileSelected, choice) {
                 // Phase 2
                 // Name of Dataset
                 writeData.paragraph += "Dataset Information".bold().italics().big() + "<br\>"
-                writeData.paragraph += "Dataset File: ".bold().italics() + "<br\>" + csvFileName + "<br\><br\>"
+                writeData.paragraph += "Dataset File: ".bold().italics() + "<br\>" + dict_data["csvFileName"] + "<br\><br\>"
                 // Preoptimization
                 writeData.paragraph += "Preoptimization: ".bold().italics() + "<br\>"
                 for (let i = 0; i < preoptCounter; i++) {
-                    writeData.paragraph += dict_data["Preopt_" + i] + "<br\>"
+                    writeData.paragraph += dict_data["Preopt_" + i].bold() + "<br\>"
                 }
                 writeData.paragraph += "<br\>"
                 // Phase 3
                 // Name of Methology
                 writeData.paragraph += "Methodology Information".bold().italics().big() + "<br\>"
                 writeData.paragraph += "Name of Methodology: ".bold().italics() + "<br\>" + dict_data["methodology"] + "<br\><br\>"
+                // Name of Method
+                writeData.paragraph += "Method: ".bold().italics() + "<br\>" + dict_data["MLalgorithm"] + "<br\><br\>"
+                // Algorithm parameters
+                writeData.paragraph += "Method Parameters".bold().italics() + "<br\>"
+                for (let i = 0; i < Results["Parameter_Length"]; i++) {
+                    writeData.paragraph += Results["Parameter_" + i + "_Name"].bold() + ": ".bold() + Results["Parameter_" + i] + "<br\>"
+                }
 
-                // Information to provide for MLA
-                if (dict_data["methodology"] == "MLA") {
+                writeData.paragraph += "<br\>"
 
-                    // Name of Method
-                    writeData.paragraph += "Method: ".bold().italics() + "<br\>" + dict_data["MLalgorithm"] + "<br\><br\>"
-                    // Algorithm parameters
-                    writeData.paragraph += "Method Parameters".bold().italics() + "<br\>"
-                    for (let i = 0; i < Results["Parameter_Length"]; i++) {
-                        writeData.paragraph += Results["Parameter_" + i + "_Name"].bold() + ": ".bold() + Results["Parameter_" + i] + "<br\>"
-                    }
+                // Validation
+                writeData.paragraph += "Validation".bold().italics() + "<br\>"
+                writeData.paragraph += "Method: ".bold() + dict_data["validation"] + "<br\>"
+                writeData.paragraph += "Random State: ".bold() + Results["Val_Random_State"] + "<br\>"
+                writeData.paragraph += "Shuffle: ".bold() + Results["Val_Shuffle"] + "<br\>"
 
-                    writeData.paragraph += "<br\>"
-
-                    // Validation
-                    writeData.paragraph += "Validation".bold().italics() + "<br\>"
-                    writeData.paragraph += "Method: ".bold() + dict_data["validation"] + "<br\>"
-                    writeData.paragraph += "Random State: ".bold() + Results["Val_Random_State"] + "<br\>"
-                    writeData.paragraph += "Shuffle: ".bold() + Results["Val_Shuffle"] + "<br\>"
-
-                    writeData.paragraph += "<br\>"
+                writeData.paragraph += "<br\>"
 
 
-                    if (Results['Validation'] == "Split") {
-                        // obtain the Metrics
-                        Accuracy = Results["Accuracy"]
-                        F1 = Results["F1"]
-                        F1_micro = Results["F1_micro"]
-                        F1_macro = Results["F1_macro"]
-                        Precision = Results["Precision"]
-                        Precision_micro = Results["Precision_micro"]
-                        Precision_macro = Results["Precision_macro"]
-                        Conf_Matrix = Results["cm_overall"]
+                if (Results['Validation'] == "Split") {
+                    // obtain the Metrics
+                    Accuracy = Results["Accuracy"]
+                    F1 = Results["F1"]
+                    F1_micro = Results["F1_micro"]
+                    F1_macro = Results["F1_macro"]
+                    Precision = Results["Precision"]
+                    Precision_micro = Results["Precision_micro"]
+                    Precision_macro = Results["Precision_macro"]
+                    Conf_Matrix = Results["cm_overall"]
 
 
-                        // display the metrics
-                        var img = new Image();
+                    // display the metrics
+                    var img = new Image();
 
-                        img.src = "data:image/png;base64," + Results["cm_overall"];
-
-
-                        writeData.paragraph += '=========================Results=========================<br\>'
-                        writeData.paragraph += Results["Accuracy_Intro"].bold() + Results["Accuracy"] + '<br\>'
-                        writeData.paragraph += Results["Precision_Intro"].bold() + Results["Precision"] + "<br\>"
-                        writeData.paragraph += Results["Precision_micro_Intro"].bold() + Results["Precision_micro"] + "<br\>"
-                        writeData.paragraph += Results["Precision_macro_Intro"].bold() + Results["Precision_macro"] + "<br\>"
-                        writeData.paragraph += Results["F1_Intro"].bold() + Results["F1"] + "<br\>"
-                        writeData.paragraph += Results["F1_micro_Intro"].bold() + Results["F1_micro"] + "<br\>"
-                        writeData.paragraph += Results["F1_macro_Intro"].bold() + Results["F1_macro"] + "<br\>"
-                        writeData.paragraph += `${img.outerHTML}` + "<br\>"
-
-                        //$('#Results').html(data.paragraph);
-                        document.getElementById("Results").innerHTML = writeData.paragraph;
-                    }
-
-                    else if (Results['Validation'] == "K-Fold") {
+                    img.src = "data:image/png;base64," + Results["cm_overall"];
 
 
-                        for (let i = 0; i < Results["acc_list"].length; i++) {
-                            writeData.paragraph += '=========================Results for Fold ' + i + '=========================<br\>'
-                            writeData.paragraph += Results["Accuracy_Intro"].bold() + Results["acc_list"][i] + '<br\>'
-                            writeData.paragraph += Results["Precision_Intro"].bold() + Results["prec_list"][i] + '<br\>'
-                            writeData.paragraph += Results["Precision_micro_Intro"].bold() + Results["prec_micro_list"][i] + '<br\>'
-                            writeData.paragraph += Results["Precision_macro_Intro"].bold() + Results["prec_macro_list"][i] + '<br\>'
-                            writeData.paragraph += Results["F1_Intro"].bold() + Results["f1_list"][i] + '<br\>'
-                            writeData.paragraph += Results["F1_micro_Intro"].bold() + Results["f1_micro_list"][i] + '<br\>'
-                            writeData.paragraph += Results["F1_macro_Intro"].bold() + Results["f1_macro_list"][i] + '<br\>'
+                    writeData.paragraph += '=========================Results=========================<br\>'
+                    writeData.paragraph += Results["Accuracy_Intro"].bold() + Results["Accuracy"] + '<br\>'
+                    writeData.paragraph += Results["Precision_Intro"].bold() + Results["Precision"] + "<br\>"
+                    writeData.paragraph += Results["Precision_micro_Intro"].bold() + Results["Precision_micro"] + "<br\>"
+                    writeData.paragraph += Results["Precision_macro_Intro"].bold() + Results["Precision_macro"] + "<br\>"
+                    writeData.paragraph += Results["F1_Intro"].bold() + Results["F1"] + "<br\>"
+                    writeData.paragraph += Results["F1_micro_Intro"].bold() + Results["F1_micro"] + "<br\>"
+                    writeData.paragraph += Results["F1_macro_Intro"].bold() + Results["F1_macro"] + "<br\>"
+                    writeData.paragraph += `${img.outerHTML}`
 
-                            var img = new Image();
-                            img.src = 'data:image/jpeg;base64,' + Results["cm_list"][i];
 
-                            writeData.paragraph += `${img.outerHTML} <br\>`
+                    //$('#Results').html(data.paragraph);
+                    document.getElementById("Results").innerHTML = writeData.paragraph;
+                }
 
-                        }
+                else if (Results['Validation'] == "K-Fold") {
 
-                        writeData.paragraph += '<br\>'
-                        writeData.paragraph += '=========================Results Overall=========================<br\>'
-                        writeData.paragraph += Results["Accuracy_Intro_Overall"].bold() + Results["acc_average"] + '<br\>'
-                        writeData.paragraph += Results["Precision_Intro_Overall"].bold() + Results["prec_average"] + '<br\>'
-                        writeData.paragraph += Results["Precision_micro_Intro_Overall"].bold() + Results["prec_micro_average"] + '<br\>'
-                        writeData.paragraph += Results["Precision_macro_Intro_Overall"].bold() + Results["prec_macro_average"] + '<br\>'
-                        writeData.paragraph += Results["F1_Intro_Overall"].bold() + Results["f1_average"] + '<br\>'
-                        writeData.paragraph += Results["F1_micro_Intro_Overall"].bold() + Results["f1_micro_average"] + '<br\>'
-                        writeData.paragraph += Results["F1_macro_Intro_Overall"].bold() + Results["f1_macro_average"] + '<br\>'
+
+                    for (let i = 0; i < Results["acc_list"].length; i++) {
+                        writeData.paragraph += '=========================Results for Fold ' + i + '=========================<br\>'
+                        writeData.paragraph += Results["Accuracy_Intro"].bold() + Results["acc_list"][i] + '<br\>'
+                        writeData.paragraph += Results["Precision_Intro"].bold() + Results["prec_list"][i] + '<br\>'
+                        writeData.paragraph += Results["Precision_micro_Intro"].bold() + Results["prec_micro_list"][i] + '<br\>'
+                        writeData.paragraph += Results["Precision_macro_Intro"].bold() + Results["prec_macro_list"][i] + '<br\>'
+                        writeData.paragraph += Results["F1_Intro"].bold() + Results["f1_list"][i] + '<br\>'
+                        writeData.paragraph += Results["F1_micro_Intro"].bold() + Results["f1_micro_list"][i] + '<br\>'
+                        writeData.paragraph += Results["F1_macro_Intro"].bold() + Results["f1_macro_list"][i] + '<br\>'
 
                         var img = new Image();
-                        img.src = 'data:image/jpeg;base64,' + Results['cm_overall'];
+                        img.src = 'data:image/jpeg;base64,' + Results["cm_list"][i];
 
                         writeData.paragraph += `${img.outerHTML} <br\>`
 
-                        document.getElementById("Results").innerHTML = writeData.paragraph;
-                    }
-                }
-
-                // Information to provide for DLANN"
-                if (dict_data["methodology"] == "DLANN") {
-                    // Neural Network information
-                    writeData.paragraph += "Neural Network: ".bold().italics() + "<br\>"
-                    for (let i = 0; i < layerCounter; i++) {
-                        writeData.paragraph += dict_data["Layer_" + i] + "<br\>"
-                    }
-                    writeData.paragraph += "<br\>"
-
-                    // Validation
-                    writeData.paragraph += "Validation:".bold().italics() + "<br\>"
-                    writeData.paragraph += "Test Split: ".bold() + dict_data["Validation_test_split_Input"] + "<br\>"
-                    writeData.paragraph += "Validation Split: ".bold() + dict_data["Validation_validation_split_Input"] + "<br\>"
-                    writeData.paragraph += "Random State: ".bold() + dict_data["Validation_random_state_Input"] + "<br\>"
-                    writeData.paragraph += "Shuffle Before Split: ".bold() + dict_data["Validation_shuffle_before_split_Input"] + "<br\>"
-                    writeData.paragraph += "Shuffle Before Epoch: ".bold() + dict_data["Validation_shuffle_before_epoch_Input"] + "<br\>"
-                    writeData.paragraph += "Batch Size: ".bold() + dict_data["Validation_batch_size_Input"] + "<br\>"
-                    writeData.paragraph += "Verbose: ".bold() + dict_data["Validation_verbose_Input"] + "<br\>"
-
-
-                    writeData.paragraph += "<br\>"
-                    writeData.paragraph += "Callbacks: ".bold().italics() + "<br\>"
-                    for (let i = 0; i < callbackCounter; i++) {
-                        writeData.paragraph += dict_data["Callback_" + i] + "<br\>"
                     }
 
-                    writeData.paragraph += "<br\>"
+                    writeData.paragraph += '<br\>'
+                    writeData.paragraph += '=========================Results Overall=========================<br\>'
+                    writeData.paragraph += Results["Accuracy_Intro_Overall"].bold() + Results["acc_average"] + '<br\>'
+                    writeData.paragraph += Results["Precision_Intro_Overall"].bold() + Results["prec_average"] + '<br\>'
+                    writeData.paragraph += Results["Precision_micro_Intro_Overall"].bold() + Results["prec_micro_average"] + '<br\>'
+                    writeData.paragraph += Results["Precision_macro_Intro_Overall"].bold() + Results["prec_macro_average"] + '<br\>'
+                    writeData.paragraph += Results["F1_Intro_Overall"].bold() + Results["f1_average"] + '<br\>'
+                    writeData.paragraph += Results["F1_micro_Intro_Overall"].bold() + Results["f1_micro_average"] + '<br\>'
+                    writeData.paragraph += Results["F1_macro_Intro_Overall"].bold() + Results["f1_macro_average"] + '<br\>'
 
+                    var img = new Image();
+                    img.src = 'data:image/jpeg;base64,' + Results['cm_overall'];
 
-                    if (Results['Validation'] == "Split") {
-                        // obtain the Metrics
-                        Accuracy = Results["Accuracy"]
-                        F1 = Results["F1"]
-                        F1_micro = Results["F1_micro"]
-                        F1_macro = Results["F1_macro"]
-                        Precision = Results["Precision"]
-                        Precision_micro = Results["Precision_micro"]
-                        Precision_macro = Results["Precision_macro"]
-                        Conf_Matrix = Results["cm_overall"]
+                    writeData.paragraph += `${img.outerHTML} <br\>`
 
-
-                        // display the metrics
-                        var img = new Image();
-
-                        img.src = "data:image/png;base64," + Results["cm_overall"];
-
-
-                        writeData.paragraph += '=========================Results=========================<br\>'
-                        writeData.paragraph += Results["Accuracy_Intro"].bold() + Results["Accuracy"] + '<br\>'
-                        writeData.paragraph += Results["Precision_Intro"].bold() + Results["Precision"] + "<br\>"
-                        writeData.paragraph += Results["Precision_micro_Intro"].bold() + Results["Precision_micro"] + "<br\>"
-                        writeData.paragraph += Results["Precision_macro_Intro"].bold() + Results["Precision_macro"] + "<br\>"
-                        writeData.paragraph += Results["F1_Intro"].bold() + Results["F1"] + "<br\>"
-                        writeData.paragraph += Results["F1_micro_Intro"].bold() + Results["F1_micro"] + "<br\>"
-                        writeData.paragraph += Results["F1_macro_Intro"].bold() + Results["F1_macro"] + "<br\>"
-                        writeData.paragraph += `${img.outerHTML}` + "<br\>"
-
-                        var img_1 = new Image();
-                        img_1.src = "data:image/png;base64," + Results["acc_history"];
-                        writeData.paragraph += `${img_1.outerHTML}` + "<br\>"
-
-                        var img_2 = new Image();
-                        img_2.src = "data:image/png;base64," + Results["loss_history"];
-                        writeData.paragraph += `${img_2.outerHTML}` + "<br\>"
-
-
-                        //$('#Results').html(data.paragraph);
-                        document.getElementById("Results").innerHTML = writeData.paragraph;
-                    }
+                    document.getElementById("Results").innerHTML = writeData.paragraph;
                 }
             }
-
             else {
                 var writeData = {
                     paragraph: ''
@@ -605,12 +423,10 @@ function getData(files, fileSelected, choice) {
     });
 }
 
-
-document.getElementById("MLAI_Form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    getData(e.target);
-});
-
+// document.getElementById("cyconForm").addEventListener("submit", function (e) {
+//     e.preventDefault();
+//     getData(e.target);
+// });
 
 
 
@@ -696,6 +512,7 @@ function displayResults(form) {
 
                 img.src = "data:image/png;base64," + Results["cm_overall"];
 
+
                 // Quick way to do this, this will be changed when Metrics class is created...
                 //  Then a loop will go through all metrics, check if each check mark is selected.
                 //      Then implement a given sentence and value...
@@ -731,21 +548,7 @@ function displayResults(form) {
                 }
 
                 if (dict_data['Met_CM_checked'] == "true") {
-                    writeData.paragraph += `${img.outerHTML}` + "<br\>"
-                }
-
-                if (dict_data["methodology"] == "DLANN") {
-                    var img = new Image();
-
-                    img.src = "data:image/png;base64," + Results["acc_history"];
-
-                    writeData.paragraph += `${img.outerHTML}` + "<br\>"
-
-                    var img = new Image();
-
-                    img.src = "data:image/png;base64," + Results["loss_history"];
-
-                    writeData.paragraph += `${img.outerHTML}` + "<br\>"
+                    writeData.paragraph += `${img.outerHTML}`
                 }
 
                 //$('#Results').html(data.paragraph);
@@ -1280,6 +1083,10 @@ function selectPreopt(Preopt, ID_Preopt) {
 
         const sent_data = JSON.stringify(dict_values)
 
+        // document.getElementById(ID_Preopt).innerHTML = sent_data;
+
+        // document.getElementById(ID_Preopt).innerHTML = "Test 1";
+
         // Get the parameters for the selected Preopt option.
         $.ajax({
             url: "/experiments/getPreoptParameters",
@@ -1361,273 +1168,6 @@ function selectPreopt(Preopt, ID_Preopt) {
 
         preoptCounter = preoptCounter + 1;
     }
-}
-
-// Addes the selected preoptimization to the form. 
-function selectCallback(Callback, ID_Callback) {
-    var Callback_selection = document.getElementById(Callback)
-    var Callback_name = Callback_selection.options[Callback_selection.selectedIndex].text
-    var Callback_value = Callback_selection.value
-
-    var addCallback = false;
-
-    document.getElementById("Results").innerHTML = Callback_value
-
-    // Check if the callback has already been added, if not add it, if so do nothing.
-    if (Callback_value == "EarlyStopping") {
-        if (!Using_EarlyStopping) {
-            addCallback = true;
-        }
-    }
-    if (Callback_value == "ReduceLROnPlateau") {
-        if (!Using_ReduceLROnPlateau) {
-            addCallback = true;
-        }
-    }
-
-    // Continue to obtain the callback information.
-    if (addCallback) {
-
-        //document.getElementById("Results").innerHTML = method_name
-
-        dict_values = { Callback: Callback_value };
-
-        const sent_data = JSON.stringify(dict_values)
-
-        // Get the parameters for the selected Preopt option.
-        $.ajax({
-            url: "/experiments/getCallbackParameters",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(sent_data),
-            async: false,
-            dataType: 'json',
-            success: function (data) {
-                // Create the html section to place in the cycon page.
-                var html_section = document.getElementById(ID_Callback);
-
-                // create the field box for the new preopt option.
-                var field = document.createElement('fieldset');
-                // create title for the field.
-                var legend = document.createElement('legend');
-                legend_text = document.createTextNode(Callback_name);
-                legend.appendChild(legend_text);
-                field.appendChild(legend);
-
-                // Create a hidden value that will contain the selected parameter name.
-                var textbox = document.createElement("input");
-                textbox.type = "text";
-                textbox.name = "Callback_" + callbackCounter;
-                textbox.value = Callback_value;
-                textbox.style.display = "none";
-
-                field.appendChild(textbox);
-
-                // Create option to edit the parameter for the preoptimization option.
-                for (var Parameter in data) {
-
-                    var Parameter_Name = data[Parameter]["Name"];
-
-                    if (data.hasOwnProperty(Parameter)) {
-                        // Create a label, which will be the parameter Name followed by the default value.
-                        var name_label = Parameter_Name + " (Default: " + data[Parameter]["Default_value"] + ") ";
-                        var label = document.createElement('label');
-                        label.htmlFor = name_label;
-                        label.appendChild(document.createTextNode(name_label));
-                        let id_info = data[Parameter]["Name"] + "_Info";
-
-                        field.appendChild(label);
-
-                        // Create popup information.
-                        let newDiv = document.createElement("div");
-                        newDiv.className = "popup";
-                        newDiv.onclick = function () { popupInformation(id_info); };
-
-                        let newImage = document.createElement("img");
-                        newImage.src = "../../static/Images/information_icon.png";
-                        newImage.width = "20";
-                        newImage.height = "20";
-
-                        newDiv.appendChild(newImage);
-
-                        let newSpan = document.createElement("span");
-                        newSpan.style = "white-space: pre-wrap";
-                        newSpan.className = "popuptext";
-                        newSpan.id = id_info;
-                        newSpan.textContent = data[Parameter]["Definition"];
-
-                        newDiv.appendChild(newSpan);
-
-                        field.appendChild(newDiv);
-
-                        // Create choices and options to edit the parameter
-
-                        fillSection(field, data, Parameter, "Callback", callbackCounter)
-                    }
-                }
-                // TO DO LATER: Add button to remove the individual preoptimization parameter.
-
-                // add field to div section
-                html_section.appendChild(field)
-
-                // Change the indication that the callback is in use.
-                if (Callback_value == "EarlyStopping") {
-                    if (!Using_EarlyStopping) {
-                        Using_EarlyStopping = true;
-                    }
-                }
-                if (Callback_value == "ReduceLROnPlateau") {
-                    if (!Using_ReduceLROnPlateau) {
-                        Using_ReduceLROnPlateau = true;
-                    }
-                }
-            }
-        });
-
-        callbackCounter = callbackCounter + 1;
-    }
-}
-
-function getCompilerOptions(ID_Compiler) {
-    document.getElementById(ID_Compiler).innerHTML = "";
-
-    $.ajax({
-        url: "/experiments/getCompilerOptions",
-        type: "POST",
-        contentType: "application/json",
-        async: false,
-        dataType: 'json',
-        success: function (data) {
-            // Create the html section to place in the cycon page.
-            var html_section = document.getElementById(ID_Compiler);
-
-            // create the field box for the new layer option.
-            var field = document.createElement('fieldset');
-            // create title for the field.
-            var legend = document.createElement('legend');
-            legend_text = document.createTextNode("Compiler");
-            legend.appendChild(legend_text);
-            field.appendChild(legend);
-
-            // Create option to edit the parameter for the NN layer option.
-            for (var Parameter in data["Parameters"]) {
-                //document.getElementById("Results").innerHTML += "<br><br>"
-                //document.getElementById("Results").innerHTML += data["Parameters"][Parameter]["Name"]
-                //document.getElementById("Results").innerHTML += data["Parameters"][Parameter]["Default_value"]
-                //document.getElementById("Results").innerHTML += data["Parameters"][Parameter]["Definition"]
-
-
-                //var Parameter_Name = data["Parameters"][Parameter]["Name"];
-
-                if (data["Parameters"].hasOwnProperty(Parameter)) {
-                    // Create a label, which will be the parameter Name followed by the default value.
-                    var name_label = data["Parameters"][Parameter]["Name"] + " (Default: " + data["Parameters"][Parameter]["Default_value"] + ") ";
-                    var label = document.createElement('label');
-                    label.htmlFor = name_label;
-                    label.appendChild(document.createTextNode(name_label));
-                    let id_info = data["Parameters"][Parameter]["Name"] + "_Info";
-
-                    field.appendChild(label);
-
-                    // Create popup information.
-                    let newDiv = document.createElement("div");
-                    newDiv.className = "popup";
-                    newDiv.onclick = function () { popupInformation(id_info); };
-
-                    let newImage = document.createElement("img");
-                    newImage.src = "../../static/Images/information_icon.png";
-                    newImage.width = "20";
-                    newImage.height = "20";
-
-                    newDiv.appendChild(newImage);
-
-                    newSpan = document.createElement("span");
-                    newSpan.style = "white-space: pre-wrap";
-                    newSpan.className = "popuptext";
-                    newSpan.id = id_info;
-                    newSpan.textContent = data["Parameters"][Parameter]["Definition"];
-
-                    newDiv.appendChild(newSpan);
-
-                    field.appendChild(newDiv);
-
-                    // Create choices and options to edit the parameter
-                    fillSection(field, data["Parameters"], Parameter, "Compiler", 0)
-                }
-            }
-
-            // add field to div section
-            html_section.appendChild(field)
-        }
-    });
-}
-
-// Obtains and fills out the validation section for the DLANN
-function getValidationOptions(ID_Val) {
-    document.getElementById(ID_Val).innerHTML = "";
-
-    $.ajax({
-        url: "/experiments/getValidationOptions",
-        type: "POST",
-        contentType: "application/json",
-        async: false,
-        dataType: 'json',
-        success: function (data) {
-            // Create the html section to place in the cycon page.
-            var html_section = document.getElementById(ID_Val);
-
-            // create the field box for the new layer option.
-            var field = document.createElement('fieldset');
-            // create title for the field.
-            var legend = document.createElement('legend');
-            legend_text = document.createTextNode("Validation");
-            legend.appendChild(legend_text);
-            field.appendChild(legend);
-
-            // Create option to edit the parameter for the NN layer option.
-            for (var Parameter in data["Parameters"]) {
-
-                if (data["Parameters"].hasOwnProperty(Parameter)) {
-                    // Create a label, which will be the parameter Name followed by the default value.
-                    var name_label = data["Parameters"][Parameter]["Name"] + " (Default: " + data["Parameters"][Parameter]["Default_value"] + ") ";
-                    var label = document.createElement('label');
-                    label.htmlFor = name_label;
-                    label.appendChild(document.createTextNode(name_label));
-                    let id_info = data["Parameters"][Parameter]["Name"] + "_Info";
-
-                    field.appendChild(label);
-
-                    // Create popup information.
-                    let newDiv = document.createElement("div");
-                    newDiv.className = "popup";
-                    newDiv.onclick = function () { popupInformation(id_info); };
-
-                    let newImage = document.createElement("img");
-                    newImage.src = "../../static/Images/information_icon.png";
-                    newImage.width = "20";
-                    newImage.height = "20";
-
-                    newDiv.appendChild(newImage);
-
-                    newSpan = document.createElement("span");
-                    newSpan.style = "white-space: pre-wrap";
-                    newSpan.className = "popuptext";
-                    newSpan.id = id_info;
-                    newSpan.textContent = data["Parameters"][Parameter]["Definition"];
-
-                    newDiv.appendChild(newSpan);
-
-                    field.appendChild(newDiv);
-
-                    // Create choices and options to edit the parameter
-                    fillSection(field, data["Parameters"], Parameter, "Validation", 0)
-                }
-            }
-
-            // add field to div section
-            html_section.appendChild(field)
-        }
-    });
 }
 
 // Addes the selected layer to the form. 
@@ -1763,15 +1303,6 @@ function clearAllPreopt() {
     $("#csv_Scale_Results_Preopt").hide();
 }
 
-// Removes all callback options.
-function clearAllCallbacks() {
-    document.getElementById("Callback_Selection").innerHTML = "";
-    callbackCounter = 0;
-
-    Using_EarlyStopping = false;
-    Using_ReduceLROnPlateau = false;
-}
-
 // Removes all layer options.
 function clearAllNN() {
     document.getElementById("Layers_Selection").innerHTML = "";
@@ -1791,23 +1322,6 @@ function fillSection(section, data, Parameter, Location, counter) {
         Parameter_Name = "Preopt_" + counter + "_" + data[Parameter]["Name"];
     }
 
-    else if (Location == "Layer") {
-        Parameter_Name = "Layer_" + counter + "_" + data[Parameter]["Name"];
-    }
-
-    else if (Location == "Callback") {
-        Parameter_Name = "Callback_" + counter + "_" + data[Parameter]["Name"];
-    }
-
-    else if (Location == "Compiler" || Location == "Validation") {
-        Parameter_Name = Location + "_" + data[Parameter]["Name"];
-    }
-
-    else {
-        Parameter_Name = data[Parameter]["Name"];
-    }
-
-
 
     // Create choices and options to alter the parameter
     for (var Type_Int in data[Parameter]["Type"]) {
@@ -1825,31 +1339,6 @@ function fillSection(section, data, Parameter, Location, counter) {
                 section.appendChild(radio);
                 if (option == default_opt) {
                     radio.checked = true;
-                }
-
-                // create label for radio button
-                var name_label = option;
-                var label = document.createElement('label')
-                label.htmlFor = name_label;
-                label.appendChild(document.createTextNode(name_label));
-
-                section.appendChild(label);
-            }
-        }
-
-        // Selectable checkboxes for multiple options to be selected.
-        if (data[Parameter]["Type"][Type_Int] == "checkbox") {
-            for (var Option_Int in data[Parameter]["Possible"]) {
-                // create checkbox
-                var check_name = Parameter_Name + "_Input";
-                var option = data[Parameter]["Possible"][Option_Int];
-                var checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.name = checkbox_name;
-                checkbox.id = option;
-                section.appendChild(checkbox);
-                if (option == default_opt) {
-                    checkbox.checked = true;
                 }
 
                 // create label for radio button
@@ -1991,7 +1480,7 @@ function fillSection(section, data, Parameter, Location, counter) {
 
                 if (typeof default_opt == 'number' && !isNaN(default_opt)) {
                     if (option == "float") {
-                        radio.checked = true;
+                        radio.check = true;
                     }
                 }
 
@@ -2012,7 +1501,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     section.appendChild(textbox);
 
                     if (typeof default_opt == 'number' && !isNaN(default_opt)) {
-                        textbox.value = default_opt;
+                        texbox.value = default_opt;
                     }
                 }
             }
@@ -2022,7 +1511,6 @@ function fillSection(section, data, Parameter, Location, counter) {
         if (data[Parameter]["Type"][Type_Int] == "option_int") {
             for (var Option_Int in data[Parameter]["Possible"]) {
                 // create radio button
-
                 var radio_name = Parameter_Name + "_Input";
                 var option = data[Parameter]["Possible"][Option_Int];
                 var radio = document.createElement("input");
@@ -2040,7 +1528,7 @@ function fillSection(section, data, Parameter, Location, counter) {
 
                 if (typeof default_opt == 'number' && !isNaN(default_opt)) {
                     if (option == "int") {
-                        radio.checked = true;
+                        radio.check = true;
                     }
                 }
 
@@ -2061,7 +1549,7 @@ function fillSection(section, data, Parameter, Location, counter) {
                     section.appendChild(textbox);
 
                     if (typeof default_opt == 'number' && !isNaN(default_opt)) {
-                        textbox.value = default_opt;
+                        texbox.value = default_opt;
                     }
                 }
             }
@@ -2306,90 +1794,3 @@ function changeCSV(files, selectedFile, choice) {
         }
     });
 }
-
-
-
-// Checks that the CSV file is able to load and displays the csv information after all selected preoptimizations with additional pdf graphs
-// such as balance and distibution of data to help the user make informed desitions when preoptimizing.
-function checkModel(form) {
-    document.getElementById("model_Error").innerHTML = "";
-    document.getElementById("model_Results").innerHTML = "";
-
-    var formData = new FormData(form);
-
-    var dict_data = {};
-
-    formData.append("layerCounter", layerCounter)
-
-    // iterate through entries...
-    for (var pair of formData.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-        dict_data[pair[0]] = pair[1]
-    }
-
-    //Send information to run model experiment.
-    // will save into a json file tilted the "projectName".json
-    $("#model_Error").hide();
-    $("#model_Title").hide();
-    $("#model_Results").hide();
-
-    const sent_data = JSON.stringify(dict_data)
-
-    const data = new FormData();
-    data.append("processes", JSON.stringify(dict_data))
-
-    $.ajax({
-        url: "/experiments/getModelSummary",
-        data: data,
-        type: "POST",
-        dataType: 'json',
-        processData: false, // important
-        contentType: false, // important,
-        success: function (Results) {
-            if (Results[0] == "worked") {
-
-                Results = Results[2]
-
-                var writeData = {
-                    paragraph: ''
-                }
-
-                document.getElementById("model_Results").innerHTML = Results['model_summary'];
-
-                $("#model_Title").show();
-                $("#model_Results").show();
-            }
-            else {
-                var writeData = {
-                    paragraph: ''
-                }
-
-                writeData.paragraph += '<FONT COLOR="#ff0000">ERROR: <br>';
-                writeData.paragraph += Results[1];
-                writeData.paragraph += '</FONT >';
-
-                document.getElementById("model_Error").innerHTML = writeData.paragraph;
-
-                $("#model_Error").show();
-            }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            var writeData = {
-                paragraph: ''
-            }
-
-            writeData.paragraph += '<FONT COLOR="#ff0000">ERROR: <br>';
-            writeData.paragraph += "Error with connection to server!";
-            writeData.paragraph += '</FONT >';
-
-            document.getElementById("model_Preopt").innerHTML = writeData.paragraph;
-        }
-    });
-}
-
-document.getElementById("DLANN_Form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    checkModel(e.target);
-});
-
-
