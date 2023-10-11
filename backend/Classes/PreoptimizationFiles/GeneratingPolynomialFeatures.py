@@ -73,7 +73,7 @@ def perform_Preopt(data, i, df):
 
     # PolynomialFeatures
     if method == "PolynomialFeatures":
-        settings = HyperParameters.getSettings(data, Parameters, i)
+        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
         
         pp = preprocessing.PolynomialFeatures(degree=(settings["Parameter_0"],settings["Parameter_1"]),
                                                 interaction_only=settings["Parameter_2"],
@@ -95,7 +95,7 @@ def perform_Preopt(data, i, df):
 
     # SplineTransformer
     if method == "SplineTransformer":
-        settings = HyperParameters.getSettings(data, Parameters, i)
+        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
 
         pp = preprocessing.SplineTransformer(n_knots=settings["Parameter_0"],
                                               degree=settings["Parameter_1"],

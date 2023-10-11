@@ -143,9 +143,11 @@ x-data="{fileSelected: '', choice: null, files: {{files}}}"
                  }
 
                  if (methodology == "DLANN") {
-                     $("div.methodology_desc").hide();
-                     $("#DLANN_Options").show();
-                 }
+                        $("div.methodology_desc").hide();
+                        $("#DLANN_Options").show();
+                        getCompilerOptions("Compile_Selection")
+                        getValidationOptions("Validation_Selection")
+                    }
              });
          });
 
@@ -367,18 +369,13 @@ x-data="{fileSelected: '', choice: null, files: {{files}}}"
                     </form>
                 </div>
 
-
-                <!-- MLA -->
+                <!-- Preprocess section-->
                 <div class="border-b border-gray-400 p-2">
-                    <form id="cyconForm" @submit.prevent="getData(files, fileSelected, choice)">
-                        <!-- Copy of information from prior sections -->
-                        <input id="projectName_copy" name="projectName" type="hidden" />
-                        <input id="phase1Text_copy" name="phase1Text" type="hidden" />
-                        <input id="csvFile_copy" name="csvFile" type="hidden" />
+                    <h1 class="mb-2 font-bold text-xl">Method</h1>
+                    <form id="methodologyForm">
 
                         <!-- Methodology section 1 -->
                         {% if g.Methodologies %}
-                        <h1 class="mb-2 font-bold text-xl">Method</h1>
 
                         {% for choices, name, infos in g.Methodologies%}
                         <input type="radio" id={{ choices }} name="methodology" value={{ choices }}> <label for={{ choices }}>{{ name }}</label>
@@ -408,7 +405,13 @@ x-data="{fileSelected: '', choice: null, files: {{files}}}"
                         {% endfor %}
                         {% endfor %}
                         {% endif %}
+                    </form>
+                </div>
 
+                <!-- MLA section-->
+                <div class="border-b border-gray-400 p-2">
+                    <!--<h1 class="mb-2 font-bold text-xl">Method</h1>-->
+                    <form id="MLA_Form">
                         <!-- Section for MLA -->
                         <div id="MLA_Options" class="methodology_desc space-y-2 space-x-2">
 
@@ -488,19 +491,17 @@ x-data="{fileSelected: '', choice: null, files: {{files}}}"
                             <input type="radio" id="Stratify_True" name="Stratify" value=True> <label for="Stratify_True">True</label>
                             <input type="radio" id="Stratify_False" name="Stratify" value=False checked> <label for="Stratify_False">False</label><br>
                         </div>
+                    </form>
+                </div>
 
-                        </div>
+                <!-- DLANN section-->
+                <div id="DLANN_Options" class="methodology_desc">
+                    <div class="border-b border-gray-400 p-2">
+                        <!--<h1 class="mb-2 font-bold text-xl">Method</h1>-->
+                        <form id="DLANN_Form">
                         <!-- Section for DLANN -->
-                        <div id="DLANN_Options" class="methodology_desc">
-                            <!-- Dynamically pull methods names and create radio buttons for each choice
-                                 <input type="radio" id=Method_BNN name="networks" value=network_BNN onclick=> <label for=Network_BNN>Basic Neural Network</label><br>
-                                 <input type="radio" id=Method_CNN name="networks" value=network_CNN onclick=> <label for=Network_CNN>Convolutional Neural Network</label><br>
-
-                                 <p>Basic Neural Network: (Info will be added later) </p>
-                                 <p>Convolutional Neural Network: (Info will be added later) </p>-->
-
                             <!-- Methods section-->
-                            <h2>Model Creation</h2><br>
+                            <h1 class="mb-2 font-bold text-xl">Model Creation</h1>
 
                             Category:
                             {% if g.NN_layer_Categories %}
@@ -533,11 +534,59 @@ x-data="{fileSelected: '', choice: null, files: {{files}}}"
 
                             <button type="submit"
                                     class="my-2 px-2 px-1.5 rounded-lg bg-white border border-gray-400"
-                                    value="Check" onclick="changePreoptSubmit('Check')"> Check </button>
+                                    value="Check" > Check </button>
 
-                            <p id="csv_Error_Preopt"></p>
+                            <p id="model_Error"></p>
+                            <p id="model_Title">Model Summary:</p>
+                            <div style="overflow: auto; max-height: 1000px; max-width: 1100px; ">
+                                <p id="model_Results" style="background-color: white;"></p>
+                            </div>
+                        </form>
+                    </div>
 
-                        </div>
+                    <!-- Model Compiler section-->
+                    <div class="border-b border-gray-400 p-2">
+                        <h1 class="mb-2 font-bold text-xl">Compiler</h1>
+                        <form id="Model_Compile_Form">
+                            <div id="Compile_Selection"></div>
+                        </form>
+                    </div>
+
+                    <!-- DLANN Validation section-->
+                    <div class="border-b border-gray-400 p-2">
+                        <h1 class="mb-2 font-bold text-xl">Validation</h1>
+                        <form id="Model_Validation_Form">
+                            <div id="Validation_Selection"></div>
+
+                            <p><b>Optional Options:</b></p>
+                            Callback:
+                            {% if g.callbacks %}
+                            <select id="callbacks"
+                                    class="px-2 py-1 mr-2 rounded-md border border-gray-400"
+                                    name="callbacks">
+                                {% for choices, names, infos in g.callbacks%}
+                                <option value={{ choices }}>{{ names }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button"
+                                    class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                    id="AddCallbacks" onclick="selectCallback('callbacks', 'Callback_Selection')">Add</button>
+                            <button type="button"
+                                    class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"
+                                    id="clearCallbacks" onclick="clearAllCallbacks()"> Remove All </button>
+                            {% endif %}
+                            <div id="Callback_Selection"></div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- MLA -->
+                <div class="border-b border-gray-400 p-2">
+                    <form id="MLAI_Form" @submit.prevent="getData(files, fileSelected, choice)">
+                        <!-- Copy of information from prior sections -->
+                        <input id="projectName_copy" name="projectName" type="hidden" />
+                        <input id="phase1Text_copy" name="phase1Text" type="hidden" />
+                        <input id="csvFile_copy" name="csvFile" type="hidden" />
 
                         <button type="submit"
                                 class="px-2 px-1.5 rounded-lg bg-white border border-gray-400"

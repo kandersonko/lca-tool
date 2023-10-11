@@ -75,7 +75,7 @@ def perform_Preopt(data, i, df):
 
     ## QuantileTransformer
     if method == "QuantileTransformer":
-        settings = HyperParameters.getSettings(data, Parameters, i)
+        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
 
         pp = preprocessing.QuantileTransformer(n_quantiles=settings["Parameter_0"],
                                                output_distribution=settings["Parameter_1"],
@@ -92,7 +92,7 @@ def perform_Preopt(data, i, df):
 
     ## PowerTransformer
     if method == "PowerTransformer":
-        settings = HyperParameters.getSettings(data, Parameters, i)
+        settings = HyperParameters.getSettings(data, Parameters, i, Preoptimizer.getName())
 
         pp = preprocessing.PowerTransformer(method=settings["Parameter_0"],
                                                standardize=settings["Parameter_1"],
