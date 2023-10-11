@@ -250,7 +250,6 @@ function readTextFile(file, callback) {
 }
 
 function getData(files, fileSelected, choice) {
-    document.getElementById("Results").innerHTML += "IS THIS WORKING??<br\>"
     const form = document.getElementById("MLAI_Form");
     console.log("get form :", form, files, choice, fileSelected);
     // Copy over information from element outside of form to the copy inside form
@@ -282,8 +281,6 @@ function getData(files, fileSelected, choice) {
         dict_data[pair[0]] = pair[1]
     }
 
-    document.getElementById("Results").innerHTML += "IS THIS WORKING?? -------  1<br\>"
-
     // Preoptimization form
     const preoptform = document.getElementById("preoptForm");
 
@@ -295,8 +292,6 @@ function getData(files, fileSelected, choice) {
         document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
         dict_data[pair[0]] = pair[1]
     }
-
-    document.getElementById("Results").innerHTML += "IS THIS WORKING?? -------  2<br\>"
 
     // Methodology form
     const methodform = document.getElementById("methodologyForm");
@@ -310,8 +305,6 @@ function getData(files, fileSelected, choice) {
         dict_data[pair[0]] = pair[1]
     }
 
-    document.getElementById("Results").innerHTML += "IS THIS WORKING?? -------  3<br\>"
-
     // MLA form
     const mla_form = document.getElementById("MLA_Form");
 
@@ -323,8 +316,6 @@ function getData(files, fileSelected, choice) {
         document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
         dict_data[pair[0]] = pair[1]
     }
-
-    document.getElementById("Results").innerHTML += "IS THIS WORKING?? -------  4<br\>"
 
     // DLANN form
     const dlann_form = document.getElementById("DLANN_Form");
@@ -338,8 +329,6 @@ function getData(files, fileSelected, choice) {
         dict_data[pair[0]] = pair[1]
     }
 
-    document.getElementById("Results").innerHTML += "IS THIS WORKING?? -------  5<br\>"
-
     // Model Compile Form
     const model_compile_form = document.getElementById("Model_Compile_Form");
 
@@ -352,8 +341,6 @@ function getData(files, fileSelected, choice) {
         dict_data[pair[0]] = pair[1]
     }
 
-    document.getElementById("Results").innerHTML += "IS THIS WORKING?? -------  6<br\>"
-
     // Model Validation Form
     const model_val_form = document.getElementById("Model_Validation_Form");
 
@@ -363,6 +350,7 @@ function getData(files, fileSelected, choice) {
     for (var pair of model_val_Form.entries()) {
         console.log(pair[0] + ": " + pair[1]);
         document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        
         dict_data[pair[0]] = pair[1]
     }
 
