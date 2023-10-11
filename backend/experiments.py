@@ -27,12 +27,12 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 
-## Models
+# Models
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from werkzeug.utils import secure_filename
 
-from backend.calculator import Calculator
+from backend.calculator import Calculator, read_data
 
 from backend.db import DBManager
 
@@ -176,8 +176,6 @@ def load_possible_experiments():
     g.callback_Info =  callback_Definition
     g.callbacks = zip(g.callback_Names, g.callback_Display_Names, g.callback_Info)
 
-
-
 @bp.route("/new_experiment")
 def new_experiment():
     return render_template("experiments/new_experiment.html")
@@ -223,6 +221,7 @@ def lca():
 
             return render_template("experiments/lca.html", files=files)
 
+
 @bp.route("/cycon")
 def cycon():
     user_id = session.get("user_id")
@@ -263,7 +262,6 @@ def cycon():
 @bp.route("/calculate", methods=["POST"])
 def calculate():
     processes_input = request.form.get("processes")
-
     choice = request.form.get("choice")
     user_data = dict()
     user_id = session.get("user_id")
@@ -305,11 +303,11 @@ def calculate():
     #         return jsonify(error=error)
     logger.debug("=== Equations: %s %s", processes)
 
-
     results = []
+    num_process = 0
     for process in processes:
+        num_process += 1
         filename = process.get("filename")
-
         kind = process.get("kind")
         data = None
         if not filename:
@@ -328,10 +326,11 @@ def calculate():
         if process_data is None:
             error = f"Missing csv file '{filename}' for process {num_process}"
             return jsonify(error=error)
-
         equation = process.get("equation")
+        if not equation or equation == "":
+            error = f"Missing equation for process for process {num_process}"
+            return jsonify(error=error)
         name = process.get("name")
-
         logger.debug("=== Process %s: %s %s",
                      num_process, filename, process_data)
         calculator = Calculator()
@@ -348,15 +347,13 @@ def calculate():
         output = dict(result=result, name=name, equation=formula)
         results.append(output)
 
-        if not evaluated:
-            flash(str(result))
-
     logger.debug("=== results: %s | dtype %s", results, type(results))
     return jsonify(processes=results)
 
 
 @bp.route("/run_experiment", methods=["POST"])
 def run_experiment():    
+
     processes_input = request.form.get("processes")
     data = json.loads(processes_input)
 
@@ -426,6 +423,7 @@ def run_experiment():
         Results = [status, msg, Metrics]
 
     return json.dumps(Results)
+
 
 @bp.route("/getResults", methods=["POST"])
 def getResults(): 
@@ -534,6 +532,7 @@ def getPreoptParameters():
     Parameters = Preoptimization.getParameters(data["Preopt"])
 
     return json.dumps(Parameters)
+
 
 @bp.route("/getLayerParameters", methods=["POST"])
 def getLayerParameters():
