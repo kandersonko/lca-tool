@@ -161,8 +161,6 @@ function changeLayerCategory(category, ID_Layers) {
     });
 }
 
-
-
 function changeAlgorithm(algorithms, ID_Parameters) {
     var algorithms_selection = document.getElementById(algorithms)
     var algorithm_name = algorithms_selection.value
@@ -252,7 +250,7 @@ function readTextFile(file, callback) {
 }
 
 function getData(files, fileSelected, choice) {
-    const form = document.getElementById("cyconForm");
+    const form = document.getElementById("MLAI_Form");
     console.log("get form :", form, files, choice, fileSelected);
     // Copy over information from element outside of form to the copy inside form
     document.getElementById("projectName_copy").value = document.getElementById("projectName").value;
@@ -270,6 +268,11 @@ function getData(files, fileSelected, choice) {
     formData.append("preoptCounter", preoptCounter)
     formData.append("layerCounter", layerCounter)
     formData.append("callbackCounter", callbackCounter)
+
+    //var checkbox = $("#cyconForm").find("input[type=checkbox]");
+    //$.each(checkbox, function (key, val) {
+    //    formData.append($(val).attr('name') + "_checked", $(this).is(':checked'));
+    //});
 
     // iterate through entries...
     for (var pair of formData.entries()) {
@@ -347,6 +350,7 @@ function getData(files, fileSelected, choice) {
     for (var pair of model_val_Form.entries()) {
         console.log(pair[0] + ": " + pair[1]);
         document.getElementById("Results").innerHTML += pair[0] + ": " + pair[1] + "<br\>";
+        
         dict_data[pair[0]] = pair[1]
     }
 
@@ -385,8 +389,6 @@ function getData(files, fileSelected, choice) {
     data.append("csvFileName", csvFileName)
     data.append("csvFile", csvFile)
 
-    document.getElementById("Results").innerHTML += data;
-
     $.ajax({
         url: "/experiments/run_experiment",
         data: data,
@@ -395,6 +397,7 @@ function getData(files, fileSelected, choice) {
         processData: false, // important
         contentType: false, // important,
         success: function (Results) {
+            document.getElementById("Results").innerHTML += "Hello?";
             if (Results[0] == "worked") {
 
                 Results = Results[2]
@@ -514,6 +517,8 @@ function getData(files, fileSelected, choice) {
 
                         writeData.paragraph += `${img.outerHTML} <br\>`
 
+                    document.getElementById("Results").innerHTML = writeData.paragraph;
+                    document.getElementById("Results").innerHTML = writeData.paragraph;
                         document.getElementById("Results").innerHTML = writeData.paragraph;
                     }
                 }
@@ -605,12 +610,10 @@ function getData(files, fileSelected, choice) {
     });
 }
 
-
-document.getElementById("MLAI_Form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    getData(e.target);
-});
-
+// document.getElementById("cyconForm").addEventListener("submit", function (e) {
+//     e.preventDefault();
+//     getData(e.target);
+// });
 
 
 
@@ -896,7 +899,7 @@ document.getElementById("resultForm").addEventListener("button", function (e) {
 // Checks that the CSV file is able to load and displays the original csv information with additional pdf graphs
 // such as balance and distibution of data to help the user make informed desitions when preoptimizing.
 function checkCSV(files, fileSelected, choice) {
-    const form = document.getElementById("cyconForm");
+    const form = document.getElementById("csvForm");
     document.getElementById("csv_Error").innerHTML = "";
     document.getElementById("csv_Results").innerHTML = "";
 
@@ -960,7 +963,7 @@ function checkCSV(files, fileSelected, choice) {
     data.append("csvFileName", csvFileName)
     data.append("csvFile", csvFile)
 
-    document.getElementById("Results").innerHTML += data;
+    //document.getElementById("Results").innerHTML += data;
 
     $.ajax({
         url: "/experiments/getCSVResults",
@@ -2307,11 +2310,10 @@ function changeCSV(files, selectedFile, choice) {
     });
 }
 
-
-
 // Checks that the CSV file is able to load and displays the csv information after all selected preoptimizations with additional pdf graphs
 // such as balance and distibution of data to help the user make informed desitions when preoptimizing.
-function checkModel(form) {
+function checkModel() {
+    const form = document.getElementById("DLANN_Form");
     document.getElementById("model_Error").innerHTML = "";
     document.getElementById("model_Results").innerHTML = "";
 
@@ -2365,6 +2367,7 @@ function checkModel(form) {
                 }
 
                 writeData.paragraph += '<FONT COLOR="#ff0000">ERROR: <br>';
+                writeData.paragraph += Results[0];
                 writeData.paragraph += Results[1];
                 writeData.paragraph += '</FONT >';
 
@@ -2392,4 +2395,8 @@ document.getElementById("DLANN_Form").addEventListener("submit", function (e) {
     checkModel(e.target);
 });
 
+var DLANN_Submit = ""
 
+function DLANNSubmit(value) {
+    DLANN_Submit = value
+}
