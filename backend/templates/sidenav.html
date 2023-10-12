@@ -16,7 +16,7 @@
            href="{{ url_for('modules.index') }}">Modules</a>
         <a class="hover:text-slate-200"
            :class="{'text-slate-100': selected === '/about'}"
-           href="{{ url_for('about.index') }}">Team</a>
+           href="{{ url_for('about.index') }}">About</a>
         {% else %}
         {% if g.user['status'] != 'active' %}
         <a class="hover:text-slate-200"

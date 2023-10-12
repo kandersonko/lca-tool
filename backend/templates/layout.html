@@ -2,13 +2,15 @@
 <html lang="en-US">
 
   <head>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'G-92Y1JLX1HW');
-    </script>
+    <!-- Google tag (gtag.js) -->
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-N9PZTK5K');</script>
+  <!-- End Google Tag Manager -->
+
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,7 +19,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="https://cdn.tailwindcss.com">
     <script src="{{url_for('static', filename='js/alpinejs.min.js')}}" defer></script>
     {% block head %}
     {% endblock %}
@@ -25,6 +26,10 @@
 
   <body
     class="relative bg-gray-100 text-gray-900 font-roboto antialiased w-screen h-screen overflow-y-auto">
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N9PZTK5K"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
     <div class="flex flex-row h-full">
 
       {% include 'sidenav.html' %}
@@ -49,7 +54,7 @@
     </div>
 
     <footer class="static bottom-0 left-0 w-full bg-gray-700 text-white p-6">
-      Copyright <span>&copy; CyCon</span> 2023 <span>version 1.10.06</span>
+      Copyright <span>&copy; CyCon</span> 2023 <span>version 1.10.12</span>
     </footer>
 
     {% block scripts %}
