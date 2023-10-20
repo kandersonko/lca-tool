@@ -98,6 +98,7 @@ def Split(data):
         plt.close()
 
         # summarize history for accuracy
+        plt.figure()
         plt.plot(history.history['accuracy'])
         plt.plot(history.history['val_accuracy'])
         plt.title('model accuracy')
@@ -111,6 +112,7 @@ def Split(data):
         plt.close()
 
         # summarize history for loss
+        plt.figure()
         plt.plot(history.history['loss'])
         plt.plot(history.history['val_loss'])
         plt.title('model loss')
