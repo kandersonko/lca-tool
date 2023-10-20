@@ -879,7 +879,7 @@ function generatePDF(form) {
             // Add you content in place of example here
             pdf.text("Created using the IDeaL Cycon Tool: https://cycon.nkn.uidaho.edu/cycon", pdf.internal.pageSize.getWidth() - 120, pdf.internal.pageSize.getHeight() - 10);
         }
-    }).save();
+    });
 
 }
 
