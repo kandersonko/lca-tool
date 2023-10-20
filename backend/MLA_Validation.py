@@ -106,11 +106,12 @@ def Split(data):
         cm = confusion_matrix(y_test, y_pred, labels=model.classes_)
         color = 'white'
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=model.classes_)
-        disp.plot()
-        my_stringIObytes = io.BytesIO()
-        plt.savefig(my_stringIObytes, format='jpg')
-        my_stringIObytes.seek(0)
-        my_base64_jpgData = base64.b64encode(my_stringIObytes.read()).decode()
+        disp.plot()  # generates the plot of the confusion matrix using matplotlib.
+        my_stringIObytes = io.BytesIO()  # creates an in-memory binary stream to store the plot image.
+        plt.savefig(my_stringIObytes, format='jpg')  # saves the plot image to the my_stringIObytes stream in JPEG format.
+        plt.close()
+        my_stringIObytes.seek(0) # moves the stream's position to the beginning, preparing it for reading.
+        my_base64_jpgData = base64.b64encode(my_stringIObytes.read()).decode() # reads the content of the stream, encodes it in Base64 format, and converts it to a string.
         #temp = os.getcwd()
         #plt.savefig(temp + '\\backend\\static\\Images\\' + data['projectName'] + '.png')
 
