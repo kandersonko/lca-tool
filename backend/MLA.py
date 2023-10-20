@@ -9,6 +9,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import BernoulliNB
 
 # clustering
 from sklearn.cluster import KMeans
@@ -321,6 +322,48 @@ k_mean_algorithm = MLA(Name, Definition, Parameters)
 
 #list_MLAs.append(k_mean_algorithm)
 
+# Bernoulli Naive Bayes Classifier
+Name = "BernoulliNB"
+Definition = ["Naive Bayes classifier for multivariate Bernoulli models.\n\nLike MultinomialNB, this classifier is suitable for discrete data. The difference is that while MultinomialNB works with occurrence counts, BernoulliNB is designed for binary/boolean features."]
+Parameter_0 =  {"Name":"alpha", 
+                "Type": ["float"], 
+                "Default_option":1.0, 
+                "Default_value":1.0, 
+                "Possible":["float"], 
+               "Definition":"Additive (Laplace/Lidstone) smoothing parameter (set alpha=0 and force_alpha=True, for no smoothing)."}
+Parameter_1 =  {"Name":"force_alpha", 
+                "Type": ["bool"], 
+                "Default_option":False, 
+                "Default_value":False, 
+                "Possible":[True, False], 
+               "Definition":"If False and alpha is less than 1e-10, it will set alpha to 1e-10. If True, alpha will remain unchanged. This may cause numerical errors if alpha is too close to 0."}
+Parameter_2 =  {"Name":"binarize", 
+                "Type": ["float_or_null"], 
+                "Default_option":0.0, 
+                "Default_value":0.0, 
+                "Possible":["float"], 
+               "Definition":"Threshold for binarizing (mapping to booleans) of sample features. If None, input is presumed to already consist of binary vectors."}
+Parameter_3 =  {"Name":"fit_prior", 
+                "Type": ["bool"], 
+                "Default_option":True, 
+                "Default_value":True, 
+                "Possible":[True, False], 
+               "Definition":"Whether to learn class prior probabilities or not. If false, a uniform prior will be used."}
+# Did not add due to overcomplications to adding array impute values.
+#Parameter_4 =  {"Name":"class_prior", 
+#                "Type": ["bool"], 
+#                "Default_option":True, 
+#                "Default_value":True, 
+#                "Possible":[True, False], 
+#               "Definition":"Whether to learn class prior probabilities or not. If false, a uniform prior will be used."}
+
+
+Parameters = {"Parameter_0":Parameter_0, "Parameter_1":Parameter_1,"Parameter_2":Parameter_2,"Parameter_3":Parameter_3}
+
+BernoulliNB_algorithm = MLA(Name, Definition, Parameters)
+
+list_MLAs.append(BernoulliNB_algorithm)
+
 def getMLAs():
     return list_MLAs
 
@@ -515,5 +558,11 @@ def createModel(data):
                     random_state=settings['Parameter_5'],
                     multi_class=settings['Parameter_6'],
                     n_jobs=settings['Parameter_7'])
+        
+    elif data["MLalgorithm"] == "BernoulliNB":
+        model = BernoulliNB(alpha=settings['Parameter_0'],
+                            force_alpha=settings['Parameter_1'],
+                            binarize=settings['Parameter_2'],
+                            fit_prior=settings['Parameter_3'])
         
     return model, settings
