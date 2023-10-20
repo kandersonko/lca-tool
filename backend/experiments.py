@@ -61,6 +61,7 @@ logger = logging.getLogger()
 
 # should be modified to work with a db or class if necessary.
 # Otherwise, the choices being pre-available on page load will slightly speed the process.
+#  etting up some initial state before the actual view function is executed.
 @bp.before_app_request
 def load_possible_experiments():
     list_Algorithms = MLA.getMLAs()
@@ -180,7 +181,9 @@ def load_possible_experiments():
 def new_experiment():
     return render_template("experiments/new_experiment.html")
 
-
+'''
+To preview the LCA site
+'''
 @bp.route("/lca", methods=["GET"])
 def lca():
     user_id = session.get("user_id")
@@ -256,9 +259,11 @@ def cycon():
 
             return render_template("experiments/cycon.html", files=files)
 
-    return render_template("experiments/cycon.html", files=[])
+    return render_template("experiments/cycon.html", files=[])                                 # <------
 
-
+'''
+If you have a plan, returns a results as a JSON response
+'''
 @bp.route("/calculate", methods=["POST"])
 def calculate():
     processes_input = request.form.get("processes")
@@ -445,7 +450,7 @@ def getResults():
     
     return json.dumps(Metrics)
 
-
+# Get machine learning algorithms parameters for the algorithm in data that we created in cycon_events
 @bp.route("/getAlgorithmParameters", methods=["POST"])
 def getAlgorithmParameters():
     output = request.get_json()
