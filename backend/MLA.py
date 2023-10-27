@@ -10,9 +10,11 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import BernoulliNB
-
-# clustering
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import ComplementNB
 from sklearn.cluster import KMeans
+from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import Perceptron
 
 class MLA:
     def __init__(self, name, definition, parameters):
@@ -39,7 +41,8 @@ Parameter_0 = {"Name":"n_neighbors",
                "Default_option":5,
                "Default_value":5,
                "Possible":["int"], 
-               "Definition":"Number of neighbors to use by default for kneighbors queries."}
+               "Definition":"Number of neighbors to use by default for kneighbors queries."
+               }
 Parameter_1 = {"Name":"weights", "Type": ["option"], "Default_option":"uniform", "Default_value":"uniform", "Possible":["uniform","distance"], 
                 "Definition":"Weight function used in prediction. Possible values:\n\n‘uniform’ : uniform weights. All points in each neighborhood are weighted equally.\n‘distance’ : weight points by the inverse of their distance. in this case, closer neighbors of a query point will have a greater influence than neighbors which are further away.\n[callable] : a user-defined function which accepts an array of distances, and returns an array of the same shape containing the weights."}
 Parameter_2 = {"Name":"algorithm", "Type": ["option"], "Default_option":"auto", "Default_value":"auto", "Possible":["ball_tree","kd_tree","brute","auto"],
@@ -297,8 +300,13 @@ Name = "K-Means"
 Definition = ["K-Means clustering."]
 Parameter_0 =  {"Name":"n_clusters", "Type": ["int"], "Default_option":8, "Default_value":8, "Possible":["int"], 
                "Definition":"The number of clusters to form as well as the number of centroids to generate."}
-Parameter_1 =  {"Name":"initialization", "Type": ["option"], "Default_option":"k-means++", "Default_value":"k-means++", "Possible":["k-means++", "random"], 
-               "Definition":"Method for initialization:\n\n‘k-means++’ : selects initial cluster centroids using sampling based on an empirical probability distribution of the points’ contribution to the overall inertia. This technique speeds up convergence. The algorithm implemented is “greedy k-means++”. It differs from the vanilla k-means++ by making several trials at each sampling step and choosing the best centroid among them.\n\n‘random’: choose n_clusters observations (rows) at random from data for the initial centroids.\n\nIf an array is passed, it should be of shape (n_clusters, n_features) and gives the initial centers.\n\nIf a callable is passed, it should take arguments X, n_clusters and a random state and return an initialization."}
+Parameter_1 =  {
+    "Name":"initialization", 
+    "Type": ["option"], 
+    "Default_option":"k-means++", 
+    "Default_value":"k-means++", 
+    "Possible":["k-means++", "random"], 
+    "Definition":"Method for initialization:\n\n‘k-means++’ : selects initial cluster centroids using sampling based on an empirical probability distribution of the points’ contribution to the overall inertia. This technique speeds up convergence. The algorithm implemented is “greedy k-means++”. It differs from the vanilla k-means++ by making several trials at each sampling step and choosing the best centroid among them.\n\n‘random’: choose n_clusters observations (rows) at random from data for the initial centroids.\n\nIf an array is passed, it should be of shape (n_clusters, n_features) and gives the initial centers.\n\nIf a callable is passed, it should take arguments X, n_clusters and a random state and return an initialization."}
 Parameter_2 =  {"Name":"n_int", "Type": ["int"], "Default_option":10, "Default_value":10, "Possible":["int"], 
                "Definition":"Number of times the k-means algorithm is run with different centroid seeds. The final results is the best output of n_init consecutive runs in terms of inertia. Several runs are recommended for sparse high-dimensional problems (see Clustering sparse data with k-means).\n\nWhen n_init='auto', the number of runs depends on the value of init: 10 if using init='random', 1 if using init='k-means++'."}
 Parameter_3 =  {"Name":"max_iter", "Type": ["int"], "Default_option":300, "Default_value":300, "Possible":["int"], 
@@ -363,6 +371,321 @@ Parameters = {"Parameter_0":Parameter_0, "Parameter_1":Parameter_1,"Parameter_2"
 BernoulliNB_algorithm = MLA(Name, Definition, Parameters)
 
 list_MLAs.append(BernoulliNB_algorithm)
+
+
+
+Name = "MultinomialNB"
+Definition = ["The multinomial Naive Bayes classifier \n is suitable for classification with discrete features (e.g., word counts for text classification). \n The multinomial distribution normally requires integer feature counts. However, in practice, fractional counts such as tf-idf may also work."]
+Parameter_0 =  {
+                "Name":"alpha", 
+                "Type": ["float"], 
+                "Default_option":1.0, 
+                "Default_value":1.0, 
+                "Possible":["float"], 
+               "Definition":"Additive (Laplace/Lidstone) smoothing parameter (set alpha=0 and force_alpha=True, for no smoothing)."
+               }
+Parameter_1 =  {"Name":"force_alpha", 
+                "Type": ["bool"], 
+                "Default_option":False, 
+                "Default_value":False, 
+                "Possible":[True, False], 
+               "Definition":"If False and alpha is less than 1e-10, it will set alpha to 1e-10. If True, alpha will remain unchanged. This may cause numerical errors if alpha is too close to 0."}
+
+Parameter_2 =  {"Name":"fit_prior", 
+                "Type": ["bool"], 
+                "Default_option":True, 
+                "Default_value":True, 
+                "Possible":[True, False], 
+               "Definition":"Whether to learn class prior probabilities or not. If false, a uniform prior will be used."}
+
+Parameters = {"Parameter_0":Parameter_0, "Parameter_1":Parameter_1, "Parameter_2":Parameter_2 }
+
+MultinomialNB_algorithm = MLA(Name, Definition, Parameters)
+
+list_MLAs.append(MultinomialNB_algorithm)
+
+Name = "ComplementNB"
+Definition = ["The Complement Naive Bayes classifier was designed to correct the “severe assumptions” made by the standard Multinomial Naive Bayes classifier. \n It is particularly suited for imbalanced data sets."]
+Parameter_0 =  {
+                "Name":"alpha", 
+                "Type": ["float"], 
+                "Default_option":1.0, 
+                "Default_value":1.0, 
+                "Possible":["float"], 
+               "Definition":"Additive (Laplace/Lidstone) smoothing parameter (set alpha=0 and force_alpha=True, for no smoothing)."
+               }
+Parameter_1 =  {"Name":"force_alpha", 
+                "Type": ["bool"], 
+                "Default_option":False, 
+                "Default_value":False, 
+                "Possible":[True, False], 
+               "Definition":"If False and alpha is less than 1e-10, it will set alpha to 1e-10. If True, alpha will remain unchanged. This may cause numerical errors if alpha is too close to 0."}
+
+Parameter_2 =  {"Name":"fit_prior", 
+                "Type": ["bool"], 
+                "Default_option":True, 
+                "Default_value":True, 
+                "Possible":[True, False], 
+               "Definition":"Only used in edge case with a single class in the training set."}
+
+Parameter_3 =  {"Name":"norm", 
+                "Type": ["bool"], 
+                "Default_option":False, 
+                "Default_value":False, 
+                "Possible":[True, False], 
+               "Definition":"Whether or not a second normalization of the weights is performed. The default behavior mirrors the implementations found in Mahout and Weka, which do not follow the full algorithm described in Table 9 of the paper."}
+
+
+
+
+Parameters = {"Parameter_0":Parameter_0, "Parameter_1":Parameter_1, "Parameter_2":Parameter_2, "Parameter_3" : Parameter_3 }
+
+ComplementNB_algorithm = MLA(Name, Definition, Parameters)
+
+list_MLAs.append(ComplementNB_algorithm)
+
+
+Name = "LogisticRegression"
+Definition = ["Logistic Regression is implemented as a linear model for classification rather than regression"]
+Parameter_0 =  {
+    "Name":"penalty", 
+    "Type": ["option"], 
+    "Default_option":"l2", 
+    "Default_value":"l2", 
+    "Possible":["l1", "l2", "elasticnet", "None"], 
+    "Definition":" Specify the norm of the penalty: \nNone: no penalty is added;\nl2: add a L2 penalty term and it is the default choice;\nl1: add a L1 penalty term;\nelasticnet: both L1 and L2 penalty terms are added."
+    }
+
+Parameter_1 =  {"Name":"dual", 
+                "Type": ["bool"], 
+                "Default_option":False, 
+                "Default_value":False, 
+                "Possible":[True, False], 
+               "Definition":"Dual formulation is only implemented for l2 penalty with liblinear solver. Prefer dual=False when n_samples > n_features."
+               }
+
+Parameter_2 =  {
+                "Name":"tol", 
+                "Type": ["float"], 
+                "Default_option":0.0001, 
+                "Default_value":0.0001, 
+                "Possible":["float"], 
+               "Definition":"Tolerance for stopping criteria."
+               }
+
+Parameter_3 =  {"Name":"C", 
+                "Type": ["float"], 
+                "Default_option":1.0, 
+                "Default_value":1.0, 
+                "Possible":["float"], 
+               "Definition":"Inverse of regularization strength; must be a positive float. Like in support vector machines, smaller values specify stronger regularization."
+               }
+
+
+Parameter_4 =  {"Name":"fit_intercept", 
+                "Type": ["bool"], 
+                "Default_option":True, 
+                "Default_value":True, 
+                "Possible":[True, False], 
+               "Definition":"Specifies if a constant (a.k.a. bias or intercept) should be added to the decision function."
+               }
+
+Parameter_5 =  {"Name":"intercept_scaling", 
+                "Type": ["float"], 
+                "Default_option":1.0, 
+                "Default_value":1.0, 
+                "Possible":["float"], 
+               "Definition":"Useful only when the solver ‘liblinear’ is used and self.fit_intercept is set to True. In this case, x becomes [x, self.intercept_scaling], i.e. a “synthetic” feature with constant value equal to intercept_scaling is appended to the instance vector. The intercept becomes intercept_scaling * synthetic_feature_weight."
+               }
+
+
+# solver{‘lbfgs’, ‘liblinear’, ‘newton-cg’, ‘newton-cholesky’, ‘sag’, ‘saga’}, default=’lbfgs’
+Parameter_6 =  {
+    "Name":"solver", 
+    "Type": ["option"], 
+    "Default_option":"lbfgs", 
+    "Default_value":"lbfgs", 
+    "Possible":["lbfgs", "liblinear", "newton-cg", "newton-cholesky", "sag", "saga"], 
+    "Definition":"Warning The choice of the algorithm depends on the penalty chosen. Supported penalties by solver:‘lbfgs’ - [‘l2’, None]‘liblinear’ - [‘l1’, ‘l2’]‘newton-cg’ - [‘l2’, None]‘newton-cholesky’ - [‘l2’, None]' sag’ - [‘l2’, None]‘saga’ - [‘elasticnet’, ‘l1’, ‘l2’, None]"
+    }
+
+Parameter_7 = {
+               "Name":"max_iter", 
+               "Type": ["int"], 
+               "Default_option":100,
+               "Default_value":100,
+               "Possible":["int"], 
+               "Definition":"Maximum number of iterations taken for the solvers to converge."
+               }
+
+Parameter_8 =  {
+    "Name":"multi_class", 
+    "Type": ["option"], 
+    "Default_option":"auto", 
+    "Default_value":"auto", 
+    "Possible":["auto", "multinomial", "ovr", "auto"], 
+    "Definition":"Specify the norm of the penalty: \nNone: no penalty is added;\nl2: add a L2 penalty term and it is the default choice;\nl1: add a L1 penalty term;\nelasticnet: both L1 and L2 penalty terms are added."
+    }
+
+
+Parameter_9 = {
+               "Name":"verbose", 
+               "Type": ["int"], 
+               "Default_option":0,
+               "Default_value":0,
+               "Possible":["int"], 
+               "Definition":"For the liblinear and lbfgs solvers set verbose to any positive number for verbosity."
+               }
+
+
+Parameter_10 =  {"Name":"warm_start", 
+                "Type": ["bool"], 
+                "Default_option":False, 
+                "Default_value":False, 
+                "Possible":[True, False], 
+               "Definition":"Specifies if a constant (a.k.a. bias or intercept) should be added to the decision function."
+               }
+
+
+
+Parameters = {"Parameter_0":Parameter_0, "Parameter_1":Parameter_1, "Parameter_2":Parameter_2, "Parameter_3" : Parameter_3, "Parameter_4": Parameter_4, "Parameter_5": Parameter_5, "Parameter_6": Parameter_6,
+              "Parameter_7": Parameter_7, "Parameter_8": Parameter_8, "Parameter_9": Parameter_9, "Parameter_10" : Parameter_10 }
+
+LogisticRegressionNB_algorithm = MLA(Name, Definition, Parameters)
+
+list_MLAs.append(LogisticRegressionNB_algorithm)
+
+
+
+
+Name = "Perceptron"
+Definition = ["The Perceptron is another simple classification algorithm suitable for large scale learning"]
+Parameter_0 =  {
+    "Name":"penalty", 
+    "Type": ["option"], 
+    "Default_option":"None", 
+    "Default_value":"None", 
+    "Possible":["l1", "l2", "elasticnet", "None"], 
+    "Definition":" Specify the norm of the penalty: \nNone: no penalty is added;\nl2: add a L2 penalty term and it is the default choice;\nl1: add a L1 penalty term;\nelasticnet: both L1 and L2 penalty terms are added."
+    }
+
+
+Parameter_1 =  {
+                "Name":"alpha", 
+                "Type": ["float"], 
+                "Default_option":0.0001, 
+                "Default_value":0.0001, 
+                "Possible":["float"], 
+               "Definition":"Constant that multiplies the regularization term if regularization is used."
+               }
+
+Parameter_2 =  {
+                "Name":"l1_ratio", 
+                "Type": ["float"], 
+                "Default_option":0.15, 
+                "Default_value":0.15, 
+                "Possible":["float"], 
+               "Definition":"The Elastic Net mixing parameter, with 0 <= l1_ratio <= 1. l1_ratio=0 corresponds to L2 penalty, l1_ratio=1 to L1. Only used if penalty='elasticnet'."
+               }
+
+
+Parameter_3 =  {"Name":"fit_intercept", 
+                "Type": ["bool"], 
+                "Default_option":True, 
+                "Default_value":True, 
+                "Possible":[True, False], 
+               "Definition":"Whether the intercept should be estimated or not. If False, the data is assumed to be already centered."
+               }
+
+
+
+Parameter_4 = {
+               "Name":"max_iter", 
+               "Type": ["int"], 
+               "Default_option":1000,
+               "Default_value":1000,
+               "Possible":["int"], 
+               "Definition":"The maximum number of passes over the training data (aka epochs)."
+               }
+
+
+Parameter_5 =  {
+                "Name":"tol", 
+                "Type": ["float"], 
+                "Default_option":0.0001, 
+                "Default_value":0.0001, 
+                "Possible":["float"], 
+               "Definition":"Tolerance for stopping criteria."
+               }
+
+Parameter_6 =  {"Name":"shuffle", 
+                "Type": ["bool"], 
+                "Default_option":True, 
+                "Default_value":True, 
+                "Possible":[True, False], 
+               "Definition":"Whether or not the training data should be shuffled after each epoch."
+               }
+
+
+Parameter_7 = {
+               "Name":"verbose", 
+               "Type": ["int"], 
+               "Default_option":0,
+               "Default_value":0,
+               "Possible":["int"], 
+               "Definition":"The verbosity level."
+               }
+
+Parameter_8 =  {
+                "Name":"eta0", 
+                "Type": ["float"], 
+                "Default_option":1, 
+                "Default_value":1, 
+                "Possible":["float"], 
+               "Definition":"Constant by which the updates are multiplied."
+               }
+
+Parameter_9 =  {"Name":"early_stopping", 
+                "Type": ["bool"], 
+                "Default_option":False, 
+                "Default_value":True, 
+                "Possible":[True, False], 
+               "Definition":"Whether to use early stopping to terminate training when validation. score is not improving. If set to True, it will automatically set aside a stratified fraction of training data as validation and terminate training when validation score is not improving by at least tol for n_iter_no_change consecutive epochs."
+               }
+
+Parameter_10 =  {
+                "Name":"validation_fraction", 
+                "Type": ["float"], 
+                "Default_option":0.1, 
+                "Default_value":0.1, 
+                "Possible":["float"], 
+               "Definition":"The proportion of training data to set aside as validation set for early stopping. Must be between 0 and 1. Only used if early_stopping is True."
+               }
+
+Parameter_11 = {
+               "Name":"n_iter_no_change", 
+               "Type": ["int"], 
+               "Default_option":5,
+               "Default_value":5,
+               "Possible":["int"], 
+               "Definition":"Number of iterations with no improvement to wait before early stopping."
+               }
+
+Parameter_12 =  {"Name":"warm_start", 
+                "Type": ["bool"], 
+                "Default_option":False, 
+                "Default_value":True, 
+                "Possible":[True, False], 
+               "Definition":"When set to True, reuse the solution of the previous call to fit as initialization, otherwise, just erase the previous solution."
+               }
+
+Parameters = {"Parameter_0":Parameter_0, "Parameter_1":Parameter_1, "Parameter_2":Parameter_2, "Parameter_3" : Parameter_3, "Parameter_4": Parameter_4, "Parameter_5": Parameter_5, "Parameter_6": Parameter_6,
+              "Parameter_7": Parameter_7, "Parameter_8": Parameter_8, "Parameter_9": Parameter_9, "Parameter_10" : Parameter_10, "Parameter_11" : Parameter_11, "Parameter_12" : Parameter_12 }
+
+Perceptron_algorithm = MLA(Name, Definition, Parameters)
+
+list_MLAs.append(Perceptron_algorithm)
+
 
 def getMLAs():
     return list_MLAs
@@ -564,5 +887,45 @@ def createModel(data):
                             force_alpha=settings['Parameter_1'],
                             binarize=settings['Parameter_2'],
                             fit_prior=settings['Parameter_3'])
+    
+    elif data["MLalgorithm"] == "MultinomialNB":
+        model = MultinomialNB(alpha=settings['Parameter_0'],
+                            force_alpha=settings['Parameter_1'],
+                            fit_prior=settings['Parameter_2'])
+    
+    elif data["MLalgorithm"] == "ComplementNB":
+        model = ComplementNB(alpha = settings['Parameter_0'],
+                            force_alpha = settings['Parameter_1'],
+                            fit_prior = settings['Parameter_2'],
+                            norm = settings['Parameter_3'])
+    
+    elif data["MLalgorithm"] == "LogisticRegression":
+        model = LogisticRegression(penalty = settings['Parameter_0'],
+                                   dual = settings["Parameter_1"],
+                                   tol = settings["Parameter_2"],
+                                   C = settings["Parameter_3"],
+                                   fit_intercept = settings["Parameter_4"],
+                                   intercept_scaling = settings["Parameter_5"],
+                                   solver = settings["Parameter_6"],
+                                   max_iter = settings["Parameter_7"],
+                                   multi_class = settings["Parameter_8"],
+                                   verbose = settings["Parameter_9"],
+                                   warm_start = settings["Parameter_10"])
+    
+    elif data["MLalgorithm"] == "Perceptron":
+        model = Perceptron(penalty = settings['Parameter_0'],
+                                   alpha = settings["Parameter_1"],
+                                   l1_ratio = settings["Parameter_2"],
+                                   fit_intercept = settings["Parameter_3"],
+                                   max_iter = settings["Parameter_4"],
+                                   tol = settings["Parameter_5"],
+                                   shuffle = settings["Parameter_6"],
+                                   verbose = settings["Parameter_7"],
+                                   eta0 = settings["Parameter_8"],
+                                   early_stopping = settings["Parameter_9"],
+                                   validation_fraction = settings["Parameter_10"],
+                                   n_iter_no_change = settings["Parameter_11"],
+                                   warm_start = settings["Parameter_12"])
+          
         
     return model, settings
