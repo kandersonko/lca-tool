@@ -1718,9 +1718,34 @@ function selectLayers(Layer, ID_Layer) {
                     }
                 }
                 // TO DO LATER: Add button to remove the individual NN layer.
+                
+
+
+                var divElement = document.createElement("div");
+                    divElement.className = "flex items-center";
+
+                    // Create the first horizontal line
+                    var hrElement1 = document.createElement("hr");
+                    hrElement1.className = "flex-grow border-t border-green-300";
+
+                    // Create a span element with text
+                    var spanElement = document.createElement("span");
+                    spanElement.className = "px-3 text-green-500";
+                    spanElement.textContent = Layer_name;
+
+                    // Create the second horizontal line
+                    var hrElement2 = document.createElement("hr");
+                    hrElement2.className = "flex-grow border-t border-green-300";
+
+                    // Append these elements to the div in the desired order
+                    divElement.appendChild(hrElement1);
+                    divElement.appendChild(spanElement);
+                    divElement.appendChild(hrElement2);
 
                 // add field to div section
+                html_section.appendChild(divElement)
                 html_section.appendChild(field)
+                
 
             }
         });
