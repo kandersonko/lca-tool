@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from backend.Classes.NeuralNetworkFiles import Core
 from backend.Classes.NeuralNetworkFiles import Convolution
 from backend.Classes.NeuralNetworkFiles import Normalization
+from backend.Classes.NeuralNetworkFiles import Regularization
 
 from tensorflow import keras
 
@@ -61,10 +62,18 @@ Definition = ["Normalization layers."]
 
 list_Layer_Categories.append(Layer_Category(Name, Display_Name, Definition))
 
+## Regularization layers
+Name = "Regularization"
+Display_Name = "Regularization"
+Definition = ["Regularization layers."]
+
+list_Layer_Categories.append(Layer_Category(Name, Display_Name, Definition))
+
 # obtain the list of Layers from all categories via their separate python files
 list_Core = Core.getCore()
 list_Convolution = Convolution.getConvolution()
 list_Normalization = Normalization.getNormalization()
+list_Regularization = Regularization.getRegularization()
 
 
 # Methods to process the Neural Network options.
@@ -80,6 +89,9 @@ def getCategoryLayers(Category_Name):
 
     if Category_Name == "Normalization":
         layers = list_Normalization
+    
+    if Category_Name == "Regularization":
+        layers = list_Regularization
 
     for layer in layers:
         layer_info = {"Name": layer.getName(), "Display_Name": layer.getDisplayName()}
@@ -90,7 +102,7 @@ def getCategoryLayers(Category_Name):
 # Method to pull all parameters from a given layer option
 def getParameters(Layer_Name):
     Parameters = {}
-    
+
     # Check Core
     for layer in list_Core:
         if layer.getName() == Layer_Name:
@@ -105,6 +117,12 @@ def getParameters(Layer_Name):
 
     # Check Normalization
     for layer in list_Normalization:
+        if layer.getName() == Layer_Name:
+            Parameters = layer.getParameters()
+            return Parameters
+        
+    # Check Regularization
+    for layer in list_Regularization:
         if layer.getName() == Layer_Name:
             Parameters = layer.getParameters()
             return Parameters
@@ -141,6 +159,14 @@ def get_Layer(data, i):
         for layers in list_Normalization:
             if layer == layers.getName():
                 new_layer = Normalization.create_Layer(data, i)
+                found = 1
+                break
+
+    ## Regularization options
+    if found == 0:
+        for layers in list_Regularization:
+            if layer == layers.getName():
+                new_layer = Regularization.create_Layer(data, i)
                 found = 1
                 break
 
