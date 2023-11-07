@@ -645,6 +645,7 @@ Parameter_8 =  {
                "Definition":"Constant by which the updates are multiplied."
                }
 
+
 Parameter_9 =  {"Name":"early_stopping", 
                 "Type": ["bool"], 
                 "Default_option":False, 
@@ -678,9 +679,15 @@ Parameter_12 =  {"Name":"warm_start",
                 "Possible":[True, False], 
                "Definition":"When set to True, reuse the solution of the previous call to fit as initialization, otherwise, just erase the previous solution."
                }
+Parameter_13 =  {"Name":"random_state",
+                "Type": ["int_or_null"], 
+                "Default_option":0, 
+                "Default_value":0,
+                "Possible":["int"], 
+                "Definition":"Used to shuffle the training data, when shuffle is set to True. Pass an int for reproducible output across multiple function calls."}
 
 Parameters = {"Parameter_0":Parameter_0, "Parameter_1":Parameter_1, "Parameter_2":Parameter_2, "Parameter_3" : Parameter_3, "Parameter_4": Parameter_4, "Parameter_5": Parameter_5, "Parameter_6": Parameter_6,
-              "Parameter_7": Parameter_7, "Parameter_8": Parameter_8, "Parameter_9": Parameter_9, "Parameter_10" : Parameter_10, "Parameter_11" : Parameter_11, "Parameter_12" : Parameter_12 }
+              "Parameter_7": Parameter_7, "Parameter_8": Parameter_8, "Parameter_9": Parameter_9, "Parameter_10" : Parameter_10, "Parameter_11" : Parameter_11, "Parameter_12" : Parameter_12, "Parameter_13" : Parameter_13 }
 
 Perceptron_algorithm = MLA(Name, Definition, Parameters)
 
