@@ -542,7 +542,7 @@ def getPreoptParameters():
 @bp.route("/getLayerParameters", methods=["POST"])
 def getLayerParameters():
     output = request.get_json()
-    data = json.loads(output)
+    data = json.loads(output)        # This line parses the JSON data retrieved from the request and converts it into a Python dictionary. The json.loads() function is used to deserialize the JSON string.
 
     Parameters = NeuralNetwork.getParameters(data["Layer"])
 

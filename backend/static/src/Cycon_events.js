@@ -187,8 +187,8 @@ function changeAlgorithm(algorithms, ID_Parameters) {
             // create title for the field.
             var legend = document.createElement('legend');
             legend_text = document.createTextNode(algorithm_name);
-            legend.appendChild(legend_text);
-            field.appendChild(legend);
+            // legend.appendChild(legend_text);
+            // field.appendChild(legend);
 
             for (var Parameter in data) {
                 //document.getElementById("Results").innerHTML += data[Parameter]["Name"] + " ";
@@ -231,6 +231,33 @@ function changeAlgorithm(algorithms, ID_Parameters) {
                     fillSection(field, data, Parameter, ID_Parameters, 0,)
                 }
             }
+            var divElement = document.createElement("div");
+                    divElement.className = "flex items-center";
+
+                    // Create the first horizontal line
+                    var hrElement1 = document.createElement("hr");
+                    hrElement1.className = "flex-grow border-t border-green-500 border-3";
+                    hrElement1.style.borderWidth = "1px";
+
+                    // Create a span element with text
+                    var spanElement = document.createElement("span");
+                    spanElement.className = "px-3 text-green-500";
+                    spanElement.textContent = algorithm_name;
+
+                    // Create the second horizontal line
+                    var hrElement2 = document.createElement("hr");
+                    hrElement2.className = "flex-grow border-t border-green-500 border-3";
+                    hrElement2.style.borderWidth = "1px";
+
+                    // Append these elements to the div in the desired order
+                    divElement.appendChild(hrElement1);
+                    divElement.appendChild(spanElement);
+                    divElement.appendChild(hrElement2);
+
+                // add field to div section
+                html_section.appendChild(divElement)
+                // add field to div section
+                html_section.appendChild(field)
 
             html_section.appendChild(field)
         }
@@ -857,31 +884,64 @@ document.getElementById("resultForm").addEventListener("submit", function (e) {
 
 
 
+
 function generatePDF(form) {
-
-    let element = document.getElementById('Results')
-
-
-    html2pdf(element, {
+    let element = document.getElementById('Results');
+  
+    html2pdf()
+      .set({
         margin: 10,
         filename: "Results.pdf",
         image: { type: 'jpeg', quality: 2 },
         html2canvas: { dpi: 300, letterRendering: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    }).get('pdf').then(function (pdf) {
+      })
+      .from(element)
+      .toPdf()
+      .get('pdf').then(function (pdf) {
         var totalPages = pdf.internal.getNumberOfPages();
-
+  
         for (let i = 1; i <= totalPages; i++) {
-            pdf.setPage(i);
-            pdf.setFontSize(10);
-            pdf.setTextColor(150);
-            // Add you content in place of example here
-            pdf.text("Created using the IDeaL Cycon Tool: https://cycon.nkn.uidaho.edu/cycon", pdf.internal.pageSize.getWidth() - 120, pdf.internal.pageSize.getHeight() - 10);
+          pdf.setPage(i);
+          pdf.setFontSize(10);
+          pdf.setTextColor(150);
+          // Add your footer content here
+          pdf.text("Created using the Ideal Cycon Tool: https://cycon.nkn.uidaho.edu/cycon", pdf.internal.pageSize.getWidth() - 120, pdf.internal.pageSize.getHeight() - 10);
         }
-    });
+  
+        // Save the PDF with the footer
+        pdf.save();
+      });
+  }
 
-}
+
+// function generatePDF(form) {
+
+//     let element = document.getElementById('Results')
+
+
+//     html2pdf(element, {
+//         margin: 10,
+//         filename: "Results.pdf",
+//         image: { type: 'jpeg', quality: 2 },
+//         html2canvas: { dpi: 300, letterRendering: true },
+//         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+//         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+//     }).get('pdf').then(function (pdf) {
+//         var totalPages = pdf.internal.getNumberOfPages();
+
+//         for (let i = 1; i <= totalPages; i++) {
+//             pdf.setPage(i);
+//             pdf.setFontSize(10);
+//             pdf.setTextColor(150);
+//             // Add you content in place of example here
+//             pdf.text("Created using the Ideal Cycon Tool: https://cycon.nkn.uidaho.edu/cycon", pdf.internal.pageSize.getWidth() - 120, pdf.internal.pageSize.getHeight() - 10);
+//         }
+//         pdf.save();
+//     });
+
+// }
 
 // When the user clicks on div, open the popup
 function popupInformation(id) {
@@ -1300,8 +1360,8 @@ function selectPreopt(Preopt, ID_Preopt) {
                 // create title for the field.
                 var legend = document.createElement('legend');
                 legend_text = document.createTextNode(Preopt_name);
-                legend.appendChild(legend_text);
-                field.appendChild(legend);
+                // legend.appendChild(legend_text);
+                // field.appendChild(legend);
 
                 // Create a hidden value that will contain the selected parameter name.
                 var textbox = document.createElement("input");
@@ -1311,7 +1371,7 @@ function selectPreopt(Preopt, ID_Preopt) {
                 textbox.style.display = "none";
 
                 field.appendChild(textbox);
-
+                
                 // Create option to edit the parameter for the preoptimization option.
                 for (var Parameter in data) {
 
@@ -1355,7 +1415,32 @@ function selectPreopt(Preopt, ID_Preopt) {
                     }
                 }
                 // TO DO LATER: Add button to remove the individual preoptimization parameter.
+            
+                var divElement = document.createElement("div");
+                    divElement.className = "flex items-center";
 
+                    // Create the first horizontal line
+                    var hrElement1 = document.createElement("hr");
+                    hrElement1.className = "flex-grow border-t border-green-500 border-3";
+                    hrElement1.style.borderWidth = "1px";
+
+                    // Create a span element with text
+                    var spanElement = document.createElement("span");
+                    spanElement.className = "px-3 text-green-500";
+                    spanElement.textContent = Preopt_name;
+
+                    // Create the second horizontal line
+                    var hrElement2 = document.createElement("hr");
+                    hrElement2.className = "flex-grow border-t border-green-500 border-3";
+                    hrElement2.style.borderWidth = "1px";
+
+                    // Append these elements to the div in the desired order
+                    divElement.appendChild(hrElement1);
+                    divElement.appendChild(spanElement);
+                    divElement.appendChild(hrElement2);
+
+                // add field to div section
+                html_section.appendChild(divElement)
                 // add field to div section
                 html_section.appendChild(field)
 
@@ -1656,23 +1741,24 @@ function selectLayers(Layer, ID_Layer) {
             dataType: 'json',
             success: function (data) {
                 // Create the html section to place in the cycon page.
+            
                 var html_section = document.getElementById(ID_Layer);
 
                 // create the field box for the new layer option.
                 var field = document.createElement('fieldset');
                 // create title for the field.
-                var legend = document.createElement('legend');
-                legend_text = document.createTextNode(Layer_name);
-                legend.appendChild(legend_text);
-                field.appendChild(legend);
-
+                // var legend = document.createElement('legend');
+                // legend_text = document.createTextNode(Layer_name);
+                // legend.appendChild(legend_text);
+                // field.appendChild(legend);
+               
                 // Create a hidden value that will contain the selected parameter name.
                 var textbox = document.createElement("input");
                 textbox.type = "text";
                 textbox.name = "Layer_" + layerCounter;
                 textbox.value = Layer_value;
                 textbox.style.display = "none";
-
+            
                 field.appendChild(textbox);
 
                 // Create option to edit the parameter for the NN layer option.
@@ -1687,7 +1773,7 @@ function selectLayers(Layer, ID_Layer) {
                         label.htmlFor = name_label;
                         label.appendChild(document.createTextNode(name_label));
                         let id_info = data[Parameter]["Name"] + "_Info";
-
+                        
                         field.appendChild(label);
 
                         // Create popup information.
@@ -1726,7 +1812,8 @@ function selectLayers(Layer, ID_Layer) {
 
                     // Create the first horizontal line
                     var hrElement1 = document.createElement("hr");
-                    hrElement1.className = "flex-grow border-t border-green-300";
+                    hrElement1.className = "flex-grow border-t border-green-500 border-3";
+                    hrElement1.style.borderWidth = "1px";
 
                     // Create a span element with text
                     var spanElement = document.createElement("span");
@@ -1735,7 +1822,8 @@ function selectLayers(Layer, ID_Layer) {
 
                     // Create the second horizontal line
                     var hrElement2 = document.createElement("hr");
-                    hrElement2.className = "flex-grow border-t border-green-300";
+                    hrElement2.className = "flex-grow border-t border-green-500 border-3";
+                    hrElement2.style.borderWidth = "1px";
 
                     // Append these elements to the div in the desired order
                     divElement.appendChild(hrElement1);
